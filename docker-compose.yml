@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      target: build
+    working_dir: /app
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/pom.xml:/app/pom.xml
+      - maven_repo:/root/.m2
+    ports:
+      - "4567:4567"
+    command: mvn compile exec:java -Dexec.mainClass=com.nemouw.App
+
+volumes:
+  maven_repo:

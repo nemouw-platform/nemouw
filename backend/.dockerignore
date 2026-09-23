@@ -1,0 +1,11 @@
+# IDE & Version Control
+.idea/
+*.iml
+.git/
+
+# Build Outputs (Local Maven builds)
+target/
+
+# Docker configuration itself
+Dockerfile
+.dockerignore
