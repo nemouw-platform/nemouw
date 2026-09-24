@@ -8,9 +8,10 @@ services:
       - ./backend/src:/app/src
       - ./backend/pom.xml:/app/pom.xml
       - maven_repo:/root/.m2
+      - ./.env:/app/.env:ro
     ports:
       - "4567:4567"
-    command: mvn compile exec:java -Dexec.mainClass=com.nemouw.App
+    command: mvn compile exec:java -Dexec.mainClass=com.nemouw.Main
     depends_on:
       db:
         condition: service_healthy
