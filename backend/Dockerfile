@@ -15,7 +15,7 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-COPY --from=build /app/target/nemouw-backend-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/nemouw-backend-1.0-SNAPSHOT.jar /app/backend.jar
 
 EXPOSE 4567
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/backend.jar"]

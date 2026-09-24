@@ -1,3 +1,8 @@
+# Env files
+.env
+.env.*
+!.env.example
+
 # Target build artifacts
 **/target/
 *.jar

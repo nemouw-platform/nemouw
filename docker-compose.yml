@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       target: build
-    working_dir: /app
+    env_file: .env
     volumes:
       - ./backend/src:/app/src
       - ./backend/pom.xml:/app/pom.xml
@@ -11,6 +11,23 @@ services:
     ports:
       - "4567:4567"
     command: mvn compile exec:java -Dexec.mainClass=com.nemouw.App
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    env_file: .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   maven_repo:
+  postgres_data:
