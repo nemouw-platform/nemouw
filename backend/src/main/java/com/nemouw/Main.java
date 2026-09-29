@@ -5,6 +5,9 @@ import static spark.Spark.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.nemouw.database.DatabaseInit.initializeDB;
 
@@ -20,10 +23,14 @@ public class Main {
         enableCORS();
         runDdosShield();
 
-        // Simple Endpoint to verify Spark Java server is alive
-        get("/api/health", (req, res) -> {
+        // Simple Endpoint to verify JDBI works
+        get("/api/debug/roles", (req, res) -> {
             res.type("application/json");
-            return "{\"status\":\"healthy\",\"server\":\"connected\",\"database\":\"active\"}";
+            java.util.List<String> codes = com.nemouw.database.DatabaseConnection.jdbi().withHandle(handle ->
+                    handle.createQuery("SELECT code FROM user_roles ORDER BY code")
+                            .mapTo(String.class)
+                            .list());
+            return "[\"" + String.join("\",\"", codes) + "\"]";
         });
     }
 
@@ -46,25 +53,12 @@ public class Main {
             }
         });
 
-        // Background thread to reset the rate limits every minute
-        Thread cleanerThread = createCleanerThread(accessPerMinute);
-        cleanerThread.start();
-    }
-
-    private static Thread createCleanerThread(Map<String, Integer> accessPerMinute) {
-        Thread cleanerThread = new Thread(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    Thread.sleep(60000);
-                    accessPerMinute.clear();
-                } catch (InterruptedException e) {
-                    // Re-interrupt the thread and exit loop cleanly instead of burning CPU 100%
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
+        // Reset the rate limits every minute on a single daemon thread
+        ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "ddos-shield-cleaner");
+            t.setDaemon(true); // Allows JVM to shut down cleanly if needed
+            return t;
         });
-        cleanerThread.setDaemon(true); // Allows JVM to shut down cleanly if needed
-        return cleanerThread;
+        cleaner.scheduleAtFixedRate(accessPerMinute::clear, 1, 1, TimeUnit.MINUTES);
     }
 }
