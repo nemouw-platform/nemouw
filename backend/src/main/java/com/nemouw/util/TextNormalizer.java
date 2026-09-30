@@ -1,12 +1,17 @@
-package com.nemouw.helper;
+package com.nemouw.util;
 
 import java.text.Normalizer;
+import java.util.Locale;
 
 public class TextNormalizer {
     private TextNormalizer() {}
 
-    /** The one canonical form used for validating AND hashing passwords. */
+    /** nfkc is used for validating AND hashing passwords. */
     public static String nfkc(String password) {
         return Normalizer.normalize(password, Normalizer.Form.NFKC);
+    }
+
+    public static String email(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }

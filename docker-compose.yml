@@ -9,6 +9,7 @@ services:
       - ./backend/pom.xml:/app/pom.xml
       - maven_repo:/root/.m2
       - ./.env:/app/.env:ro
+      - ./backend/logs:/app/logs
     ports:
       - "4567:4567"
     command: mvn compile exec:java -Dexec.mainClass=com.nemouw.Main

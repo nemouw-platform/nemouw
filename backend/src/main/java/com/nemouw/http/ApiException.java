@@ -10,36 +10,42 @@ public class ApiException extends RuntimeException {
     private final int status;
     private final String code;
     private final List<FieldError> errors;
+    private final Integer retryAfterSeconds;
 
-    private ApiException(int status, String code, String message, List<FieldError> errors) {
+    private ApiException(int status, String code, String message, List<FieldError> errors, Integer retryAfter) {
         super(message);
         this.status = status;
         this.code = code;
         this.errors = errors;
+        this.retryAfterSeconds = retryAfter;
     }
 
     public static ApiException badRequest(String code, String msg) {
-        return new ApiException(400, code, msg, List.of());
+        return new ApiException(400, code, msg, List.of(), null);
     }
 
     public static ApiException unauthorized(String code, String msg) {
-        return new ApiException(401, code, msg, List.of());
+        return new ApiException(401, code, msg, List.of(), null);
     }
 
     public static ApiException forbidden(String code, String msg) {
-        return new ApiException(403, code, msg, List.of());
+        return new ApiException(403, code, msg, List.of(), null);
     }
 
     public static ApiException notFound(String code, String msg) {
-        return new ApiException(404, code, msg, List.of());
+        return new ApiException(404, code, msg, List.of(), null);
     }
 
     public static ApiException conflict(String code, String msg) {
-        return new ApiException(409, code, msg, List.of());
+        return new ApiException(409, code, msg, List.of(), null);
     }
 
     public static ApiException validation(List<FieldError> errors) {
-        return new ApiException(422, "VALIDATION_ERROR", "Validation failed", errors);
+        return new ApiException(422, "VALIDATION_ERROR", "Validation failed", errors, null);
+    }
+
+    public static ApiException tooManyRequests(int retryAfter) {
+        return new ApiException(429, "RATE_LIMITED", "Too many requests", List.of(), retryAfter);
     }
 
     public int status() {
@@ -52,5 +58,9 @@ public class ApiException extends RuntimeException {
 
     public List<FieldError> errors() {
         return errors;
+    }
+
+    public Integer retryAfterSeconds() {
+        return retryAfterSeconds;
     }
 }

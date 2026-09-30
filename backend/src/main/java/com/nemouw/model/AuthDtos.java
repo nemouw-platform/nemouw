@@ -18,4 +18,7 @@ public final class AuthDtos {
 
     public record AuthTokens(String accessToken, String refreshToken, String tokenType, int expiresIn) {
     }
+
+    public record ResendOtpRequest(String email) {
+    }
 }

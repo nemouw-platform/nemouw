@@ -15,10 +15,12 @@ import static spark.Spark.*;
 public final class ErrorHandling {
     private static final Logger log = LogManager.getLogger(ErrorHandling.class);
 
-    private ErrorHandling() {}
+    private ErrorHandling() {
+    }
 
     public record ErrorBody(int status, String code, String message, String traceId,
-                            @JsonInclude(JsonInclude.Include.NON_EMPTY) List<ApiException.FieldError> errors) {}
+                            @JsonInclude(JsonInclude.Include.NON_EMPTY) List<ApiException.FieldError> errors) {
+    }
 
     public static void install() {
         before((req, res) -> {
@@ -34,6 +36,12 @@ public final class ErrorHandling {
         exception(Exception.class, (e, req, res) -> {
             log.error("Unhandled exception", e);
             write(req, res, 500, "INTERNAL_ERROR", "Something went wrong", List.of());
+        });
+
+        exception(ApiException.class, (e, req, res) -> {
+            if (e.retryAfterSeconds() != null) res.header("Retry-After", String.valueOf(e.retryAfterSeconds()));
+            log.info("api_error code={} status={}", e.code(), e.status());
+            write(req, res, e.status(), e.code(), e.getMessage(), e.errors());
         });
 
         notFound((req, res) -> {

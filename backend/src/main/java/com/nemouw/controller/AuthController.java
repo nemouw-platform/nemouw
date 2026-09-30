@@ -2,6 +2,7 @@ package com.nemouw.controller;
 
 import com.nemouw.http.Json;
 import com.nemouw.http.route.Routes;
+import com.nemouw.model.AuthDtos.ResendOtpRequest;
 import com.nemouw.model.AuthDtos.VerifyOtpRequest;
 import com.nemouw.model.AuthDtos.SignupRequest;
 import com.nemouw.service.AuthService;
@@ -22,8 +23,13 @@ public class AuthController {
             post("/signup", Routes.json(201, (req, res) ->
                     auth.signup(Json.read(req.body(), SignupRequest.class))));
 
-            post("/signup/verify-otp", Routes.json(200, (req, res) ->
+            post("/verify-otp", Routes.json(200, (req, res) ->
                     auth.verifyOtp(Json.read(req.body(), VerifyOtpRequest.class), clientIp(req), req.userAgent())));
+
+            post("/resend-otp", Routes.json(202, (req, res) -> {
+                auth.resendOtp(Json.read(req.body(), ResendOtpRequest.class));
+                return null;
+            }));
         });
     }
 

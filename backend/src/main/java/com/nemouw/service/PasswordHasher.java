@@ -1,7 +1,7 @@
 package com.nemouw.service;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.nemouw.helper.TextNormalizer;
+import com.nemouw.util.TextNormalizer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

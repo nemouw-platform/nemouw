@@ -33,6 +33,7 @@ nbrls/
 # Log files
 *.log
 logs/
+backend/logs/
 
 # OS-specific files
 .DS_Store

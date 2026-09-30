@@ -1,6 +1,6 @@
 package com.nemouw.http.validation;
 
-import com.nemouw.helper.TextNormalizer;
+import com.nemouw.util.TextNormalizer;
 import com.nemouw.http.ApiException.FieldError;
 
 import java.io.BufferedReader;
