@@ -1,5 +1,16 @@
 package com.nemouw;
 
+import com.nemouw.controller.AuthController;
+import com.nemouw.database.DatabaseConnection;
+import com.nemouw.http.ErrorHandling;
+import com.nemouw.repository.UserRepository;
+import com.nemouw.repository.VerificationTokenRepository;
+import com.nemouw.service.AuthService;
+import com.nemouw.service.LoggingEmailSender;
+import com.nemouw.service.OtpService;
+import com.nemouw.service.PasswordHasher;
+import io.github.cdimascio.dotenv.Dotenv;
+
 import static com.nemouw.http.CORSFilter.enableCORS;
 import static spark.Spark.*;
 
@@ -20,20 +31,17 @@ public class Main {
         // Open HTTP Server Ports and Configurations
         port(4567);
 
+        ErrorHandling.install();
+
         enableCORS();
         runDdosShield();
 
-        // Simple Endpoint to verify JDBI works
-        get("/api/debug/roles", (req, res) -> {
-            res.type("application/json");
-            java.util.List<String> codes = com.nemouw.database.DatabaseConnection.jdbi().withHandle(handle ->
-                    handle.createQuery("SELECT code FROM user_roles ORDER BY code")
-                            .mapTo(String.class)
-                            .list());
-            return "[\"" + String.join("\",\"", codes) + "\"]";
-        });
+        // Endpoints to test
+        Dotenv env = Dotenv.load();
+        new AuthController(new AuthService(
+                DatabaseConnection.jdbi(), new UserRepository(), new VerificationTokenRepository(),
+                new PasswordHasher(), new OtpService(env.get("OTP_SECRET")), new LoggingEmailSender())).register();
     }
-
 
     /**
      * In-memory DDoS Rate Limiter

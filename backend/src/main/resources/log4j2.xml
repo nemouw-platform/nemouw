@@ -1,28 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <!-- Console Appender -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{trace_id}] %logger{36} - %msg%n"/>
         </Console>
-        <!-- File Appender for all logs -->
-        <File name="LogFile" fileName="logs/app.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
-        </File>
-        <!-- File Appender for ERROR logs -->
-        <File name="ErrorFile" fileName="logs/errors.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
-        </File>
+
+        <RollingFile name="LogFile" fileName="logs/app.log"
+                     filePattern="logs/app-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{trace_id}] %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="14"/>
+        </RollingFile>
+
+        <RollingFile name="ErrorFile" fileName="logs/errors.log"
+                     filePattern="logs/errors-%d{yyyy-MM-dd}-%i.log.gz">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{trace_id}] %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="14"/>
+        </RollingFile>
     </Appenders>
+
     <Loggers>
-        <!-- Root Logger -->
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="LogFile"/>
-        </Root>
-        <!-- Logger for capturing ERROR level logs -->
-        <Logger name="ErrorLogger" level="error" additivity="false">
             <AppenderRef ref="ErrorFile"/>
-        </Logger>
+        </Root>
     </Loggers>
 </Configuration>
