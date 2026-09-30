@@ -15,12 +15,12 @@ public class OtpService {
 
     public OtpService(String hmacSecret) {
         if (hmacSecret == null || hmacSecret.length() < 32)
-            throw new IllegalStateException("OTP_SECRET must be at least 32 characters");
+            throw new IllegalStateException("OTP_HASH_SECRET must be at least 32 characters");
         this.key = hmacSecret.getBytes(StandardCharsets.UTF_8);
     }
 
     public String generateCode() {
-        return String.format("%06d", random.nextInt(1_000_000));   // keeps leading zeros: "004821"
+        return String.format("%06d", random.nextInt(1_000_000));
     }
 
     public String hash(UUID userId, String code) {
@@ -33,7 +33,6 @@ public class OtpService {
         }
     }
 
-    /** Constant-time comparison. Used in Step 6. */
     public boolean matches(UUID userId, String code, String storedHash) {
         return MessageDigest.isEqual(
                 hash(userId, code).getBytes(StandardCharsets.UTF_8),

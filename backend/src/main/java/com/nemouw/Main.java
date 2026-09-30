@@ -3,12 +3,10 @@ package com.nemouw;
 import com.nemouw.controller.AuthController;
 import com.nemouw.database.DatabaseConnection;
 import com.nemouw.http.ErrorHandling;
+import com.nemouw.repository.SessionRepository;
 import com.nemouw.repository.UserRepository;
 import com.nemouw.repository.VerificationTokenRepository;
-import com.nemouw.service.AuthService;
-import com.nemouw.service.LoggingEmailSender;
-import com.nemouw.service.OtpService;
-import com.nemouw.service.PasswordHasher;
+import com.nemouw.service.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import static com.nemouw.http.CORSFilter.enableCORS;
@@ -38,9 +36,12 @@ public class Main {
 
         // Endpoints to test
         Dotenv env = Dotenv.load();
+        SessionRepository sessions = new SessionRepository();
+        TokenService tokenService = new TokenService(sessions, env.get("JWT_SECRET"));
         new AuthController(new AuthService(
                 DatabaseConnection.jdbi(), new UserRepository(), new VerificationTokenRepository(),
-                new PasswordHasher(), new OtpService(env.get("OTP_SECRET")), new LoggingEmailSender())).register();
+                new PasswordHasher(), new OtpService(env.get("OTP_HASH_SECRET")), tokenService,
+                new LoggingEmailSender())).register();
     }
 
     /**

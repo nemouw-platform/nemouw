@@ -5,22 +5,19 @@ import com.nemouw.enums.UserRole;
 import com.nemouw.enums.VerificationPurpose;
 import com.nemouw.http.ApiException;
 import com.nemouw.http.validation.Validator;
-import com.nemouw.model.AuthDtos.SignupRequest;
-import com.nemouw.model.AuthDtos.SignupResponse;
+import com.nemouw.model.AuthDtos.*;
 import com.nemouw.repository.UserRepository;
 import com.nemouw.repository.VerificationTokenRepository;
 import org.jdbi.v3.core.Jdbi;
 
 import java.time.OffsetDateTime;
-import java.util.EnumSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class AuthService {
     /** Roles a visitor may pick for themselves at signup. Everything else is assigned by an admin. */
     private static final Set<UserRole> SELF_REGISTERABLE = EnumSet.of(UserRole.SPECIALIST);
     private static final int OTP_TTL_SECONDS = 600;   // 10 minutes
+    private static final int OTP_MAX_ATTEMPTS = 5;
 
     private final Jdbi jdbi;
     private final UserRepository users;
@@ -28,15 +25,18 @@ public class AuthService {
     private final VerificationTokenRepository tokens;
     private final OtpService otp;
     private final EmailSender emailSender;
+    private final TokenService tokenService;
 
 
     public AuthService(Jdbi jdbi, UserRepository users, VerificationTokenRepository tokens,
-                       PasswordHasher hasher, OtpService otp, EmailSender emailSender) {
+                       PasswordHasher hasher, OtpService otp, TokenService tokenService,
+                       EmailSender emailSender) {
         this.jdbi = jdbi;
         this.users = users;
         this.tokens = tokens;
         this.hasher = hasher;
         this.otp = otp;
+        this.tokenService = tokenService;
         this.emailSender = emailSender;
     }
 
@@ -78,6 +78,38 @@ public class AuthService {
 
         emailSender.sendSignupOtp(email, code, created.expiresAt());
         return new SignupResponse(created.userId(), email, created.expiresAt());
+    }
+
+    public AuthTokens verifyOtp(VerifyOtpRequest req, String ip, String userAgent) {
+        new Validator()
+                .required("email", req.email()).email("email", req.email())
+                .required("code", req.code())
+                .check(req.code() == null || req.code().matches("\\d{6}"), "code", "INVALID_FORMAT", "must be 6 digits")
+                .throwIfInvalid();
+
+        String email = req.email().trim().toLowerCase(Locale.ROOT);
+        var identity = jdbi.withHandle(h -> users.findByEmail(h, email)).orElse(null);
+        if (identity == null) {
+            // Same answer as a wrong or expired code, so this endpoint cannot be used to test whether an email is registered
+            throw ApiException.badRequest("INVALID_OR_EXPIRED_TOKEN", "Code is invalid, expired, or locked");
+        }
+
+        // A wrong code must NOT throw in here: that would roll back the spent attempt.
+        // Return empty, let the transaction commit, then throw below.
+        Optional<AuthTokens> result = jdbi.inTransaction(h -> {
+            var claimed = tokens.claimAttempt(h, identity.userId(), VerificationPurpose.SIGNUP_OTP, OTP_MAX_ATTEMPTS);
+            if (claimed.isEmpty()
+                    || !"pending".equals(identity.status())
+                    || !otp.matches(identity.userId(), req.code(), claimed.get().tokenHash())) {
+                return Optional.empty();
+            }
+            tokens.consume(h, claimed.get().id());
+            users.activate(h, identity.userId(), identity.identifierId());
+            return Optional.of(tokenService.issue(h, identity.userId(), identity.roleCode(), userAgent, ip));
+        });
+
+        return result.orElseThrow(() ->
+                ApiException.badRequest("INVALID_OR_EXPIRED_TOKEN", "Code is invalid, expired, or locked"));
     }
 
     private static String emailLocalPart(String email) {
