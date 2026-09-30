@@ -37,3 +37,6 @@ logs/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Ignore any zip files
+*.zip
