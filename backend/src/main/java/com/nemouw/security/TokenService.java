@@ -1,4 +1,4 @@
-package com.nemouw.service;
+package com.nemouw.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -15,17 +15,16 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.UUID;
 
-public class TokenService {
-    public static final int ACCESS_TTL_SECONDS = 900;
-    public static final int REFRESH_TTL_DAYS = 30;
+import static com.nemouw.Constants.*;
 
+public class TokenService {
     private final SecureRandom random = new SecureRandom();
     private final SessionRepository sessions;
     private final Algorithm algorithm;
 
     public TokenService(SessionRepository sessions, String jwtSecret) {
-        if (jwtSecret == null || jwtSecret.length() < 32)
-            throw new IllegalStateException("JWT_SECRET must be at least 32 characters");
+        if (jwtSecret == null || jwtSecret.length() < MIN_SECRET_LENGTH)
+            throw new IllegalStateException("JWT_SECRET must be at least " + MIN_SECRET_LENGTH + " characters");
         this.sessions = sessions;
         this.algorithm = Algorithm.HMAC256(jwtSecret);
     }

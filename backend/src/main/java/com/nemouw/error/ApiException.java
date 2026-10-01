@@ -1,4 +1,4 @@
-package com.nemouw.http;
+package com.nemouw.error;
 
 import java.util.List;
 
@@ -44,8 +44,8 @@ public class ApiException extends RuntimeException {
         return new ApiException(422, "VALIDATION_ERROR", "Validation failed", errors, null);
     }
 
-    public static ApiException tooManyRequests(int retryAfter) {
-        return new ApiException(429, "RATE_LIMITED", "Too many requests", List.of(), retryAfter);
+    public static ApiException tooManyRequests(String code, String msg, int retryAfter) {
+        return new ApiException(429, code, msg, List.of(), retryAfter);
     }
 
     public int status() {

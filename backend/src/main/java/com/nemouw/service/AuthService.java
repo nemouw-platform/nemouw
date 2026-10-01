@@ -4,25 +4,31 @@ import com.nemouw.database.Db;
 import com.nemouw.enums.UserRole;
 import com.nemouw.enums.UserStatus;
 import com.nemouw.enums.VerificationPurpose;
-import com.nemouw.http.ApiException;
-import com.nemouw.http.validation.Validator;
+import com.nemouw.error.ApiException;
+import com.nemouw.error.Errors;
+import com.nemouw.error.FieldErrors;
+import com.nemouw.security.PasswordHasher;
+import com.nemouw.security.TokenService;
+import com.nemouw.validation.Validator;
 import com.nemouw.model.AuthDtos.*;
 import com.nemouw.repository.UserRepository;
 import com.nemouw.repository.UserRepository.EmailIdentity;
 import com.nemouw.repository.VerificationTokenRepository;
 import com.nemouw.service.OtpIssuer.IssuedOtp;
-import com.nemouw.util.TextNormalizer;
+import com.nemouw.security.TextNormalizer;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
 import java.util.*;
+
+import static com.nemouw.Constants.*;
+import static com.nemouw.error.Errors.invalidCredentials;
 
 public class AuthService {
     /**
      * Roles a visitor may pick for themselves at signup. Everything else is assigned by an admin.
      */
     private static final Set<UserRole> SELF_REGISTERABLE = EnumSet.of(UserRole.SPECIALIST);
-    private static final int OTP_MAX_ATTEMPTS = 5;
 
     private final Jdbi jdbi;
     private final UserRepository users;
@@ -53,16 +59,14 @@ public class AuthService {
         UserRole role = UserRole.tryFrom(req.role()).orElse(null);
 
         new Validator()
-                .check(role != null && SELF_REGISTERABLE.contains(role), "role", "INVALID_ROLE",
-                        "only 'specialist' can self-register")
+                .check(role != null && SELF_REGISTERABLE.contains(role), FieldErrors.invalidRole("role"))
                 .required("first_name", req.firstName())
                 .required("last_name", req.lastName())
-                .required("email", req.email()).email("email", req.email())
-                .required("password", req.password())
+                .requiredEmail("email", req.email())
                 .password("password", req.password(), emailLocalPart(req.email()))
                 .throwIfInvalid();
 
-        String email = TextNormalizer.email(req.email());
+        String email = TextNormalizer.normalize(req.email());
         String firstName = req.firstName().trim();
         String lastName = req.lastName().trim();
         String passwordHash = hasher.hash(req.password());   // slow, so done BEFORE holding a DB connection
@@ -73,7 +77,7 @@ public class AuthService {
                     .map(existing -> restartPending(h, existing, firstName, lastName, passwordHash))
                     .orElseGet(() -> registerNew(h, role, firstName, lastName, email, passwordHash)));
         } catch (RuntimeException e) {
-            if (Db.isUniqueViolation(e)) throw ApiException.conflict("EMAIL_TAKEN", "Email is already registered");
+            if (Db.isUniqueViolation(e)) throw Errors.emailTaken();
             throw e;
         }
 
@@ -101,10 +105,10 @@ public class AuthService {
 
         // Lock first, then trust the locked status instead of the earlier unlocked read
         if (users.lockStatus(h, userId).orElse(null) != UserStatus.PENDING) {
-            throw ApiException.conflict("EMAIL_TAKEN", "Email is already registered");
+            throw Errors.emailTaken();
         }
         if (otpIssuer.isThrottled(h, userId)) {
-            throw ApiException.tooManyRequests(otpIssuer.retryAfterSeconds());
+            throw Errors.tooManyRequests(otpIssuer.retryAfterSeconds());
         }
 
         users.updateName(h, userId, firstName, lastName);
@@ -114,20 +118,21 @@ public class AuthService {
 
     public AuthTokens verifyOtp(VerifyOtpRequest req, String ip, String userAgent) {
         new Validator()
-                .required("email", req.email()).email("email", req.email())
+                .requiredEmail("email", req.email())
                 .required("code", req.code())
-                .check(req.code() == null || req.code().matches("\\d{6}"), "code", "INVALID_FORMAT", "must be 6 digits")
+                .check(req.code() == null || req.code().matches("\\d{" + OTP_CODE_DIGITS + "}"),
+                        FieldErrors.invalidFormat("code", "must be " + OTP_CODE_DIGITS + " digits"))
                 .throwIfInvalid();
 
-        String email = TextNormalizer.email(req.email());
+        String email = TextNormalizer.normalize(req.email());
 
         // Unknown email gets the same answer as a wrong code, so this endpoint cannot be used to probe registrations
         EmailIdentity identity = jdbi.withHandle(h -> users.findByEmail(h, email))
-                .orElseThrow(AuthService::invalidCode);
+                .orElseThrow(Errors::invalidOrExpiredCode);
 
         // tryVerify never throws on a bad code: throwing would roll back the spent attempt
         return jdbi.inTransaction(h -> tryVerify(h, identity, req.code(), ip, userAgent))
-                .orElseThrow(AuthService::invalidCode);
+                .orElseThrow(Errors::invalidOrExpiredCode);
     }
 
     private Optional<AuthTokens> tryVerify(Handle h, EmailIdentity identity, String code, String ip, String userAgent) {
@@ -146,16 +151,48 @@ public class AuthService {
     }
 
     public void resendOtp(ResendOtpRequest req) {
-        new Validator().required("email", req.email()).email("email", req.email()).throwIfInvalid();
-        String email = TextNormalizer.email(req.email());
+        new Validator().requiredEmail("email", req.email()).throwIfInvalid();
+        String email = TextNormalizer.normalize(req.email());
 
         EmailIdentity identity = jdbi.withHandle(h -> users.findByEmail(h, email)).orElse(null);
         if (identity == null || identity.userStatus() != UserStatus.PENDING) {
-            return;   // silent: same 202 whether or not the account exists
+            return;   // silent: same 202 regardless of whether the account exists
         }
 
         Optional<IssuedOtp> issued = jdbi.inTransaction(h -> reissueIfAllowed(h, identity));
         issued.ifPresent(o -> emailSender.sendSignupOtp(email, o.code(), o.expiresAt()));
+    }
+
+    public AuthTokens login(LoginRequest req, String ip, String userAgent) {
+        new Validator()
+                .required("identifier", req.identifier())
+                .required("password", req.password())
+                .throwIfInvalid();
+
+        String identifier = TextNormalizer.normalize(req.identifier());
+        var row = jdbi.withHandle(h -> users.findLoginByIdentifier(h, identifier)).orElse(null);
+
+        boolean passwordOk;
+        if (row == null || row.passwordHash() == null) {
+            hasher.verifyDummy(req.password());      // burn the same time as a real check
+            passwordOk = false;
+        } else {
+            passwordOk = hasher.verify(req.password(), row.passwordHash());
+        }
+        if (!passwordOk) throw invalidCredentials();
+
+        ApiException blocked = switch (row.userStatus()) {
+            case ACTIVE -> null;
+            case PENDING -> Errors.accountNotVerified();
+            case SUSPENDED -> Errors.accountSuspended();
+            case DELETED -> invalidCredentials();
+        };
+        if (blocked != null) throw blocked;
+
+        return jdbi.inTransaction(h -> {
+            users.touchLastLogin(h, row.id());
+            return tokenService.issue(h, row.id(), row.roleCode(), userAgent, ip);
+        });
     }
 
     private Optional<IssuedOtp> reissueIfAllowed(Handle h, EmailIdentity identity) {
@@ -164,10 +201,6 @@ public class AuthService {
             return Optional.empty();   // throttled or no longer pending: do nothing, still answer 202
         }
         return Optional.of(otpIssuer.issue(h, userId, identity.identifierId()));
-    }
-
-    private static ApiException invalidCode() {
-        return ApiException.badRequest("INVALID_OR_EXPIRED_TOKEN", "Code is invalid, expired, or locked");
     }
 
     private static String emailLocalPart(String email) {

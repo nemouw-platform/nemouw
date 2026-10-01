@@ -80,4 +80,29 @@ public class UserRepository {
                 .bind("id", identifierId).execute();
         return true;
     }
+
+    public record LoginRow(UUID id, String status, String roleCode, String passwordHash) {
+        public UserStatus userStatus() {
+            return UserStatus.fromCode(status);
+        }
+    }
+
+    /**
+     * identifier can be an email, phone or username. The caller passes it trimmed and lowercased.
+     */
+    public Optional<LoginRow> findLoginByIdentifier(Handle h, String identifier) {
+        return h.createQuery("""
+                        SELECT u.id, u.status, r.code AS role_code, p.password_hash
+                        FROM user_identifiers ui
+                        JOIN users u ON u.id = ui.user_id
+                        JOIN user_roles r ON r.id = u.role_id
+                        LEFT JOIN user_passwords p ON p.user_id = u.id
+                        WHERE ui.identifier = :i""")
+                .bind("i", identifier)
+                .map(ConstructorMapper.of(LoginRow.class)).findFirst();
+    }
+
+    public void touchLastLogin(Handle h, UUID userId) {
+        h.createUpdate("UPDATE users SET last_login_at = now() WHERE id = :id").bind("id", userId).execute();
+    }
 }

@@ -1,25 +1,23 @@
-package com.nemouw.service;
+package com.nemouw.security;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.nemouw.util.TextNormalizer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class PasswordHasher {
-    private static final int COST = 12;
-    private static final int MAX_BYTES = 72;
+import static com.nemouw.Constants.BCRYPT_COST;
+import static com.nemouw.Constants.PASSWORD_MAX_BYTES;
 
+public class PasswordHasher {
     /**
      * Hash of a throwaway string, used to burn the same CPU time when the user doesn't exist.
      */
-    private static final String DUMMY_HASH =
-            BCrypt.withDefaults().hashToString(COST, "dummy-password-for-timing".toCharArray());
+    private static final String DUMMY_HASH = BCrypt.withDefaults().hashToString(BCRYPT_COST, "dummy-password-for-timing".toCharArray());
 
     public String hash(String password) {
         char[] pw = prepare(password);
         try {
-            return BCrypt.withDefaults().hashToString(COST, pw);
+            return BCrypt.withDefaults().hashToString(BCRYPT_COST, pw);
         } finally {
             Arrays.fill(pw, '\0');
         }
@@ -31,7 +29,7 @@ public class PasswordHasher {
         try {
             // Over-long input can never match a stored hash (signup rejects it), and the bcrypt
             // library throws on it, which would turn a bad login into a 500.
-            if (new String(pw).getBytes(StandardCharsets.UTF_8).length > MAX_BYTES) return false;
+            if (new String(pw).getBytes(StandardCharsets.UTF_8).length > PASSWORD_MAX_BYTES) return false;
             return BCrypt.verifyer().verify(pw, hash).verified;
         } finally {
             Arrays.fill(pw, '\0');

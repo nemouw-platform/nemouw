@@ -9,18 +9,21 @@ import java.security.SecureRandom;
 import java.util.HexFormat;
 import java.util.UUID;
 
+import static com.nemouw.Constants.*;
+
 public class OtpService {
+    private static final String OTP_FORMAT = "%0" + OTP_CODE_DIGITS + "d";
     private final SecureRandom random = new SecureRandom();
     private final byte[] key;
 
-    public OtpService(String hmacSecret) {
-        if (hmacSecret == null || hmacSecret.length() < 32)
-            throw new IllegalStateException("OTP_HASH_SECRET must be at least 32 characters");
-        this.key = hmacSecret.getBytes(StandardCharsets.UTF_8);
+    public OtpService(String hashSecret) {
+        if (hashSecret == null || hashSecret.length() < MIN_SECRET_LENGTH)
+            throw new IllegalStateException("OTP_HASH_SECRET must be at least " + MIN_SECRET_LENGTH + " characters");
+        this.key = hashSecret.getBytes(StandardCharsets.UTF_8);
     }
 
     public String generateCode() {
-        return String.format("%06d", random.nextInt(1_000_000));
+        return String.format(OTP_FORMAT, random.nextInt(OTP_CODE_SPACE));
     }
 
     public String hash(UUID userId, String code) {

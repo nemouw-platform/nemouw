@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.nemouw.error.Errors;
 
 public final class Json {
     private Json() {}
@@ -25,13 +26,11 @@ public final class Json {
     }
 
     public static <T> T read(String body, Class<T> type) {
-        if (body == null || body.isBlank()) {
-            throw ApiException.badRequest("MALFORMED_JSON", "Request body is required");
-        }
+        if (body == null || body.isBlank()) throw Errors.malformedJson("Request body is required");
         try {
             return MAPPER.readValue(body, type);
         } catch (JsonProcessingException e) {
-            throw ApiException.badRequest("MALFORMED_JSON", "Request body is not valid JSON");
+            throw Errors.malformedJson("Request body is not valid JSON");
         }
     }
 }

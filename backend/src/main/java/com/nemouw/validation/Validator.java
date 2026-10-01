@@ -1,7 +1,9 @@
-package com.nemouw.http.validation;
+package com.nemouw.validation;
 
-import com.nemouw.http.ApiException;
-import com.nemouw.http.ApiException.FieldError;
+import com.nemouw.error.ApiException;
+import com.nemouw.error.ApiException.FieldError;
+import com.nemouw.error.FieldErrors;
+import com.nemouw.security.PasswordPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +14,24 @@ public final class Validator {
     private final List<FieldError> errors = new ArrayList<>();
 
     public Validator required(String field, String v) {
-        if (v == null || v.isBlank()) errors.add(new FieldError(field, "REQUIRED", "is required"));
+        if ((v == null || v.isBlank())
+                && errors.stream().noneMatch(e -> e.field().equals(field) && e.code().equals(FieldErrors.REQUIRED)))
+            errors.add(FieldErrors.required(field));
         return this;
     }
 
     public Validator email(String field, String v) {
         if (v != null && !v.isBlank() && !EMAIL.matcher(v.trim()).matches())
-            errors.add(new FieldError(field, "MUST_BE_EMAIL", "must be a valid email address"));
+            errors.add(FieldErrors.mustBeEmail(field));
         return this;
+    }
+
+    public Validator requiredEmail(String field, String v) {
+        if (v == null || v.isBlank()) {
+            errors.add(FieldErrors.required(field));
+            return this;
+        }
+        return email(field, v);
     }
 
     /**
@@ -28,12 +40,13 @@ public final class Validator {
      * @param personalInfo values the password must not contain (e.g. email local part)
      */
     public Validator password(String field, String v, String... personalInfo) {
+        if (v == null || v.isEmpty()) return required(field, v);
         errors.addAll(PasswordPolicy.check(field, v, personalInfo));
         return this;
     }
 
-    public Validator check(boolean ok, String field, String code, String message) {
-        if (!ok) errors.add(new FieldError(field, code, message));
+    public Validator check(boolean ok, FieldError error) {
+        if (!ok) errors.add(error);
         return this;
     }
 

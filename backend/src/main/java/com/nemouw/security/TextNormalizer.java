@@ -1,4 +1,4 @@
-package com.nemouw.util;
+package com.nemouw.security;
 
 import java.text.Normalizer;
 import java.util.Locale;
@@ -11,7 +11,7 @@ public class TextNormalizer {
         return Normalizer.normalize(password, Normalizer.Form.NFKC);
     }
 
-    public static String email(String email) {
+    public static String normalize(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
 }

@@ -1,41 +1,35 @@
 package com.nemouw.controller;
 
+import com.nemouw.http.ClientIp;
 import com.nemouw.http.Json;
-import com.nemouw.http.route.Routes;
-import com.nemouw.model.AuthDtos.ResendOtpRequest;
-import com.nemouw.model.AuthDtos.VerifyOtpRequest;
-import com.nemouw.model.AuthDtos.SignupRequest;
+import com.nemouw.model.AuthDtos;
 import com.nemouw.service.AuthService;
-import spark.Request;
 
+import static com.nemouw.http.JsonRoutes.*;
 import static spark.Spark.path;
 import static spark.Spark.post;
 
-public class AuthController {
+public class AuthController implements Controller {
     private final AuthService auth;
 
-    public AuthController(AuthService auth) {
-        this.auth = auth;
-    }
+    public AuthController(AuthService auth) { this.auth = auth; }
 
+    @Override
     public void register() {
-        path("/v1/auth", () -> {
-            post("/signup", Routes.json(201, (req, res) ->
-                    auth.signup(Json.read(req.body(), SignupRequest.class))));
+        path("/auth", () -> {
+            post("/signup", created((req, res) ->
+                    auth.signup(Json.read(req.body(), AuthDtos.SignupRequest.class))));
 
-            post("/verify-otp", Routes.json(200, (req, res) ->
-                    auth.verifyOtp(Json.read(req.body(), VerifyOtpRequest.class), clientIp(req), req.userAgent())));
+            post("/verify-otp", ok((req, res) ->
+                    auth.verifyOtp(Json.read(req.body(), AuthDtos.VerifyOtpRequest.class), ClientIp.of(req), req.userAgent())));
 
-            post("/resend-otp", Routes.json(202, (req, res) -> {
-                auth.resendOtp(Json.read(req.body(), ResendOtpRequest.class));
+            post("/resend-otp", accepted((req, res) -> {
+                auth.resendOtp(Json.read(req.body(), AuthDtos.ResendOtpRequest.class));
                 return null;
             }));
-        });
-    }
 
-    private static String clientIp(Request req) {
-        String ip = req.ip();
-        int zone = ip == null ? -1 : ip.indexOf('%');
-        return zone >= 0 ? ip.substring(0, zone) : ip;
+            post("/login", ok((req, res) ->
+                    auth.login(Json.read(req.body(), AuthDtos.LoginRequest.class), ClientIp.of(req), req.userAgent())));
+        });
     }
 }

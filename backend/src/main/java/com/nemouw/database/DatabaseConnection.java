@@ -1,8 +1,8 @@
 package com.nemouw.database;
 
+import com.nemouw.Config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 
@@ -16,10 +16,9 @@ public class DatabaseConnection {
     private static final Jdbi jdbi;
 
     static {
-        Dotenv env = Dotenv.load();
-        String dbUrl = env.get("DB_URL");
+        String dbUrl = Config.dbUrl();
 
-        if (dbUrl == null || dbUrl.trim().isEmpty()) {
+        if (dbUrl.trim().isEmpty()) {
             throw new IllegalStateException("FATAL: DB_URL environment variable is missing or empty!");
         }
 
