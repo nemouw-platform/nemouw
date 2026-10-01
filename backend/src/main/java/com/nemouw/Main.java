@@ -1,7 +1,10 @@
 package com.nemouw;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.nemouw.controller.AuthController;
 import com.nemouw.database.DatabaseConnection;
+import com.nemouw.http.ApiException;
 import com.nemouw.http.ErrorHandling;
 import com.nemouw.repository.SessionRepository;
 import com.nemouw.repository.UserRepository;
@@ -12,11 +15,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 import static com.nemouw.http.CORSFilter.enableCORS;
 import static spark.Spark.*;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.nemouw.database.DatabaseInit.initializeDB;
 
@@ -34,6 +34,12 @@ public class Main {
         enableCORS();
         runDdosShield();
 
+        // Tells all bots to stay out of API subdomain entirely
+        get("/robots.txt", (request, response) -> {
+            response.type("text/plain");
+            return "User-agent: *\nDisallow: /";
+        });
+
         // Endpoints to test
         Dotenv env = Dotenv.load();
         SessionRepository sessions = new SessionRepository();
@@ -48,29 +54,33 @@ public class Main {
     }
 
     /**
-     * In-memory DDoS Rate Limiter
+     * In-memory DDoS Rate Limiter (Production-Ready)
      */
     private static void runDdosShield() {
-        int requestLimitPerMinute = Config.getDdosShieldRequestLimitPerSecond() * 60;
-        Map<String /*IP*/, Integer> accessPerMinute = new ConcurrentHashMap<>();
+        // Enforce the rate limit strictly per-second to prevent bursts
+        int requestLimitPerSecond = Config.getDdosShieldRequestLimitPerSecond();
+        int retryWindowSeconds = 1;
+
+        // Self-cleaning memory shield. IPs are completely erased from RAM exactly 1 second after they stop attacking.
+        Cache<String, AtomicInteger> accessPerSecond = Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.SECONDS)
+                .build();
 
         before("/*", (request, response) -> {
-            String ip = request.ip();
+            if (request.requestMethod().equalsIgnoreCase("OPTIONS")) {
+                return;
+            }
 
-            // Atomic merge prevents race conditions across Spark threads
-            int currentAccessCount = accessPerMinute.merge(ip, 1, Integer::sum);
+            String ip = request.headers("X-Forwarded-For");
+            if (ip == null || ip.isEmpty()) {
+                ip = request.ip();
+            }
 
-            if (currentAccessCount > requestLimitPerMinute) {
-                halt(429, "Too many requests");
+            AtomicInteger counter = accessPerSecond.get(ip, key -> new AtomicInteger(0));
+            int currentAccessCount = counter.incrementAndGet();
+            if (currentAccessCount > requestLimitPerSecond) {
+                throw ApiException.tooManyRequests(retryWindowSeconds);
             }
         });
-
-        // Reset the rate limits every minute on a single daemon thread
-        ScheduledExecutorService cleaner = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "ddos-shield-cleaner");
-            t.setDaemon(true); // Allows JVM to shut down cleanly if needed
-            return t;
-        });
-        cleaner.scheduleAtFixedRate(accessPerMinute::clear, 1, 1, TimeUnit.MINUTES);
     }
 }

@@ -18,14 +18,7 @@ public class CORSFilter {
 
     public static void enableCORS() {
         Spark.before((request, response) -> {
-            String origin = request.headers("Origin");
-
-            if (isAllowed(origin)) {
-                response.header("Access-Control-Allow-Origin", origin);
-                response.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-                response.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Access-Control-Allow-Origin");
-                response.header("Access-Control-Allow-Credentials", "true");
-            }
+            applyHeadersIfAllowed(request, response);
 
             // Preflight is fully answered here, it never reaches a route
             if (request.requestMethod().equalsIgnoreCase("OPTIONS")) {
@@ -33,5 +26,15 @@ public class CORSFilter {
                 Spark.halt(200);
             }
         });
+    }
+
+    public static void applyHeadersIfAllowed(spark.Request request, spark.Response response) {
+        String origin = request.headers("Origin");
+        if (isAllowed(origin)) {
+            response.header("Access-Control-Allow-Origin", origin);
+            response.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+            response.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Access-Control-Allow-Origin");
+            response.header("Access-Control-Allow-Credentials", "true");
+        }
     }
 }

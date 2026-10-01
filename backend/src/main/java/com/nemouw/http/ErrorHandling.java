@@ -30,21 +30,24 @@ public final class ErrorHandling {
         });
         afterAfter((req, res) -> ThreadContext.clearAll());
 
-        exception(ApiException.class, (e, req, res) ->
-                write(req, res, e.status(), e.code(), e.getMessage(), e.errors()));
-
         exception(Exception.class, (e, req, res) -> {
+            // Force CORS policy compliance so the frontend can read the error payload
+            CORSFilter.applyHeadersIfAllowed(req, res);
             log.error("Unhandled exception", e);
             write(req, res, 500, "INTERNAL_ERROR", "Something went wrong", List.of());
         });
 
         exception(ApiException.class, (e, req, res) -> {
-            if (e.retryAfterSeconds() != null) res.header("Retry-After", String.valueOf(e.retryAfterSeconds()));
+            CORSFilter.applyHeadersIfAllowed(req, res);
+            if (e.retryAfterSeconds() != null) {
+                res.header("Retry-After", String.valueOf(e.retryAfterSeconds()));
+            }
             log.info("api_error code={} status={}", e.code(), e.status());
             write(req, res, e.status(), e.code(), e.getMessage(), e.errors());
         });
 
         notFound((req, res) -> {
+            CORSFilter.applyHeadersIfAllowed(req, res);
             write(req, res, 404, "NOT_FOUND", "Route not found", List.of());
             return res.body();
         });

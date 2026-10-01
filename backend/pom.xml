@@ -58,13 +58,6 @@
             <artifactId>jdbi3-postgres</artifactId>
             <version>${jdbi.version}</version>
         </dependency>
-        <!-- Optional: annotated DAO interfaces (@SqlQuery / @SqlUpdate). Uncomment to use.
-        <dependency>
-            <groupId>org.jdbi</groupId>
-            <artifactId>jdbi3-sqlobject</artifactId>
-            <version>${jdbi.version}</version>
-        </dependency>
-        -->
 
         <!-- Web Framework -->
         <dependency>
@@ -96,8 +89,7 @@
             <artifactId>log4j-core</artifactId>
             <version>2.20.0</version>
         </dependency>
-        <!-- Bridges third-party SLF4J logs (SparkJava, Hikari, Flyway, JDBI) straight into Log4j2.
-             slf4j-simple must NOT be present: two SLF4J bindings conflict. -->
+        <!-- Bridges third-party SLF4J logs (SparkJava, Hikari, Flyway, JDBI) straight into Log4j2. -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
@@ -125,6 +117,11 @@
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.2.4</version>
         </dependency>
 
         <!-- Test -->
