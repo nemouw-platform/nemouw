@@ -2,6 +2,7 @@ package com.nemouw.security;
 
 import com.nemouw.error.FieldErrors;
 import com.nemouw.error.ApiException.FieldError;
+import com.nemouw.util.TextNormalizer;
 
 import static com.nemouw.Constants.*;
 

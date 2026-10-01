@@ -1,4 +1,4 @@
-package com.nemouw.security;
+package com.nemouw.util;
 
 import java.text.Normalizer;
 import java.util.Locale;

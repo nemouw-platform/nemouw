@@ -30,7 +30,7 @@ public class RateLimitFilter {
                 return;
             }
 
-            String ip = ClientIp.of(request);
+            String ip = ClientIp.resolve(request);
 
             AtomicInteger counter = accessPerSecond.get(ip, key -> new AtomicInteger(0));
             int currentAccessCount = counter.incrementAndGet();

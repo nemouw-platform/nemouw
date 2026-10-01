@@ -26,7 +26,9 @@ public final class Constants {
     // ---- Tokens ----
     // Also what the API returns as expires_in, so changing it changes the contract.
     public static final int ACCESS_TTL_SECONDS = 900;
-    public static final int REFRESH_TTL_DAYS = 30;
+    public static final int REFRESH_TTL_DAYS = 90;
+    // A replay of a just-rotated refresh token inside this window is treated as a tab race, not theft.
+    public static final int REFRESH_REUSE_GRACE_SECONDS = 10;
 
     // ---- Secrets ----
     public static final int MIN_SECRET_LENGTH = 32;

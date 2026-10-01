@@ -14,6 +14,8 @@ public final class Errors {
     public static final String ACCOUNT_SUSPENDED = "ACCOUNT_SUSPENDED";
     public static final String INVALID_TOKEN = "INVALID_TOKEN";
     public static final String MALFORMED_JSON = "MALFORMED_JSON";
+    public static final String FORBIDDEN = "FORBIDDEN";
+    public static final String UNAUTHENTICATED = "UNAUTHENTICATED";
 
     // ---- Auth ----
     public static ApiException invalidCredentials() {
@@ -36,8 +38,8 @@ public final class Errors {
         return ApiException.forbidden(ACCOUNT_SUSPENDED, "This account is suspended");
     }
 
-    public static ApiException invalidAccessToken() {
-        return ApiException.unauthorized(INVALID_TOKEN, "Invalid or expired access token");
+    public static ApiException invalidRefreshToken() {
+        return ApiException.unauthorized(INVALID_TOKEN, "Invalid or expired refresh token");
     }
 
     // ---- Request ----
@@ -47,5 +49,16 @@ public final class Errors {
 
     public static ApiException tooManyRequests(int retryAfterSeconds) {
         return ApiException.tooManyRequests(MALFORMED_JSON, "Too many requests", retryAfterSeconds);
+    }
+
+    // ---- Middleware ----
+    public static ApiException missingAccessToken() {
+        return ApiException.unauthorized(UNAUTHENTICATED, "Authentication required");
+    }
+    public static ApiException invalidAccessToken() {
+        return ApiException.unauthorized(INVALID_TOKEN, "Invalid or expired access token");
+    }
+    public static ApiException forbidden() {
+        return ApiException.forbidden(FORBIDDEN, "You do not have permission to perform this action");
     }
 }

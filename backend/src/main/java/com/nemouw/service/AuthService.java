@@ -7,6 +7,7 @@ import com.nemouw.enums.VerificationPurpose;
 import com.nemouw.error.ApiException;
 import com.nemouw.error.Errors;
 import com.nemouw.error.FieldErrors;
+import com.nemouw.model.ClientInfo;
 import com.nemouw.security.PasswordHasher;
 import com.nemouw.security.TokenService;
 import com.nemouw.validation.Validator;
@@ -15,7 +16,9 @@ import com.nemouw.repository.UserRepository;
 import com.nemouw.repository.UserRepository.EmailIdentity;
 import com.nemouw.repository.VerificationTokenRepository;
 import com.nemouw.service.OtpIssuer.IssuedOtp;
-import com.nemouw.security.TextNormalizer;
+import com.nemouw.util.TextNormalizer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
@@ -38,6 +41,8 @@ public class AuthService {
     private final OtpIssuer otpIssuer;
     private final TokenService tokenService;
     private final EmailSender emailSender;
+
+    private static final Logger log = LogManager.getLogger(AuthService.class);
 
     public AuthService(Jdbi jdbi, UserRepository users, VerificationTokenRepository tokens,
                        PasswordHasher hasher, OtpService otp, OtpIssuer otpIssuer,
@@ -116,7 +121,7 @@ public class AuthService {
         return new Registration(userId, otpIssuer.issue(h, userId, existing.identifierId()));
     }
 
-    public AuthTokens verifyOtp(VerifyOtpRequest req, String ip, String userAgent) {
+    public IssuedSession verifyOtp(VerifyOtpRequest req, ClientInfo client) {
         new Validator()
                 .requiredEmail("email", req.email())
                 .required("code", req.code())
@@ -131,11 +136,11 @@ public class AuthService {
                 .orElseThrow(Errors::invalidOrExpiredCode);
 
         // tryVerify never throws on a bad code: throwing would roll back the spent attempt
-        return jdbi.inTransaction(h -> tryVerify(h, identity, req.code(), ip, userAgent))
+        return jdbi.inTransaction(h -> tryVerify(h, identity, req.code(), client))
                 .orElseThrow(Errors::invalidOrExpiredCode);
     }
 
-    private Optional<AuthTokens> tryVerify(Handle h, EmailIdentity identity, String code, String ip, String userAgent) {
+    private Optional<IssuedSession> tryVerify(Handle h, EmailIdentity identity, String code, ClientInfo client) {
         var claimed = tokens.claimAttempt(h, identity.userId(), VerificationPurpose.SIGNUP_OTP, OTP_MAX_ATTEMPTS);
 
         // Order matters: activate runs last, and only for a matching code
@@ -147,7 +152,7 @@ public class AuthService {
         }
 
         tokens.consume(h, claimed.get().id());
-        return Optional.of(tokenService.issue(h, identity.userId(), identity.roleCode(), userAgent, ip));
+        return Optional.of(tokenService.issue(h, identity.userId(), identity.roleCode(), client));
     }
 
     public void resendOtp(ResendOtpRequest req) {
@@ -163,7 +168,7 @@ public class AuthService {
         issued.ifPresent(o -> emailSender.sendSignupOtp(email, o.code(), o.expiresAt()));
     }
 
-    public AuthTokens login(LoginRequest req, String ip, String userAgent) {
+    public IssuedSession login(LoginRequest req, ClientInfo client) {
         new Validator()
                 .required("identifier", req.identifier())
                 .required("password", req.password())
@@ -191,8 +196,30 @@ public class AuthService {
 
         return jdbi.inTransaction(h -> {
             users.touchLastLogin(h, row.id());
-            return tokenService.issue(h, row.id(), row.roleCode(), userAgent, ip);
+            return tokenService.issue(h, row.id(), row.roleCode(), client);
         });
+    }
+
+    public IssuedSession refresh(String refreshToken) {
+        // A missing cookie means "not authenticated" (401), not a validation problem (422)
+        if (refreshToken == null || refreshToken.isBlank()) throw Errors.invalidRefreshToken();
+        String presented = refreshToken.trim();
+
+        // Never throw inside the transaction: a revocation must commit
+        Optional<IssuedSession> result = jdbi.inTransaction(h -> {
+            Optional<IssuedSession> rotated = tokenService.rotate(h, presented);
+            if (rotated.isEmpty()) {
+                tokenService.revokeIfReplayed(h, presented).ifPresent(s ->
+                        log.warn("refresh_token_reuse session={} user={}", s.sessionId(), s.userId()));
+            }
+            return rotated;
+        });
+        return result.orElseThrow(Errors::invalidRefreshToken);
+    }
+
+    public void logout(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) return;
+        jdbi.useHandle(h -> tokenService.revokeByRefreshToken(h, refreshToken.trim()));
     }
 
     private Optional<IssuedOtp> reissueIfAllowed(Handle h, EmailIdentity identity) {

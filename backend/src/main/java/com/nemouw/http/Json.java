@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nemouw.error.Errors;
+import com.nemouw.model.AuthDtos;
 
 public final class Json {
     private Json() {}
@@ -18,6 +19,10 @@ public final class Json {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static String write(Object o) {
+        if (o instanceof AuthDtos.IssuedSession) {
+            throw new IllegalStateException("IssuedSession contains secrets and must never be serialized");
+        }
+
         try {
             return MAPPER.writeValueAsString(o);
         } catch (JsonProcessingException e) {

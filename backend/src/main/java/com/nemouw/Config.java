@@ -80,8 +80,18 @@ public final class Config {
         return getBoolean("TRUST_PROXY", false);
     }
 
+    public static boolean cookieSecure()        { return getBoolean("COOKIE_SECURE", true); }
+
+    public static boolean allowLocalhostOrigins() { return getBoolean("ALLOW_LOCALHOST_ORIGINS", false); }
+
     public static int getDdosShieldRequestLimitPerSecond() {
         return getInt("DDOS_SHIELD_REQUEST_LIMIT_PER_SECOND", 5);
     }
 
+    public static java.util.Set<String> trustedProxyIps() {
+        String v = ENV.get("TRUSTED_PROXY_IPS");
+        if (v == null || v.isBlank()) return java.util.Set.of();
+        return java.util.Arrays.stream(v.split(",")).map(String::trim)
+                .filter(s -> !s.isEmpty()).collect(java.util.stream.Collectors.toUnmodifiableSet());
+    }
 }

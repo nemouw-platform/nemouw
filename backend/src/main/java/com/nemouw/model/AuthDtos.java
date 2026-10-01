@@ -12,9 +12,18 @@ public final class AuthDtos {
 
     public record VerifyOtpRequest(String email, String code) {}
 
-    public record AuthTokens(String accessToken, String refreshToken, String tokenType, int expiresIn) {}
+    // Server-side only: contains secrets. NEVER return this from a route. It goes into cookies.
+    public record IssuedSession(String accessToken, String refreshToken, UUID userId, String role) {}
 
     public record ResendOtpRequest(String email) {}
 
     public record LoginRequest(String identifier, String password) {}
+
+    // What the client is allowed to see.
+    public record SessionResponse(UUID userId, String role, int expiresIn) {
+        public static SessionResponse from(IssuedSession s) {
+            return new SessionResponse(s.userId(), s.role(), com.nemouw.Constants.ACCESS_TTL_SECONDS);
+        }
+    }
+
 }

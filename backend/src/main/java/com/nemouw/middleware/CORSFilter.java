@@ -1,5 +1,6 @@
 package com.nemouw.middleware;
 
+import com.nemouw.Config;
 import spark.Spark;
 
 import java.util.Set;
@@ -12,8 +13,9 @@ public class CORSFilter {
             "https://www.nemouw.com"
     );
 
-    private static boolean isAllowed(String origin) {
-        return origin != null && (ALLOWED_ORIGINS.contains(origin) || origin.startsWith("http://localhost:"));
+    public static boolean isAllowed(String origin) {
+        return origin != null && (ALLOWED_ORIGINS.contains(origin)
+                || (Config.allowLocalhostOrigins() && origin.startsWith("http://localhost:")));
     }
 
     public static void enableCORS() {
