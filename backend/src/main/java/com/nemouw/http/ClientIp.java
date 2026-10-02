@@ -4,7 +4,6 @@ import com.nemouw.Config;
 import spark.Request;
 
 import java.net.InetAddress;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public final class ClientIp {
@@ -14,34 +13,29 @@ public final class ClientIp {
     private static final Pattern IPV4 = Pattern.compile("^(" + OCTET + "\\.){3}" + OCTET + "$");
     private static final Pattern IPV6_CHARS = Pattern.compile("^[0-9a-fA-F:.]{2,45}$");
 
-    /** Extra proxies to trust, e.g. a load balancer with a public address: TRUSTED_PROXY_IPS=203.0.113.5,203.0.113.6 */
-    private static final Set<String> EXTRA_TRUSTED = Config.trustedProxyIps();
-
     public static String resolve(Request req) {
-        return resolve(req.ip(), req.headers("X-Forwarded-For"));
+        return resolve(req.ip(), req.headers("X-Forwarded-For"), Config.trustProxy());
     }
 
-    /** Pure function so it can be unit tested without Spark. */
-    static String resolve(String rawPeer, String xForwardedFor) {
+    static String resolve(String rawPeer, String xForwardedFor, boolean trustProxy) {
         String peer = literalOrNull(rawPeer);
         if (peer == null) return null;
-        if (xForwardedFor == null || xForwardedFor.isBlank() || !isTrustedProxy(peer)) return peer;
-
-        String[] hops = xForwardedFor.split(",");
-        for (int i = hops.length - 1; i >= 0; i--) {
-            String hop = literalOrNull(hops[i]);
-            if (hop == null) return peer;              // junk in the chain: don't guess
-            if (!isTrustedProxy(hop)) return hop;      // first untrusted from the right = the real client
+        if (!trustProxy || xForwardedFor == null || xForwardedFor.isBlank() || !isNginxPeer(peer)) {
+            return peer;
         }
-        String first = literalOrNull(hops[0]);         // every hop was internal (e.g. local Docker)
-        return first != null ? first : peer;
+
+        // nginx appends the address it saw, so the last entry is the real client.
+        // Earlier entries are client-supplied and must not be trusted.
+        String[] hops = xForwardedFor.split(",");
+        String last = literalOrNull(hops[hops.length - 1]);
+        return last != null ? last : peer;
     }
 
-    /** Returns a normalized IP literal, or null. Never does a DNS lookup: only valid literals reach InetAddress. */
+    /** Returns a normalized IP literal, or null. Never does a DNS lookup. */
     private static String literalOrNull(String raw) {
         if (raw == null) return null;
         String s = raw.trim();
-        int zone = s.indexOf('%');                     // "fe80::1%eth0" is not a valid inet value
+        int zone = s.indexOf('%');
         if (zone >= 0) s = s.substring(0, zone);
         if (IPV4.matcher(s).matches()) return s;
         if (s.contains(":") && IPV6_CHARS.matcher(s).matches()) {
@@ -54,13 +48,12 @@ public final class ClientIp {
         return null;
     }
 
-    private static boolean isTrustedProxy(String ip) {
-        if (EXTRA_TRUSTED.contains(ip)) return true;
+    private static boolean isNginxPeer(String ip) {
         try {
             InetAddress a = InetAddress.getByName(ip);
             if (a.isLoopbackAddress() || a.isSiteLocalAddress() || a.isLinkLocalAddress()) return true;
             byte[] b = a.getAddress();
-            return b.length == 16 && (b[0] & 0xfe) == 0xfc;      // IPv6 unique-local fc00::/7
+            return b.length == 16 && (b[0] & 0xfe) == 0xfc;
         } catch (Exception e) {
             return false;
         }

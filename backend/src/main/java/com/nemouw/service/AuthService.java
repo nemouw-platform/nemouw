@@ -87,7 +87,7 @@ public class AuthService {
         }
 
         IssuedOtp issued = registration.otp();
-        emailSender.sendSignupOtp(email, issued.code(), issued.expiresAt());
+        emailSender.sendSignupOtp(email, issued.code());
         return new SignupResponse(registration.userId(), email, issued.expiresAt());
     }
 
@@ -165,7 +165,7 @@ public class AuthService {
         }
 
         Optional<IssuedOtp> issued = jdbi.inTransaction(h -> reissueIfAllowed(h, identity));
-        issued.ifPresent(o -> emailSender.sendSignupOtp(email, o.code(), o.expiresAt()));
+        issued.ifPresent(o -> emailSender.sendSignupOtp(email, o.code()));
     }
 
     public IssuedSession login(LoginRequest req, ClientInfo client) {

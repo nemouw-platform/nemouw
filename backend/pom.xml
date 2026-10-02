@@ -78,6 +78,14 @@
             <version>0.10.2</version>
         </dependency>
 
+        <!-- Email (Resend) -->
+        <dependency>
+            <groupId>com.resend</groupId>
+            <artifactId>resend-java</artifactId>
+            <version>4.26.0</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Logging: Native Log4j2 Implementation Engine -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

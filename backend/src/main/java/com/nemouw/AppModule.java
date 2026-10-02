@@ -22,7 +22,7 @@ public class AppModule {
         OtpService otpService = new OtpService(Config.otpHashSecret());
         TokenService tokenService = new TokenService(sessions, Config.jwtSecret());
         OtpIssuer otpIssuer = new OtpIssuer(otpService, verificationTokens);
-        EmailSender emailSender = new LoggingEmailSender();
+        EmailSender emailSender = new DefaultEmailSender();
 
         AuthService authService = new AuthService(
                 jdbi, users, verificationTokens, new PasswordHasher(),
