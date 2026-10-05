@@ -6,12 +6,18 @@ import java.util.Locale;
 public class TextNormalizer {
     private TextNormalizer() {}
 
-    /** nfkc is used for validating AND hashing passwords. */
-    public static String nfkc(String password) {
-        return Normalizer.normalize(password, Normalizer.Form.NFKC);
+    /** NFC: used only to validate passwords (blocklist, context words). Never for hashing. */
+    public static String nfc(String s) {
+        return Normalizer.normalize(s, Normalizer.Form.NFC);
     }
 
-    public static String normalize(String email) {
+    /** NFKC: for other normalizations (never for passwords). */
+    public static String nfkc(String s) {
+        return Normalizer.normalize(s, Normalizer.Form.NFKC);
+    }
+
+
+    public static String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
 }

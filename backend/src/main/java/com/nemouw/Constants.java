@@ -12,8 +12,11 @@ public final class Constants {
 
     // ---- Passwords ----
     public static final int PASSWORD_MIN_LENGTH = 8;
-    public static final int PASSWORD_MAX_BYTES = 72;
-    public static final int BCRYPT_COST = 12;
+    public static final int PASSWORD_MAX_LENGTH = 64;
+    // OWASP minimum for Argon2id: 19 MiB, 2 iterations, 1 lane. Tune upward on your hardware.
+    public static final int ARGON2_MEMORY_KB = 19_456;
+    public static final int ARGON2_ITERATIONS = 2;
+    public static final int ARGON2_PARALLELISM = 1;
 
     // ---- One-time codes ----
     public static final int OTP_CODE_DIGITS = 6;

@@ -71,7 +71,7 @@ public class AuthService {
                 .password("password", req.password(), emailLocalPart(req.email()))
                 .throwIfInvalid();
 
-        String email = TextNormalizer.normalize(req.email());
+        String email = TextNormalizer.normalizeEmail(req.email());
         String firstName = req.firstName().trim();
         String lastName = req.lastName().trim();
         String passwordHash = hasher.hash(req.password());   // slow, so done BEFORE holding a DB connection
@@ -129,7 +129,7 @@ public class AuthService {
                         FieldErrors.invalidFormat("code", "must be " + OTP_CODE_DIGITS + " digits"))
                 .throwIfInvalid();
 
-        String email = TextNormalizer.normalize(req.email());
+        String email = TextNormalizer.normalizeEmail(req.email());
 
         // Unknown email gets the same answer as a wrong code, so this endpoint cannot be used to probe registrations
         EmailIdentity identity = jdbi.withHandle(h -> users.findByEmail(h, email))
@@ -157,7 +157,7 @@ public class AuthService {
 
     public void resendOtp(ResendOtpRequest req) {
         new Validator().requiredEmail("email", req.email()).throwIfInvalid();
-        String email = TextNormalizer.normalize(req.email());
+        String email = TextNormalizer.normalizeEmail(req.email());
 
         EmailIdentity identity = jdbi.withHandle(h -> users.findByEmail(h, email)).orElse(null);
         if (identity == null || identity.userStatus() != UserStatus.PENDING) {
@@ -174,7 +174,7 @@ public class AuthService {
                 .required("password", req.password())
                 .throwIfInvalid();
 
-        String identifier = TextNormalizer.normalize(req.identifier());
+        String identifier = TextNormalizer.normalizeEmail(req.identifier());
         var row = jdbi.withHandle(h -> users.findLoginByIdentifier(h, identifier)).orElse(null);
 
         boolean passwordOk;

@@ -31,8 +31,8 @@ public final class FieldErrors {
         return new FieldError(field, TOO_SHORT, "must be at least " + minChars + " characters");
     }
 
-    public static FieldError tooLong(String field, int maxBytes) {
-        return new FieldError(field, TOO_LONG, "must be at most " + maxBytes + " bytes");
+    public static FieldError tooLong(String field, int maxChars) {
+        return new FieldError(field, TOO_LONG, "must be at most " + maxChars + " characters");
     }
 
     public static FieldError tooCommon(String field) {

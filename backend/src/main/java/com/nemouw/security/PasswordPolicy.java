@@ -64,17 +64,19 @@ public final class PasswordPolicy {
      */
     public static List<FieldError> check(String field, String password, String... personalInfo) {
         List<FieldError> errors = new ArrayList<>();
-        if (password == null || password.isEmpty()) return errors;   // "required" is reported separately
+        if (password == null || password.isEmpty()) return errors;
 
-        // NFKC so visually identical passwords count the same. Apply the same normalization before hashing.
-        String pw = TextNormalizer.nfkc(password);
-
-        if (pw.codePointCount(0, pw.length()) < PASSWORD_MIN_LENGTH)
+        int rawLength = password.codePointCount(0, password.length());
+        if (rawLength > PASSWORD_MAX_LENGTH)
+            errors.add(FieldErrors.tooLong(field, PASSWORD_MAX_LENGTH));
+        if (rawLength < PASSWORD_MIN_LENGTH)
             errors.add(FieldErrors.tooShort(field, PASSWORD_MIN_LENGTH));
-        if (pw.getBytes(StandardCharsets.UTF_8).length > PASSWORD_MAX_BYTES)
-            errors.add(FieldErrors.tooLong(field, PASSWORD_MAX_BYTES));
 
-        String[] forms = normalizedForms(pw);
+        if (!errors.isEmpty()) return errors; // fail early
+
+        // NFC for validation
+        String normalizedPw  = TextNormalizer.nfc(password);
+        String[] forms = normalizedForms(normalizedPw);
 
         if (isCommon(forms))
             errors.add(FieldErrors.tooCommon(field));
@@ -93,7 +95,14 @@ public final class PasswordPolicy {
         String leetDecoded = lower.replace('@', 'a').replace('0', 'o').replace('3', 'e')
                 .replace('$', 's').replace('5', 's').replace('7', 't').replace('1', 'i')
                 .replaceAll("[^\\p{L}]", "");
-        return new String[]{lower, lettersOnly, leetDecoded};
+
+        // Prevent validation anomalies with strings that strip out entirely into empty values
+        List<String> list = new ArrayList<>();
+        list.add(lower);
+        if (!lettersOnly.isEmpty()) list.add(lettersOnly);
+        if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly)) list.add(leetDecoded);
+
+        return list.toArray(new String[0]);
     }
 
     private static boolean isCommon(String[] forms) {
