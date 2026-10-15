@@ -18,7 +18,8 @@ import java.util.Set;
 
 /**
  * The single place where password rules live:
- * length, blocklist, and context-specific words. No mandatory composition rules.
+ * length, blocklist, and context-specific words. No mandatory composition
+ * rules.
  */
 public final class PasswordPolicy {
     private PasswordPolicy() {
@@ -48,7 +49,8 @@ public final class PasswordPolicy {
                     String line;
                     while ((line = r.readLine()) != null) {
                         line = line.trim().toLowerCase(Locale.ROOT);
-                        if (!line.isEmpty()) set.add(line);
+                        if (!line.isEmpty())
+                            set.add(line);
                     }
                 }
             }
@@ -64,7 +66,13 @@ public final class PasswordPolicy {
      */
     public static List<FieldError> check(String field, String password, String... personalInfo) {
         List<FieldError> errors = new ArrayList<>();
-        if (password == null || password.isEmpty()) return errors;
+        if (password == null || password.isEmpty())
+            return errors;
+
+        if (password.isBlank()) {
+            errors.add(FieldErrors.required(field));
+            return errors;
+        }
 
         int rawLength = password.codePointCount(0, password.length());
         if (rawLength > PASSWORD_MAX_LENGTH)
@@ -72,10 +80,11 @@ public final class PasswordPolicy {
         if (rawLength < PASSWORD_MIN_LENGTH)
             errors.add(FieldErrors.tooShort(field, PASSWORD_MIN_LENGTH));
 
-        if (!errors.isEmpty()) return errors; // fail early
+        if (!errors.isEmpty())
+            return errors; // fail early
 
         // NFC for validation
-        String normalizedPw  = TextNormalizer.nfc(password);
+        String normalizedPw = TextNormalizer.nfc(password);
         String[] forms = normalizedForms(normalizedPw);
 
         if (isCommon(forms))
@@ -87,7 +96,8 @@ public final class PasswordPolicy {
     }
 
     /**
-     * lowercase, letters only ("Password1!" -> "password"), and leet-decoded ("P@ssw0rd" -> "password").
+     * lowercase, letters only ("Password1!" -> "password"), and leet-decoded
+     * ("P@ssw0rd" -> "password").
      */
     private static String[] normalizedForms(String password) {
         String lower = password.toLowerCase(Locale.ROOT);
@@ -96,17 +106,22 @@ public final class PasswordPolicy {
                 .replace('$', 's').replace('5', 's').replace('7', 't').replace('1', 'i')
                 .replaceAll("[^\\p{L}]", "");
 
-        // Prevent validation anomalies with strings that strip out entirely into empty values
+        // Prevent validation anomalies with strings that strip out entirely into empty
+        // values
         List<String> list = new ArrayList<>();
         list.add(lower);
-        if (!lettersOnly.isEmpty()) list.add(lettersOnly);
-        if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly)) list.add(leetDecoded);
+        if (!lettersOnly.isEmpty())
+            list.add(lettersOnly);
+        if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly))
+            list.add(leetDecoded);
 
         return list.toArray(new String[0]);
     }
 
     private static boolean isCommon(String[] forms) {
-        for (String f : forms) if (COMMON.contains(f)) return true;
+        for (String f : forms)
+            if (COMMON.contains(f))
+                return true;
         return false;
     }
 
@@ -114,14 +129,17 @@ public final class PasswordPolicy {
         Set<String> words = new HashSet<>(SERVICE_WORDS);
         if (personalInfo != null) {
             for (String part : personalInfo) {
-                if (part == null) continue;
+                if (part == null)
+                    continue;
                 String p = part.trim().toLowerCase(Locale.ROOT);
-                if (p.length() >= MIN_PERSONAL_PART) words.add(p);
+                if (p.length() >= MIN_PERSONAL_PART)
+                    words.add(p);
             }
         }
         for (String w : words)
             for (String f : forms)
-                if (f.contains(w)) return true;
+                if (f.contains(w))
+                    return true;
         return false;
     }
 }

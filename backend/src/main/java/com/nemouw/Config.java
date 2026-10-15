@@ -13,7 +13,8 @@ public final class Config {
     private static final String DB_URL = "DB_URL";
     private static final String JWT_SECRET = "JWT_SECRET";
     private static final String OTP_HASH_SECRET = "OTP_HASH_SECRET";
-    private static final List<String> REQUIRED = List.of(DB_URL, JWT_SECRET, OTP_HASH_SECRET);
+    private static final String RESEND_API_KEY = "RESEND_API_KEY";
+    private static final List<String> REQUIRED = List.of(DB_URL, JWT_SECRET, OTP_HASH_SECRET, RESEND_API_KEY);
 
     private Config() {
     }
@@ -24,7 +25,7 @@ public final class Config {
     public static void validate() {
         List<String> missing = REQUIRED.stream()
                 .filter(k -> {
-                    String v = ENV.get(k);
+                    String v = get(k);
                     return v == null || v.isBlank();
                 })
                 .toList();
@@ -38,7 +39,7 @@ public final class Config {
      * For secrets and connection strings: the app refuses to start without them.
      */
     public static String require(String key) {
-        String v = ENV.get(key);
+        String v = get(key);
         if (v == null || v.isBlank()) {
             throw new IllegalStateException("Missing required environment variable: " + key);
         }
@@ -49,7 +50,7 @@ public final class Config {
      * For tunable settings that have a sensible default.
      */
     public static int getInt(String key, int defaultValue) {
-        String v = ENV.get(key);
+        String v = get(key);
         if (v == null || v.isBlank()) return defaultValue;
         try {
             return Integer.parseInt(v.trim());
@@ -60,8 +61,13 @@ public final class Config {
     }
 
     public static boolean getBoolean(String key, boolean defaultValue) {
-        String v = ENV.get(key);
+        String v = get(key);
         return (v == null || v.isBlank()) ? defaultValue : Boolean.parseBoolean(v.trim());
+    }
+
+    private static String get(String key) {
+        String override = System.getProperty(key);   // tests and -D flags win over .env
+        return (override != null && !override.isBlank()) ? override : ENV.get(key);
     }
 
     public static String dbUrl() {
@@ -88,5 +94,5 @@ public final class Config {
         return getInt("DDOS_SHIELD_REQUEST_LIMIT_PER_SECOND", 5);
     }
 
-    public static String resendApiKey() { return require("RESEND_API_KEY"); }
+    public static String resendApiKey() { return require(RESEND_API_KEY); }
 }
