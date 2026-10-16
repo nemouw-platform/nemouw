@@ -125,10 +125,11 @@ public class AuthService {
     }
 
     public IssuedSession verifyOtp(VerifyOtpRequest req, ClientInfo client) {
+        String code = req.code() == null ? null : req.code().trim();
         new Validator()
                 .requiredEmail("email", req.email())
-                .required("code", req.code())
-                .check(req.code() == null || req.code().matches("\\d{" + OTP_CODE_DIGITS + "}"),
+                .required("code", code)
+                .check(code == null || code.matches("\\d{" + OTP_CODE_DIGITS + "}"),
                         FieldErrors.invalidFormat("code", "must be " + OTP_CODE_DIGITS + " digits"))
                 .throwIfInvalid();
 
@@ -139,7 +140,7 @@ public class AuthService {
                 .orElseThrow(Errors::invalidOrExpiredCode);
 
         // tryVerify never throws on a bad code: throwing would roll back the spent attempt
-        return jdbi.inTransaction(h -> tryVerify(h, identity, req.code(), client))
+        return jdbi.inTransaction(h -> tryVerify(h, identity, code, client))
                 .orElseThrow(Errors::invalidOrExpiredCode);
     }
 

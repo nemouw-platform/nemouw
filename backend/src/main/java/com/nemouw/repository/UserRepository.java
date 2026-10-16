@@ -33,7 +33,9 @@ public class UserRepository {
     }
 
     public void replacePassword(Handle h, UUID userId, String hash) {
-        h.createUpdate("UPDATE user_passwords SET password_hash = :hash WHERE user_id = :userId")
+        h.createUpdate("""
+                        INSERT INTO user_passwords (user_id, password_hash) VALUES (:userId, :hash)
+                        ON CONFLICT (user_id) DO UPDATE SET password_hash = EXCLUDED.password_hash""")
                 .bind("userId", userId)
                 .bind("hash", hash)
                 .execute();
