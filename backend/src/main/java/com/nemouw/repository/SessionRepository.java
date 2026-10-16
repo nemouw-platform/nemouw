@@ -97,4 +97,9 @@ public class SessionRepository {
                           AND revoked_at IS NULL""")
                 .bind("h", hash).execute();
     }
+
+    public void revokeAllForUser(Handle h, UUID userId) {
+        h.createUpdate("UPDATE user_sessions SET revoked_at = now() WHERE user_id = :userId AND revoked_at IS NULL")
+                .bind("userId", userId).execute();
+    }
 }

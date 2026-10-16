@@ -16,14 +16,15 @@ public final class Errors {
     public static final String MALFORMED_JSON = "MALFORMED_JSON";
     public static final String FORBIDDEN = "FORBIDDEN";
     public static final String UNAUTHENTICATED = "UNAUTHENTICATED";
+    public static final String TOO_MANY_REQUESTS = "TOO_MANY_REQUESTS";
 
     // ---- Auth ----
     public static ApiException invalidCredentials() {
-        return ApiException.unauthorized(INVALID_CREDENTIALS, "Invalid credentials");
+        return ApiException.unauthorized(INVALID_CREDENTIALS, "Invalid email or password");
     }
 
     public static ApiException invalidOrExpiredCode() {
-        return ApiException.badRequest(INVALID_OR_EXPIRED_TOKEN, "Code is invalid, expired, or locked");
+        return ApiException.badRequest(INVALID_OR_EXPIRED_TOKEN, "The code is invalid or has expired");
     }
 
     public static ApiException emailTaken() {
@@ -31,11 +32,11 @@ public final class Errors {
     }
 
     public static ApiException accountNotVerified() {
-        return ApiException.forbidden(ACCOUNT_NOT_VERIFIED, "Verify your email to continue");
+        return ApiException.forbidden(ACCOUNT_NOT_VERIFIED, "Your account is not verified yet. Please verify your email to log in.");
     }
 
     public static ApiException accountSuspended() {
-        return ApiException.forbidden(ACCOUNT_SUSPENDED, "This account is suspended");
+        return ApiException.forbidden(ACCOUNT_SUSPENDED, "This account has been suspended for violating our terms of service. Please contact support if you believe this is a mistake.");
     }
 
     public static ApiException invalidRefreshToken() {
@@ -48,7 +49,7 @@ public final class Errors {
     }
 
     public static ApiException tooManyRequests(int retryAfterSeconds) {
-        return ApiException.tooManyRequests(MALFORMED_JSON, "Too many requests", retryAfterSeconds);
+        return ApiException.tooManyRequests(TOO_MANY_REQUESTS, "Too many requests", retryAfterSeconds);
     }
 
     // ---- Middleware ----

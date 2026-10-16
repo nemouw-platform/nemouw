@@ -33,8 +33,10 @@ public class UserRepository {
     }
 
     public void replacePassword(Handle h, UUID userId, String hash) {
-        h.createUpdate("UPDATE user_passwords SET password_hash = :h WHERE user_id = :u")
-                .bind("u", userId).bind("h", hash).execute();
+        h.createUpdate("UPDATE user_passwords SET password_hash = :hash WHERE user_id = :userId")
+                .bind("userId", userId)
+                .bind("hash", hash)
+                .execute();
     }
 
     public void updateName(Handle h, UUID userId, String firstName, String lastName) {

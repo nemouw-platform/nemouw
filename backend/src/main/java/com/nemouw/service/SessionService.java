@@ -1,4 +1,4 @@
-package com.nemouw.security;
+package com.nemouw.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static com.nemouw.Constants.*;
 
-public class TokenService {
+public class SessionService {
     private final SecureRandom random = new SecureRandom();
     private final SessionRepository sessions;
     private final Algorithm algorithm;
@@ -32,7 +32,7 @@ public class TokenService {
 
     public record AccessClaims(UUID userId, UUID sessionId) {}
 
-    public TokenService(SessionRepository sessions, String jwtSecret) {
+    public SessionService(SessionRepository sessions, String jwtSecret) {
         if (jwtSecret == null || jwtSecret.length() < MIN_SECRET_LENGTH)
             throw new IllegalStateException("JWT_SECRET must be at least " + MIN_SECRET_LENGTH + " characters");
         this.sessions = sessions;

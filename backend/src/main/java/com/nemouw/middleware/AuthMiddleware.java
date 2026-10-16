@@ -4,7 +4,7 @@ import com.nemouw.enums.UserRole;
 import com.nemouw.http.AuthCookies;
 import com.nemouw.error.Errors;
 import com.nemouw.repository.SessionRepository;
-import com.nemouw.security.TokenService;
+import com.nemouw.service.SessionService;
 import org.apache.logging.log4j.ThreadContext;
 import org.jdbi.v3.core.Jdbi;
 import spark.Request;
@@ -40,10 +40,10 @@ public class AuthMiddleware {
     );
 
     private final Jdbi jdbi;
-    private final TokenService tokens;
+    private final SessionService tokens;
     private final SessionRepository sessions;
 
-    public AuthMiddleware(Jdbi jdbi, TokenService tokens, SessionRepository sessions) {
+    public AuthMiddleware(Jdbi jdbi, SessionService tokens, SessionRepository sessions) {
         this.jdbi = jdbi;
         this.tokens = tokens;
         this.sessions = sessions;
@@ -75,6 +75,6 @@ public class AuthMiddleware {
 
         req.attribute(AuthContext.ATTR,
                 new AuthContext(claims.userId(), claims.sessionId(), UserRole.fromCode(session.roleCode())));
-        ThreadContext.put("user_id", claims.userId().toString());   // optional: add %X{user_id} to log4j2.xml
+        ThreadContext.put("user_id", claims.userId().toString());
     }
 }

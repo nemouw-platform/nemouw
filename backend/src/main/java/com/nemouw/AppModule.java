@@ -17,30 +17,34 @@ import static spark.Spark.path;
 
 public class AppModule {
 
-    public record Secrets(String jwtSecret, String otpSecret) {}
+    public record Secrets(String jwtSecret, String otpSecret) {
+    }
 
-    /** Filters, then routes. Main and the integration tests both call this, so tests run the real wiring. */
+    /**
+     * Filters, then routes. Main and the integration tests both call this, so tests run the real wiring.
+     */
     public static void configure(Jdbi jdbi, Secrets secrets, EmailSender emailSender, boolean ddosShield) {
         SessionRepository sessions = new SessionRepository();
         UserRepository users = new UserRepository();
         VerificationTokenRepository verificationTokens = new VerificationTokenRepository();
-
-        OtpService otpService = new OtpService(secrets.otpSecret());
-        TokenService tokenService = new TokenService(sessions, secrets.jwtSecret());
-        OtpIssuer otpIssuer = new OtpIssuer(otpService, verificationTokens);
+        PasswordHasher hasher = new PasswordHasher();
+        VerificationTokenService verificationTokenService = new VerificationTokenService(secrets.otpSecret());
+        SessionService sessionService = new SessionService(sessions, secrets.jwtSecret());
+        VerificationTokenIssuer verificationTokenIssuer = new VerificationTokenIssuer(verificationTokenService, verificationTokens);
+        SessionRepository sessionRepository = new SessionRepository();
 
         // Filters run in registration order
         ErrorHandling.install();
         enableCORS();
         if (ddosShield) runDdosShield();
         CsrfGuard.install();
-        new AuthMiddleware(jdbi, tokenService, sessions).install();
+        new AuthMiddleware(jdbi, sessionService, sessions).install();
 
-        AuthService authService = new AuthService(
-                jdbi, users, verificationTokens, new PasswordHasher(),
-                otpService, otpIssuer, tokenService, emailSender);
+        AuthDependencies dependencies = new AuthDependencies(jdbi, users, verificationTokens, hasher, verificationTokenService, verificationTokenIssuer, sessionService, sessionRepository, emailSender);
+        AuthService auth = new AuthService(dependencies);
+        PasswordResetService passwordReset = new PasswordResetService(dependencies);
 
-        List<Controller> controllers = List.of(new AuthController(authService));
+        List<Controller> controllers = List.of(new AuthController(auth, passwordReset));
         path("/v1", () -> controllers.forEach(Controller::register));
     }
 }

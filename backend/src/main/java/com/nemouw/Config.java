@@ -14,6 +14,7 @@ public final class Config {
     private static final String JWT_SECRET = "JWT_SECRET";
     private static final String OTP_HASH_SECRET = "OTP_HASH_SECRET";
     private static final String RESEND_API_KEY = "RESEND_API_KEY";
+    private static final String URL_BASE = "URL_BASE";
     private static final List<String> REQUIRED = List.of(DB_URL, JWT_SECRET, OTP_HASH_SECRET, RESEND_API_KEY);
 
     private Config() {
@@ -95,4 +96,6 @@ public final class Config {
     }
 
     public static String resendApiKey() { return require(RESEND_API_KEY); }
+    
+    public static String urlBase() { return require(URL_BASE); }
 }

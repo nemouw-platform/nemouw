@@ -20,4 +20,10 @@ public class TextNormalizer {
     public static String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
+
+    public static String emailLocalPart(String email) {
+        if (email == null) return null;
+        int at = email.indexOf('@');
+        return at > 0 ? email.substring(0, at) : null;
+    }
 }

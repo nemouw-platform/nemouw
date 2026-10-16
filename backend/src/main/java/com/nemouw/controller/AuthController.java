@@ -6,6 +6,7 @@ import com.nemouw.http.Json;
 import com.nemouw.model.AuthDtos;
 import com.nemouw.model.ClientInfo;
 import com.nemouw.service.AuthService;
+import com.nemouw.service.PasswordResetService;
 import spark.Request;
 import spark.Response;
 
@@ -15,8 +16,12 @@ import static spark.Spark.post;
 
 public class AuthController implements Controller {
     private final AuthService auth;
+    private final PasswordResetService passwordReset;
 
-    public AuthController(AuthService auth) { this.auth = auth; }
+    public AuthController(AuthService auth, PasswordResetService passwordReset) {
+        this.auth = auth;
+        this.passwordReset = passwordReset;
+    }
 
     @Override
     public void register() {
@@ -41,6 +46,16 @@ public class AuthController implements Controller {
             post("/logout", noContent((req, res) -> {
                 auth.logout(req.cookie(AuthCookies.REFRESH));
                 AuthCookies.clear(res);      // cleared even if the cookie was missing or the token unknown
+                return null;
+            }));
+
+            post("/password/forgot", accepted((req, res) -> {
+                passwordReset.forgotPassword(Json.read(req.body(), AuthDtos.ForgotPasswordRequest.class));
+                return null;
+            }));
+
+            post("/password/reset", ok((req, res) -> {
+                passwordReset.resetPassword(Json.read(req.body(), AuthDtos.ResetPasswordRequest.class));
                 return null;
             }));
         });

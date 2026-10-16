@@ -19,6 +19,10 @@ public final class AuthDtos {
 
     public record LoginRequest(String identifier, String password) {}
 
+    public record ForgotPasswordRequest(String email) {}
+
+    public record ResetPasswordRequest(String token, String newPassword) {}
+
     // What the client is allowed to see.
     public record SessionResponse(UUID userId, String role, int expiresIn) {
         public static SessionResponse from(IssuedSession s) {
