@@ -1,0 +1,19 @@
+# Maven build output
+target/
+dependency-reduced-pom.xml
+
+# Packaged artifacts
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+
+# JVM crash and dump files
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# Local Spring config (secrets, machine-specific overrides)
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+src/main/resources/application-local.yaml
