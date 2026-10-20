@@ -2,28 +2,42 @@ services:
   backend:
     build:
       context: ./backend
-      target: build
+      target: dev
     env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./backend/src:/app/src
-      - ./backend/pom.xml:/app/pom.xml
+      - ./backend:/app
       - maven_repo:/root/.m2
-      - ./.env:/app/.env:ro
-      - ./backend/logs:/app/logs
     ports:
-      - "4567:4567"
-    command: mvn compile exec:java -Dexec.mainClass=com.nemouw.Main
+      - "8080:8080"
+      - "5005:5005"
+    command: >
+      mvn spring-boot:run
+      -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     depends_on:
       db:
         condition: service_healthy
 
+    develop:
+      watch:
+        # Rebuild the container when a Java file changes so it recompiles and re-executes automatically
+        - path: ./backend/src/main/java
+          action: rebuild
+
+        # Completely rebuild the image target if you add a new maven dependency
+        - path: ./backend/pom.xml
+          action: rebuild
+
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     env_file: .env
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
       interval: 5s
