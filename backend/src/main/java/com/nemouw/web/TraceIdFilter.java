@@ -21,6 +21,8 @@ import java.util.UUID;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TraceIdFilter extends OncePerRequestFilter {
     public static final String MDC_KEY = "trace_id";
+    /** Echoed on every response (success or error) so support can match a user's report to the logs. */
+    public static final String HEADER = "X-Trace-Id";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -28,6 +30,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
         String traceId = UUID.randomUUID().toString();
         request.setAttribute(MDC_KEY, traceId);
         MDC.put(MDC_KEY, traceId);
+        response.setHeader(HEADER, traceId);
         try {
             chain.doFilter(request, response);
         } finally {

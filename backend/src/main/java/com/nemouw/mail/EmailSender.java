@@ -52,7 +52,7 @@ public class EmailSender {
 
     public void sendPasswordReset(String to, String token, LocaleCode locale) {
         submit(EmailType.PASSWORD_RESET, to, locale, Map.of(
-                "link", urlBase + "/reset-password?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8),
+                "link", urlBase + "/reset-password#token=" + URLEncoder.encode(token, StandardCharsets.UTF_8),
                 "minutes", String.valueOf(AuthConstants.RESET_TTL_SECONDS / 60)));
     }
 

@@ -66,7 +66,9 @@ public class SignupService {
         new Validator()
                 .check(role != null && SELF_REGISTERABLE.contains(role), FieldErrors.invalidRole("role"))
                 .required("first_name", req.firstName())
+                .maxLength("first_name", req.firstName(), NAME_MAX_LENGTH)
                 .required("last_name", req.lastName())
+                .maxLength("last_name", req.lastName(), NAME_MAX_LENGTH)
                 .requiredEmail("email", req.email())
                 .throwIfInvalid();
 
@@ -84,7 +86,7 @@ public class SignupService {
         Registration registration;
         try {
             registration = tx.execute(status -> users.findByEmail(email)
-                    .map(this::restartPending)
+                    .map(existing -> restartPending(existing, firstName, lastName))
                     .orElseGet(() -> registerNew(role, firstName, lastName, email)));
         } catch (DuplicateKeyException e) {
             throw Errors.emailTaken();   // two signups raced for the same email
@@ -92,7 +94,7 @@ public class SignupService {
 
         IssuedOtp issued = registration.otp();
         emailSender.sendSignupOtp(email, issued.code(), LocaleCode.orDefault(req.locale()));
-        return new SignupResponse(registration.userId(), email, issued.expiresAt());
+        return new SignupResponse(email, issued.expiresAt());
     }
 
     private Registration registerNew(UserRole role, String firstName, String lastName, String email) {
@@ -103,11 +105,12 @@ public class SignupService {
     }
 
     /**
-     * Signing up again with a still-pending email only re-issues the OTP. The stored name is NOT touched:
-     * the OTP goes to the mailbox owner, so an anonymous signup must not be able to rewrite the account that
-     * owner is about to claim. (There is no password to protect any more, but the same rule keeps the profile safe.)
+     * Signing up again with a still-pending email re-issues the OTP and rewrites the stored name with the one
+     * just submitted, so the person who actually owns the mailbox (and receives the code) ends up with the name
+     * they typed last. Only a PENDING account is touched: the status is re-read under the row lock, and the name
+     * update shares the transaction with the OTP issue, so a throttled attempt changes nothing.
      */
-    private Registration restartPending(EmailIdentity existing) {
+    private Registration restartPending(EmailIdentity existing, String firstName, String lastName) {
         UUID userId = existing.userId();
 
         // Lock first, then trust the locked status instead of the earlier unlocked read
@@ -118,6 +121,7 @@ public class SignupService {
         IssuedOtp issued = tokenIssuer.issueOtp(userId, existing.identifierId(), VerificationPurpose.SIGNUP_OTP)
                 .orElseThrow(() -> Errors.tooManyRequests(Math.max(1,
                         tokenIssuer.secondsUntilAllowed(existing.identifierId(), VerificationPurpose.SIGNUP_OTP))));
+        users.updateName(userId, firstName, lastName);
         return new Registration(userId, issued);
     }
 

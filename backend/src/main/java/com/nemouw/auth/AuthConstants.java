@@ -16,6 +16,11 @@ public final class AuthConstants {
     // The User-Agent header can be 8 KB: don't store attacker-sized text.
     public static final int MAX_USER_AGENT_LENGTH = 512;
 
+    // ---- Signup input limits (counted in characters, after trimming) ----
+    // 254 is the longest valid email address (RFC 5321). Also keeps values well inside the index row size limit.
+    public static final int EMAIL_MAX_LENGTH = 254;
+    public static final int NAME_MAX_LENGTH = 100;
+
     // ---- Passwords ----
     public static final int PASSWORD_MIN_LENGTH = 8;
     public static final int PASSWORD_MAX_LENGTH = 64;

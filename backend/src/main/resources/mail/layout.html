@@ -6,40 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
-    <meta name="color-scheme" content="light only">
-    <meta name="supported-color-schemes" content="light only">
+    <!-- Both schemes are supported: the email never paints its own page background, so the mail app's own
+         light or dark background shows through, and only the text colours below change with the scheme. -->
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
     <title th:text="${subject}">Nemouw</title>
+    <style>
+        :root { color-scheme: light dark; supported-color-schemes: light dark; }
+
+        /* Apple Mail, iOS Mail, Outlook (new) and other clients that honour prefers-color-scheme */
+        @media (prefers-color-scheme: dark) {
+            .c-head  { color: #F4EEF8 !important; }
+            .c-body  { color: #D9CFE2 !important; }
+            .c-muted { color: #A89BB6 !important; }
+            .c-brand { color: #D2B8E6 !important; }
+            .c-link  { color: #D2B8E6 !important; }
+            .c-code  { color: #E3D0F2 !important; border-color: #6B5A7C !important; }
+            .c-card  { border-color: #4B3C59 !important; }
+            .c-rule  { border-color: #4B3C59 !important; }
+            .c-btn   { background-color: #8A55AD !important; }
+        }
+
+        /* Outlook.com / Outlook apps, which mark dark mode with data-ogsc (text) and data-ogsb (background) */
+        [data-ogsc] .c-head  { color: #F4EEF8 !important; }
+        [data-ogsc] .c-body  { color: #D9CFE2 !important; }
+        [data-ogsc] .c-muted { color: #A89BB6 !important; }
+        [data-ogsc] .c-brand { color: #D2B8E6 !important; }
+        [data-ogsc] .c-link  { color: #D2B8E6 !important; }
+        [data-ogsc] .c-code  { color: #E3D0F2 !important; border-color: #6B5A7C !important; }
+        [data-ogsc] .c-card  { border-color: #4B3C59 !important; }
+        [data-ogsc] .c-rule  { border-color: #4B3C59 !important; }
+        [data-ogsb] .c-btn   { background-color: #8A55AD !important; }
+    </style>
 </head>
-<body style="margin:0;padding:0;background-color:#F6F2F8;">
+<body style="margin:0;padding:0;">
 <!-- Preheader: the preview text inbox lists show after the subject -->
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;" th:text="${preheader}">Preheader</div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F6F2F8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td align="center" style="padding:32px 16px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 
                 <!-- Brand -->
                 <tr>
-                    <td align="center"
+                    <td align="center" class="c-brand"
                         style="padding:0 0 20px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:24px;line-height:30px;font-weight:700;letter-spacing:0.5px;color:#502668;"
                         th:text="${brand}">Nemouw</td>
                 </tr>
 
-                <!-- Card -->
+                <!-- Card: no fill of its own, only a border, so it sits on whatever background the mail app uses -->
                 <tr>
-                    <td th:attr="dir=${dir}"
-                        style="background-color:#FFFFFF;border:1px solid #E7DEEE;border-radius:12px;padding:36px 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;color:#2E1840;">
+                    <td th:attr="dir=${dir}" class="c-card c-head"
+                        style="border:1px solid #DCD0E6;border-radius:12px;padding:36px 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;color:#2E1840;">
                         <th:block th:replace="${content}">content goes here</th:block>
                     </td>
                 </tr>
 
                 <!-- Footer -->
                 <tr>
-                    <td align="center"
+                    <td align="center" class="c-muted"
                         style="padding:24px 16px 0 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:12px;line-height:18px;color:#6B6277;">
                         <span th:text="#{mail.footer.unrequested}">Footer note</span><br>
-                        &copy; <span th:text="${year}">2026</span> <span th:text="${brand}">Nemouw</span>
+                        &copy; <span th:text="${brand}">Nemouw</span>
                     </td>
                 </tr>
             </table>

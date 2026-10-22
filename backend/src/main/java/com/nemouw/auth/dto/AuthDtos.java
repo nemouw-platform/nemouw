@@ -15,14 +15,16 @@ public final class AuthDtos {
     // No password here: it is chosen after the email is verified (see SetPasswordRequest).
     public record SignupRequest(String role, String firstName, String lastName, String email, String locale) {}
 
-    public record SignupResponse(UUID userId, String email, OffsetDateTime otpExpiresAt) {}
+    // No user id here: anonymous callers must not learn internal ids. The id is only returned with a real session.
+    public record SignupResponse(String email, OffsetDateTime otpExpiresAt) {}
 
     public record VerifyOtpRequest(String email, String code) {}
 
     // Verified, but still no session: the only thing the caller may do next is set a password.
-    public record PasswordSetupResponse(UUID userId, int expiresIn) {
+    // No user id: it is only returned once the password is set and a session starts (see SessionResponse).
+    public record PasswordSetupResponse(int expiresIn) {
         public static PasswordSetupResponse from(IssuedSetupToken t) {
-            return new PasswordSetupResponse(t.userId(), SETUP_TTL_SECONDS);
+            return new PasswordSetupResponse(SETUP_TTL_SECONDS);
         }
     }
 

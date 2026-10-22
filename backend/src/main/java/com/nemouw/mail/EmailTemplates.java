@@ -56,7 +56,10 @@ public class EmailTemplates {
 
     public Rendered render(EmailType type, LocaleCode locale, Map<String, Object> vars) {
         Locale loc = Locale.forLanguageTag(locale.code());
-        String subject = messages.getMessage(type.subjectKey(), null, loc);
+        // {0} = the one-time code, so the subject can lead with it (copyable from the inbox list / notification).
+        // Other email types have no placeholder and ignore it.
+        Object[] args = {vars.getOrDefault("code", "")};
+        String subject = messages.getMessage(type.subjectKey(), args, loc);
 
         var ctx = new Context(loc);
         ctx.setVariables(vars);

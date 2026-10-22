@@ -2,21 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!-- One-time code box. dir=ltr keeps digits in order inside RTL emails. -->
-<table th:fragment="codeBox(code)" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+<!-- One-time code box. dir=ltr keeps digits in order inside RTL emails.
+     No background fill: just a border, so it works on the mail app's light or dark background. -->
+<!-- The label sits in the same cell as the code, so the text reads "Your verification code is 123456" as one unit
+     (what code detectors such as Gmail's "Copy code" look for). Only the digits are click-to-select. -->
+<table th:fragment="codeBox(label, code)" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
        style="margin:28px 0;">
     <tr>
-        <td align="center" dir="ltr"
-            style="background-color:#F1EAF6;border:1px solid #DCCDE8;border-radius:10px;padding:18px 12px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:34px;line-height:40px;font-weight:700;letter-spacing:10px;color:#502668;"
-            th:text="${code}">123456</td>
+        <td align="center" dir="ltr" class="c-code"
+            style="border:2px solid #C9B6DB;border-radius:10px;padding:18px 12px;color:#502668;">
+            <div th:attr="dir=${dir}" class="c-muted"
+                 style="margin:0 0 8px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:400;letter-spacing:normal;color:#6B6277;"
+                 th:text="${label}">Your verification code is</div>
+            <div dir="ltr"
+                 style="font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:34px;line-height:40px;font-weight:700;letter-spacing:10px;-webkit-user-select:all;user-select:all;"
+                 th:text="${code}">123456</div>
+        </td>
     </tr>
 </table>
 
-<!-- Call-to-action button (table-based so it renders in Outlook too) -->
+<!-- Call-to-action button (table-based so it renders in Outlook too).
+     It keeps its own purple fill with white text: that is a control, readable on both backgrounds. -->
 <table th:fragment="button(url, label)" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0"
        style="margin:28px auto;">
     <tr>
-        <td align="center" bgcolor="#502668" style="background-color:#502668;border-radius:8px;">
+        <td align="center" class="c-btn" bgcolor="#502668" style="background-color:#502668;border-radius:8px;">
             <a th:href="${url}" target="_blank"
                style="display:inline-block;padding:14px 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:16px;line-height:20px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:8px;"
                th:text="${label}">Button</a>

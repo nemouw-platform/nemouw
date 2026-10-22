@@ -16,11 +16,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
- * Spring Security rejects requests in a servlet filter, before any controller runs, so
- * GlobalExceptionHandler never sees them. This writes the same JSON {@link ErrorBody} for those 401 and 403s.
+ * Spring Security (and our rate limiter) reject requests in a servlet filter, before any controller runs,
+ * so GlobalExceptionHandler never sees them. This writes the same JSON {@link ErrorBody} for those responses.
  */
 @Component
 public class SecurityErrorHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
@@ -46,10 +45,12 @@ public class SecurityErrorHandler implements AuthenticationEntryPoint, AccessDen
         write(response, Errors.forbidden());
     }
 
-    private void write(HttpServletResponse response, ApiException error) throws IOException {
+    /** Writes any ApiException, including its extra headers (Retry-After) and field errors. */
+    public void write(HttpServletResponse response, ApiException error) throws IOException {
         response.setStatus(error.status());
+        error.responseHeaders().forEach((name, values) -> values.forEach(value -> response.addHeader(name, value)));
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         mapper.writeValue(response.getOutputStream(), new ErrorBody(
-                error.status(), error.code(), error.getMessage(), MDC.get(TraceIdFilter.MDC_KEY), List.of()));
+                error.status(), error.code(), error.getMessage(), MDC.get(TraceIdFilter.MDC_KEY), error.fieldErrors()));
     }
 }
