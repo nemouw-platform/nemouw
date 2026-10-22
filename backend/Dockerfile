@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B
 # ---- Build stage ----
 FROM dev AS build
 COPY src ./src
-RUN --mount=type=cache,target=/root/.m2 mvn package -DskipTests -B
+RUN --mount=type=cache,target=/root/.m2 mvn package -Dmaven.test.skip=true -B
 
 
 # ---- Extract Layers ----

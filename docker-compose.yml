@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       target: dev
-    env_file: .env
+    env_file: ./backend/.env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}

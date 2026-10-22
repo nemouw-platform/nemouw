@@ -1,3 +1,12 @@
+# Env files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
 # Maven build output
 target/
 dependency-reduced-pom.xml
