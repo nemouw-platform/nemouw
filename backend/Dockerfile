@@ -1,4 +1,4 @@
-# ---- Dev stage (Built with pre-installed Maven) ----
+# ---- Dev stage (Maven + JDK, the target docker compose uses) ----
 FROM maven:3.9-eclipse-temurin-25 AS dev
 WORKDIR /app
 COPY pom.xml ./
@@ -11,11 +11,11 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 mvn package -Dmaven.test.skip=true -B
 
 
-# ---- Extract Layers ----
-# unzips the JAR into specific layers for optimal Docker caching
+# ---- Extract layers ----
+# Splits the jar into layers (dependencies, loader, snapshot dependencies, application) for Docker caching.
 FROM eclipse-temurin:25-jdk-jammy AS extract
 WORKDIR /extract
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar application.jar
 RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 
@@ -25,14 +25,13 @@ WORKDIR /app
 
 RUN groupadd -r app && useradd -r -g app app
 
-# Copy each layer individually.
-# Docker will cache the first layers and only re-copy the 'application' layer on code changes.
+# One COPY per layer: Docker keeps the first three cached and only re-copies the application layer on code changes
 COPY --from=extract /extract/extracted/dependencies/ ./
 COPY --from=extract /extract/extracted/spring-boot-loader/ ./
 COPY --from=extract /extract/extracted/snapshot-dependencies/ ./
 COPY --from=extract /extract/extracted/application/ ./
 
-# Secure container by running as non-root user
+# Run as a non-root user
 USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "application.jar"]
