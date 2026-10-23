@@ -12,8 +12,8 @@ services:
       - ./backend:/app
       - maven_repo:/root/.m2
     ports:
-      - "8080:8080"
-      - "5005:5005"
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:5005:5005"
     command: >
       mvn spring-boot:run
       -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"

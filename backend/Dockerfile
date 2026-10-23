@@ -14,9 +14,9 @@ RUN --mount=type=cache,target=/root/.m2 mvn package -Dmaven.test.skip=true -B
 # ---- Extract Layers ----
 # unzips the JAR into specific layers for optimal Docker caching
 FROM eclipse-temurin:25-jdk-jammy AS extract
-WORKDIR /app
+WORKDIR /extract
 COPY --from=build /app/target/*.jar app.jar
-RUN java -Djarmode=tools -jar app.jar extract
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 
 # ---- Runtime stage ----
@@ -27,13 +27,12 @@ RUN groupadd -r app && useradd -r -g app app
 
 # Copy each layer individually.
 # Docker will cache the first layers and only re-copy the 'application' layer on code changes.
-COPY --from=extract /app/dependencies/ ./
-COPY --from=extract /app/snapshot-dependencies/ ./
-COPY --from=extract /app/application/ ./
+COPY --from=extract /extract/extracted/dependencies/ ./
+COPY --from=extract /extract/extracted/spring-boot-loader/ ./
+COPY --from=extract /extract/extracted/snapshot-dependencies/ ./
+COPY --from=extract /extract/extracted/application/ ./
 
 # Secure container by running as non-root user
 USER app
 EXPOSE 8080
-
-# Use JarLauncher instead of 'java -jar' to boot from the extracted layers natively
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-jar", "application.jar"]

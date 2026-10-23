@@ -1,11 +1,7 @@
 package com.nemouw.config;
 
 import com.nemouw.enums.UserRole;
-import com.nemouw.web.ClientIpResolver;
-import com.nemouw.web.RateLimitFilter;
-import com.nemouw.web.RateLimiter;
-import com.nemouw.web.SecurityErrorHandler;
-import com.nemouw.web.TraceIdFilter;
+import com.nemouw.web.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -57,7 +54,7 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain publicAuthChain(HttpSecurity http, RateLimiter limiter, ClientIpResolver clientIp,
-                                        SecurityErrorHandler errors) throws Exception {
+                                        SecurityErrorHandler errors) {
         applyStatelessDefaults(http, new RateLimitFilter(limiter, clientIp, errors));
 
         return http
@@ -69,7 +66,7 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain apiChain(HttpSecurity http, RateLimiter limiter, ClientIpResolver clientIp,
-                                 SecurityErrorHandler errors, JwtDecoder jwtDecoder) throws Exception {
+                                 SecurityErrorHandler errors, JwtDecoder jwtDecoder) {
         applyStatelessDefaults(http, new RateLimitFilter(limiter, clientIp, errors));
 
         return http
@@ -88,6 +85,7 @@ public class SecurityConfig {
                         .jwt(jwt -> jwt
                                 .decoder(jwtDecoder)
                                 .jwtAuthenticationConverter(authoritiesConverter())))
+                .addFilterAfter(new UserIdMdcFilter(), BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
@@ -95,7 +93,7 @@ public class SecurityConfig {
     @Bean
     @Order(3)
     SecurityFilterChain fallbackChain(HttpSecurity http, RateLimiter limiter, ClientIpResolver clientIp,
-                                      SecurityErrorHandler errors) throws Exception {
+                                      SecurityErrorHandler errors) {
         applyStatelessDefaults(http, new RateLimitFilter(limiter, clientIp, errors));
 
         return http
