@@ -23,7 +23,8 @@ class AppPropertiesTest {
     private static AppProperties withSecrets(String jwtSecret, String otpHashSecret) {
         AppProperties base = props();
         return new AppProperties(
-                new AppProperties.Security(jwtSecret, otpHashSecret, true, false),
+                new AppProperties.Security(jwtSecret, otpHashSecret, true, false,
+                        900, 90),
                 base.cors(), base.rateLimit(), base.mail());
     }
 

@@ -6,9 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.nemouw.user.AuthConstants.OTP_TTL_SECONDS;
+import static com.nemouw.user.AuthConstants.RESET_TTL_SECONDS;
 import static com.nemouw.support.Fixtures.props;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -38,7 +41,7 @@ class EmailSenderTest {
         EmailSender sender = new EmailSender(resend, props(), templates, Runnable::run);
         AtomicReference<Map<String, Object>> variables = captureTemplateVariables(sender);
 
-        sender.sendPasswordReset("amira.haddad@clinicmail.org", "Zx9-Kq2_mT7vLb4NwR1pYc8HdJ5sUe0AfG3iOa6BkQ", LocaleCode.EN);
+        sender.sendPasswordReset("amira.haddad@clinicmail.org", "Zx9-Kq2_mT7vLb4NwR1pYc8HdJ5sUe0AfG3iOa6BkQ", Duration.ofSeconds(RESET_TTL_SECONDS), LocaleCode.EN);
 
         assertThat(variables.get()).containsEntry("link",
                 "https://app.nemouw.com/reset-password#token=Zx9-Kq2_mT7vLb4NwR1pYc8HdJ5sUe0AfG3iOa6BkQ");
@@ -50,7 +53,7 @@ class EmailSenderTest {
         EmailSender sender = new EmailSender(resend, props(), templates, Runnable::run);
         AtomicReference<Map<String, Object>> variables = captureTemplateVariables(sender);
 
-        sender.sendPasswordReset("amira.haddad@clinicmail.org", "a+b/c=d", LocaleCode.EN);
+        sender.sendPasswordReset("amira.haddad@clinicmail.org", "a+b/c=d", Duration.ofSeconds(RESET_TTL_SECONDS), LocaleCode.EN);
 
         assertThat(variables.get()).containsEntry("link", "https://app.nemouw.com/reset-password#token=a%2Bb%2Fc%3Dd");
     }
@@ -60,7 +63,7 @@ class EmailSenderTest {
         EmailSender sender = new EmailSender(resend, props(), templates, Runnable::run);
         AtomicReference<Map<String, Object>> variables = captureTemplateVariables(sender);
 
-        sender.sendSignupOtp("amira.haddad@clinicmail.org", "482913", LocaleCode.FR);
+        sender.sendSignupOtp("amira.haddad@clinicmail.org", "482913", Duration.ofSeconds(OTP_TTL_SECONDS), LocaleCode.FR);
 
         assertThat(variables.get()).containsEntry("code", "482913").containsEntry("minutes", "10");
     }
@@ -70,7 +73,7 @@ class EmailSenderTest {
         EmailSender sender = new EmailSender(resend, props(), templates, Runnable::run);
         captureTemplateVariables(sender);
 
-        assertThatCode(() -> sender.sendSignupOtp("amira.haddad@clinicmail.org", "482913", LocaleCode.EN))
+        assertThatCode(() -> sender.sendSignupOtp("amira.haddad@clinicmail.org", "482913", Duration.ofSeconds(OTP_TTL_SECONDS), LocaleCode.EN))
                 .doesNotThrowAnyException();
     }
 
@@ -79,7 +82,7 @@ class EmailSenderTest {
         doThrow(new TaskRejectedException("mail queue is full")).when(executor).execute(any());
         EmailSender sender = new EmailSender(resend, props(), templates, executor);
 
-        assertThatCode(() -> sender.sendPasswordReset("amira.haddad@clinicmail.org", "token", LocaleCode.EN))
+        assertThatCode(() -> sender.sendPasswordReset("amira.haddad@clinicmail.org", "token", Duration.ofSeconds(OTP_TTL_SECONDS), LocaleCode.EN))
                 .doesNotThrowAnyException();
     }
 }

@@ -72,17 +72,17 @@ sequenceDiagram
 
 ## 3. Endpoints
 
-| Method and path | Auth | Request body | Success |
-|---|---|---|---|
-| `POST /signup` | none | `role`, `first_name`, `last_name`, `email`, `locale?` | `201` `{email, otp_expires_at}` |
-| `POST /verify-otp` | none | `email`, `code` | `200` `{expires_in}` + setup cookie |
-| `POST /resend-otp` | none | `email`, `locale?` | `202`, empty (always, even for unknown emails) |
-| `POST /password/setup` | setup cookie | `password` | `200` `{user_id, role, expires_in}` + session cookies |
-| `POST /login` | none | `identifier`, `password` | `200` `{user_id, role, expires_in}` + session cookies |
-| `POST /refresh` | refresh cookie | none | `200` `{user_id, role, expires_in}` + new cookies |
-| `POST /logout` | refresh cookie (optional) | none | `204` + cookies cleared |
-| `POST /password/forgot` | none | `email`, `locale?` | `202`, empty |
-| `POST /password/reset` | none | `token`, `new_password` | `200`, empty |
+| Method and path         | Auth                      | Request body                                          | Success                                               |
+|-------------------------|---------------------------|-------------------------------------------------------|-------------------------------------------------------|
+| `POST /signup`          | none                      | `role`, `first_name`, `last_name`, `email`, `locale?` | `201` `{email, otp_expires_at}`                       |
+| `POST /verify-otp`      | none                      | `email`, `code`                                       | `200` `{expires_in}` + setup cookie                   |
+| `POST /resend-otp`      | none                      | `email`, `locale?`                                    | `202`, empty (always, even for unknown emails)        |
+| `POST /password/setup`  | setup cookie              | `password`                                            | `200` `{user_id, role, expires_in}` + session cookies |
+| `POST /login`           | none                      | `identifier`, `password`                              | `200` `{user_id, role, expires_in}` + session cookies |
+| `POST /refresh`         | refresh cookie            | none                                                  | `200` `{user_id, role, expires_in}` + new cookies     |
+| `POST /logout`          | refresh cookie (optional) | none                                                  | `204` + cookies cleared                               |
+| `POST /password/forgot` | none                      | `email`, `locale?`                                    | `202`, empty                                          |
+| `POST /password/reset`  | none                      | `token`, `new_password`                               | `200`, empty                                          |
 
 Notes:
 
@@ -94,14 +94,14 @@ Roles: `admin`, `patient`, `specialist`, `syndicate_staff`.
 
 ## 4. Cookies
 
-| | `access_token` | `refresh_token` |
-|---|---|---|
-| Content | Signed JWT (session token, or setup token during sign-up) | 32 random bytes, base64url |
-| Lifetime | 15 minutes (setup token: 15 minutes) | 90 days |
-| `Path` | `/` | `/v1/auth` (never sent with ordinary API calls) |
-| `SameSite` | `Lax` | `Strict` |
-| `HttpOnly` | yes | yes |
-| `Secure` | `COOKIE_SECURE` (must be `true` outside local HTTP) | same |
+|            | `access_token`                                            | `refresh_token`                                 |
+|------------|-----------------------------------------------------------|-------------------------------------------------|
+| Content    | Signed JWT (session token, or setup token during sign-up) | 32 random bytes, base64url                      |
+| Lifetime   | 15 minutes (setup token: 15 minutes)                      | 90 days                                         |
+| `Path`     | `/`                                                       | `/v1/auth` (never sent with ordinary API calls) |
+| `SameSite` | `Lax`                                                     | `Strict`                                        |
+| `HttpOnly` | yes                                                       | yes                                             |
+| `Secure`   | `COOKIE_SECURE` (must be `true` outside local HTTP)       | same                                            |
 
 Frontend requirements:
 
@@ -121,13 +121,13 @@ Frontend requirements:
 
 ## 6. Validation rules
 
-| Field | Rule |
-|---|---|
-| `email` | Required, at most 254 characters, shape `x@y.z`. Trimmed and lowercased before use |
-| `first_name`, `last_name` | Required, at most 100 characters (after trimming) |
-| `role` | Must be `specialist` |
-| `code` | Exactly 6 digits |
-| `password` | 8 to 64 characters (counted as Unicode code points); not on the common-password blocklist (about 100k entries, also checked after removing non-letters and decoding leet such as `P@ssw0rd`); must not contain `nemouw` or the email local part (4+ characters). No mandatory uppercase / digit / symbol rules |
+| Field                     | Rule                                                                                                                                                                                                                                                                                                           |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `email`                   | Required, at most 254 characters, shape `x@y.z`. Trimmed and lowercased before use                                                                                                                                                                                                                             |
+| `first_name`, `last_name` | Required, at most 100 characters (after trimming)                                                                                                                                                                                                                                                              |
+| `role`                    | Must be `specialist`                                                                                                                                                                                                                                                                                           |
+| `code`                    | Exactly 6 digits                                                                                                                                                                                                                                                                                               |
+| `password`                | 8 to 64 characters (counted as Unicode code points); not on the common-password blocklist (about 100k entries, also checked after removing non-letters and decoding leet such as `P@ssw0rd`); must not contain `nemouw` or the email local part (4+ characters). No mandatory uppercase / digit / symbol rules |
 
 Passwords are hashed exactly as typed (no normalization) with **Argon2id** (19 MiB, 2 iterations, 1 lane, 16-byte salt, 32-byte hash), the OWASP minimum.
 
@@ -135,13 +135,13 @@ Passwords are hashed exactly as typed (no normalization) with **Argon2id** (19 M
 
 Per email address, stored in the database (`user_verification_tokens`), so it survives restarts and works across instances.
 
-| | Signup OTP | Password reset |
-|---|---|---|
-| Code / token lifetime | 10 min | 60 min |
-| Wrong attempts allowed | 5 per issued code | not applicable (256-bit token) |
-| Minimum gap between sends | 60 s | 60 s |
-| Sends per window | 3 per 15 min | 3 per 60 min |
-| Sends per day | 10 | 10 |
+|                           | Signup OTP        | Password reset                 |
+|---------------------------|-------------------|--------------------------------|
+| Code / token lifetime     | 10 min            | 60 min                         |
+| Wrong attempts allowed    | 5 per issued code | not applicable (256-bit token) |
+| Minimum gap between sends | 60 s              | 60 s                           |
+| Sends per window          | 3 per 15 min      | 3 per 60 min                   |
+| Sends per day             | 10                | 10                             |
 
 When throttled the API answers `429 TOO_MANY_REQUESTS` with a `Retry-After` header (seconds).
 
@@ -157,22 +157,22 @@ schemas, HTTP status codes, error codes, and validation errors.
 
 ## 9. Security model
 
-| Threat | Mitigation |
-|---|---|
-| Token theft by XSS | HttpOnly cookies, nothing in response bodies, tokens kept out of logs (`toString` overridden) |
-| CSRF | No Spring CSRF filter, by design. `SameSite` cookies plus CORS: a cross-site browser request carries an `Origin` header that is rejected unless listed in `CORS_ALLOWED_ORIGINS`. The refresh cookie is `Strict` and scoped to `/v1/auth` |
-| Algorithm confusion / `none` | Decoder pinned to HS256 |
-| Stolen or replayed refresh token | Rotation, hashed storage, reuse detection with session revocation |
-| Revoked session still usable | Live database check on every request |
-| Account enumeration | Same response and timing for login failures, same `202` for forgot / resend, same `400` for OTP on unknown email. **Exception:** sign-up returns `409 EMAIL_TAKEN`, a deliberate product trade-off |
-| OTP guessing | 5 attempts per code, increment and limit in one SQL statement, constant-time comparison, new code needs the cooldown and caps |
-| Reset token leakage | HMAC-hashed at rest, URL fragment, single use, 60 min |
-| Concurrent races (double set-password, double refresh, double reset) | Row locks and atomic `UPDATE` / `DELETE ... RETURNING` |
-| SQL injection | Every query uses bound parameters |
-| Weak or missing secrets | App refuses to start unless both secrets are at least 32 characters |
-| Privilege escalation at sign-up | Role allow-list (`specialist` only) |
-| Forged client IP | `X-Forwarded-For` is trusted only when `TRUST_PROXY=true` **and** the direct peer is a private or loopback address, and only the last entry is used |
-| Oversized input | Field limits, 512 character user-agent cap |
+| Threat                                                               | Mitigation                                                                                                                                                                                                                                |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Token theft by XSS                                                   | HttpOnly cookies, nothing in response bodies, tokens kept out of logs (`toString` overridden)                                                                                                                                             |
+| CSRF                                                                 | No Spring CSRF filter, by design. `SameSite` cookies plus CORS: a cross-site browser request carries an `Origin` header that is rejected unless listed in `CORS_ALLOWED_ORIGINS`. The refresh cookie is `Strict` and scoped to `/v1/auth` |
+| Algorithm confusion / `none`                                         | Decoder pinned to HS256                                                                                                                                                                                                                   |
+| Stolen or replayed refresh token                                     | Rotation, hashed storage, reuse detection with session revocation                                                                                                                                                                         |
+| Revoked session still usable                                         | Live database check on every request                                                                                                                                                                                                      |
+| Account enumeration                                                  | Same response and timing for login failures, same `202` for forgot / resend, same `400` for OTP on unknown email. **Exception:** sign-up returns `409 EMAIL_TAKEN`, a deliberate product trade-off                                        |
+| OTP guessing                                                         | 5 attempts per code, increment and limit in one SQL statement, constant-time comparison, new code needs the cooldown and caps                                                                                                             |
+| Reset token leakage                                                  | HMAC-hashed at rest, URL fragment, single use, 60 min                                                                                                                                                                                     |
+| Concurrent races (double set-password, double refresh, double reset) | Row locks and atomic `UPDATE` / `DELETE ... RETURNING`                                                                                                                                                                                    |
+| SQL injection                                                        | Every query uses bound parameters                                                                                                                                                                                                         |
+| Weak or missing secrets                                              | App refuses to start unless both secrets are at least 32 characters                                                                                                                                                                       |
+| Privilege escalation at sign-up                                      | Role allow-list (`specialist` only)                                                                                                                                                                                                       |
+| Forged client IP                                                     | `X-Forwarded-For` is trusted only when `TRUST_PROXY=true` **and** the direct peer is a private or loopback address, and only the last entry is used                                                                                       |
+| Oversized input                                                      | Field limits, 512 character user-agent cap                                                                                                                                                                                                |
 
 Stored secrets: password hashes (Argon2id), refresh token hashes (SHA-256), OTP and reset token hashes (HMAC-SHA256 with `OTP_HASH_SECRET`).
 
@@ -180,14 +180,14 @@ Stored secrets: password hashes (Argon2id), refresh token hashes (SHA-256), OTP 
 
 Created by `V2__identity_auth.sql` and `V6__session_rotation.sql`.
 
-| Table | Purpose |
-|---|---|
-| `users` | Account, role, status (`pending`, `active`, `suspended`, `deleted`) |
-| `user_identifiers` | Email (phone and username modeled, not used yet). Emails are stored lowercase, enforced by a check constraint |
-| `user_passwords` | Argon2id hashes, one row per user |
-| `user_verification_tokens` | One row per (identifier, purpose): hashed code, attempts, send counters |
-| `user_sessions` | Hashed refresh token, previous hash, rotation time, revocation, device info |
-| `user_social_accounts` | Reserved for social login |
+| Table                      | Purpose                                                                                                       |
+|----------------------------|---------------------------------------------------------------------------------------------------------------|
+| `users`                    | Account, role, status (`pending`, `active`, `suspended`, `deleted`)                                           |
+| `user_identifiers`         | Email (phone and username modeled, not used yet). Emails are stored lowercase, enforced by a check constraint |
+| `user_passwords`           | Argon2id hashes, one row per user                                                                             |
+| `user_verification_tokens` | One row per (identifier, purpose): hashed code, attempts, send counters                                       |
+| `user_sessions`            | Hashed refresh token, previous hash, rotation time, revocation, device info                                   |
+| `user_social_accounts`     | Reserved for social login                                                                                     |
 
 ## 11. Operations notes
 

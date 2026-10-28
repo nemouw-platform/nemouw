@@ -1,6 +1,6 @@
 package com.nemouw.support;
 
-import com.nemouw.auth.model.ClientInfo;
+import com.nemouw.user.session.ClientInfo;
 import com.nemouw.common.config.AppProperties;
 import com.nemouw.common.exception.ApiException;
 import com.nemouw.common.exception.ErrorCode;
@@ -22,7 +22,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/** Realistic, fixed values shared by the auth tests. Nothing here is random, so every test is repeatable. */
+/** Realistic, fixed values shared by the tests. Nothing here is random, so every test is repeatable. */
 public final class Fixtures {
     private Fixtures() {
     }
@@ -54,7 +54,7 @@ public final class Fixtures {
 
     public static AppProperties props(boolean cookieSecure, boolean trustProxy) {
         return new AppProperties(
-                new AppProperties.Security(JWT_SECRET, OTP_SECRET, cookieSecure, trustProxy),
+                new AppProperties.Security(JWT_SECRET, OTP_SECRET, cookieSecure, trustProxy, 900, 90),
                 new AppProperties.Cors(List.of("https://app.nemouw.com"), false),
                 new AppProperties.RateLimit(20),
                 new AppProperties.Mail("re_live_7Hq2Zk9Xw4", "Nemouw <no-reply@nemouw.com>", "https://app.nemouw.com"));

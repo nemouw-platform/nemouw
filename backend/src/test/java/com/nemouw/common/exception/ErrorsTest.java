@@ -26,7 +26,6 @@ class ErrorsTest {
                 Arguments.of(Errors.missingAccessToken(), "UNAUTHENTICATED", 401),
                 Arguments.of(Errors.invalidAccessToken(), "INVALID_TOKEN", 401),
                 Arguments.of(Errors.forbidden(), "FORBIDDEN", 403),
-                Arguments.of(Errors.csrfBlocked(), "CSRF_BLOCKED", 403),
                 Arguments.of(Errors.malformedJson("Unexpected end of input"), "MALFORMED_JSON", 400),
                 Arguments.of(Errors.tooManyRequests(30), "TOO_MANY_REQUESTS", 429),
                 Arguments.of(new ValidationException(List.of(FieldErrors.required("email"))), "VALIDATION_ERROR", 422));

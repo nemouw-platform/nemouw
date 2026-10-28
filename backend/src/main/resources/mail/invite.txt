@@ -1,0 +1,11 @@
+[[${brand}]]
+
+[[#{mail.invite.heading}]]
+
+[[#{mail.invite.intro}]]
+
+[[${link}]]
+
+[[#{mail.invite.expires(${hours})}]]
+
+[[#{mail.footer.unrequested}]]
