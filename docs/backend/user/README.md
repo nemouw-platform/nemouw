@@ -10,7 +10,7 @@ Base path: `/v1/auth`. JSON is `snake_case`. All state-changing calls are `POST`
 - **Tokens live in HttpOnly cookies only.** No token is ever returned in a response body, so frontend JavaScript cannot read or leak it.
 - **Hybrid JWT + database sessions.** The access token is a short-lived signed JWT. Every request also checks that its session row is still live in PostgreSQL, so logout, password reset and suspension take effect immediately.
 - **Rotating refresh tokens** with reuse detection.
-- **Deny by default.** Anything that is not an explicit public auth route or an authenticated `/v1/**` route is rejected.
+- **Deny by default.** Anything that is not an explicit public route (the auth endpoints and a few read-only reference lists) or an authenticated `/v1/**` route with a matching role rule is rejected.
 
 ## 2. Flows
 
@@ -32,9 +32,9 @@ sequenceDiagram
 
 Details:
 
-- Only the `specialist` role can self-register. Any other role returns `422 INVALID_ROLE`.
+- Only the `specialist` role can self-register. Any other role returns `422 VALIDATION_ERROR` with an `INVALID_ROLE` field error.
 - The account is created as `pending`. It becomes `active` only when the password is set.
-- Signing up again with an email that is still `pending` re-issues the code and overwrites the stored name (the person who owns the mailbox wins). An email that belongs to a non-pending account returns `409 EMAIL_TAKEN`.
+- Signing up again with an email that is still `pending` re-issues the code and overwrites the stored name (the person who owns the mailbox wins). An email that belongs to a non-pending account returns `409 EMAIL_TAKEN`. Signing up again while the resend cooldown is running returns `429 TOO_MANY_REQUESTS`.
 - The setup token is **not a session**. It carries only the scope `password_setup`, and Spring Security accepts it on exactly one endpoint (`POST /password/setup`). It has no refresh token and cannot be renewed.
 - The setup token is single use: setting the password flips the account from `pending` to `active` under a row lock, and the endpoint refuses anything that is not `pending`.
 
@@ -69,6 +69,7 @@ sequenceDiagram
 - A successful reset **revokes every session** of that user.
 - Suspended and deleted accounts get no email and the same `202`.
 - A reset on a `pending` account activates it and marks the email verified (the link proves mailbox control).
+- Staff invites reuse this flow: the invited account starts `pending`, and the link in the invite email is a reset token that lives 24 hours instead of 60 minutes.
 
 ## 3. Endpoints
 
@@ -87,8 +88,8 @@ sequenceDiagram
 Notes:
 
 - `locale` is `en`, `fr` or `ar`. Anything else falls back to `en`.
-- `expires_in` is in seconds (access token: 900, setup token: 900).
-- Every other `/v1/**` endpoint requires a valid access cookie from a live session with one of the roles below.
+- `expires_in` is in seconds (access token: 900 by default, set by `ACCESS_TTL_SECONDS`; setup token: 900).
+- Every other `/v1/**` endpoint requires a valid access cookie from a live session, and the role rules in `SecurityConfig` decide who may call it. A route with no rule is denied. A few read-only lists (`GET` on countries, specialties, conditions and syndicates) are public.
 
 Roles: `admin`, `patient`, `specialist`, `syndicate_staff`.
 
@@ -103,6 +104,8 @@ Roles: `admin`, `patient`, `specialist`, `syndicate_staff`.
 | `HttpOnly` | yes                                                       | yes                                             |
 | `Secure`   | `COOKIE_SECURE` (must be `true` outside local HTTP)       | same                                            |
 
+The lifetimes above are the defaults of `ACCESS_TTL_SECONDS` (900) and `REFRESH_TTL_DAYS` (90).
+
 Frontend requirements:
 
 - Send requests with credentials: `fetch(url, { credentials: 'include' })`, and serve the frontend from an origin listed in `CORS_ALLOWED_ORIGINS`.
@@ -115,7 +118,7 @@ Frontend requirements:
 
 **Setup token (JWT, HS256).** Claims: `sub`, `scope=password_setup`, `iat`, `exp`. No `role` and no `sid`, so it matches no role rule and cannot reach any normal endpoint.
 
-**Refresh token.** Stored only as a SHA-256 hash in `user_sessions`. Each rotation keeps the previous hash for reuse detection.
+**Refresh token.** Stored only as an SHA-256 hash in `user_sessions`. Each rotation keeps the previous hash for reuse detection.
 
 **`user_sessions`** also stores the device type, OS, browser, user agent (cut at 512 characters) and IP, for a future "your devices" screen.
 
@@ -178,7 +181,7 @@ Stored secrets: password hashes (Argon2id), refresh token hashes (SHA-256), OTP 
 
 ## 10. Database tables
 
-Created by `V2__identity_auth.sql` and `V6__session_rotation.sql`.
+Created by `V2__identity_auth.sql`. `V5__onboarding.sql` adds the `deleted` status and `V6__session_rotation.sql` adds the refresh-rotation columns.
 
 | Table                      | Purpose                                                                                                       |
 |----------------------------|---------------------------------------------------------------------------------------------------------------|
@@ -191,7 +194,7 @@ Created by `V2__identity_auth.sql` and `V6__session_rotation.sql`.
 
 ## 11. Operations notes
 
-- **Logging.** One `http_request` line per request (method, path, status, duration; no query string) and `user_id` / `trace_id` on every line. Emails log the recipient address and provider id, never the code or link.
+- **Logging.** One `http_request` line per request (method, path, status, duration; no query string) and `trace_id` on every line (plus `user_id` once the caller is authenticated). Emails log the recipient address and provider id, never the code or link.
 - **Email failures.** Delivery runs on a 4-thread executor with a queue of 100 and 3 attempts (1 s and 4 s backoff). When it gives up it logs `EMAIL_UNDELIVERED`; the user can request a new code. If the queue is full the email is dropped and logged, not queued forever.
 - **Cleanup.** Expired sessions and verification tokens are not deleted yet. Plan a scheduled purge.
 - **Rotating `JWT_SECRET`** logs everyone out (all access tokens become invalid; refresh tokens still work and mint new ones).

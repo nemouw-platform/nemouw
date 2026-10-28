@@ -56,7 +56,7 @@ public class SessionService {
         return new IssuedSession(signAccessToken(userId, roleCode, sessionId), refreshToken, userId, roleCode);
     }
 
-    public void revokeAllForUser(UUID userId) {                                            // NEW
+    public void revokeAllForUser(UUID userId) {
         sessions.revokeAllForUser(userId);
     }
 

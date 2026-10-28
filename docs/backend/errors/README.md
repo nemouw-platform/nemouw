@@ -4,7 +4,7 @@ Nemouw uses consistent, machine-readable errors across `/v1`. The OpenAPI contra
 
 ## Response format
 
-Every error has the same JSON shape: an HTTP `status`, a stable `code`, a human-readable `message` and a `trace_id`. The backend sets `trace_id` on every error and also sends it in the `X-Trace-Id` response header, but the contract marks it nullable, so clients should tolerate its absence.
+Every error has the same JSON shape: an HTTP `status`, a stable `code`, a human-readable `message` and a `trace_id`. The backend sets `trace_id` on every error and also sends it in the `X-Trace-Id` header of every response, but the contract marks it nullable, so clients should tolerate its absence.
 
 ```json
 {
@@ -38,8 +38,10 @@ The shape is the same whether the error comes from a controller, the security la
 - **HTTP status** describes the category of failure; **`code`** identifies the specific condition.
 - Treat `code` as the stable interface. Do not parse or depend on `message` text.
 - Use `422` for field validation, `409` for state conflicts, `401` for authentication failures, and `403` for permission or account restrictions.
+- A missing or unparseable JSON body returns `400 MALFORMED_JSON`. A path or query value of the wrong type returns `400 BAD_REQUEST`.
 - Errors raised by the framework (unknown route, wrong HTTP method, unsupported media type) keep their own status and use the HTTP status name as `code`, for example `405` with `METHOD_NOT_ALLOWED`.
 - Unexpected failures return `500 INTERNAL_ERROR` with a generic message. Stack traces, internal details, credentials and tokens are never exposed.
+- Every code is declared once, in the backend's `ErrorCode` enum, and the constant name is the `code` clients receive. Renaming one is a breaking change.
 - Use the same error shape for all modules. Domain-specific codes belong in the OpenAPI contract, not in separate competing catalogs.
 
 ## Rate limiting
@@ -54,4 +56,4 @@ The shape is the same whether the error comes from a controller, the security la
 - Show safe, user-friendly messages for unexpected errors and keep the `trace_id` for support.
 - Never assume every `403`, `404`, or `409` has the same business meaning.
 
-For authentication flows and token behavior, see [Authentication](../auth/README.md).
+For authentication flows and token behavior, see [Authentication](../user/README.md).
