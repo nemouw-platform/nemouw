@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.nemouw.user.AuthConstants.CLAIM_SCOPE;
-import static com.nemouw.user.AuthConstants.CLAIM_SESSION_ID;
-import static com.nemouw.user.AuthConstants.PASSWORD_SETUP_SCOPE;
-
 @Component
 class ActiveSessionValidator implements OAuth2TokenValidator<Jwt> {
     private static final OAuth2TokenValidatorResult REJECTED = OAuth2TokenValidatorResult.failure(
@@ -26,9 +22,9 @@ class ActiveSessionValidator implements OAuth2TokenValidator<Jwt> {
 
     @Override
     public OAuth2TokenValidatorResult validate(Jwt jwt) {
-        String sessionId = jwt.getClaimAsString(CLAIM_SESSION_ID);
+        String sessionId = jwt.getClaimAsString(TokenClaims.SESSION_ID);
         boolean ok = sessionId == null
-                ? PASSWORD_SETUP_SCOPE.equals(jwt.getClaimAsString(CLAIM_SCOPE))
+                ? TokenClaims.PASSWORD_SETUP_SCOPE.equals(jwt.getClaimAsString(TokenClaims.SCOPE))
                 : isLive(sessionId, jwt.getSubject());
         return ok ? OAuth2TokenValidatorResult.success() : REJECTED;
     }

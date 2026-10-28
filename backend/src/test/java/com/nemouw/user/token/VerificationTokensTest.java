@@ -2,20 +2,19 @@ package com.nemouw.user.token;
 
 import com.nemouw.user.token.VerificationTokenRepository.ClaimedToken;
 import com.nemouw.common.config.AppProperties;
+import com.nemouw.support.ShippedProperties;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.dao.QueryTimeoutException;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static com.nemouw.user.AuthConstants.OTP_CODE_DIGITS;
-import static com.nemouw.user.AuthConstants.OTP_MAX_ATTEMPTS;
-import static com.nemouw.user.AuthConstants.RESET_TOKEN_BYTES;
 import static com.nemouw.support.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,6 +22,12 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class VerificationTokensTest {
+
+    private static final TokenProperties TOKEN_PROPS =
+            ShippedProperties.bind("app.user.token", TokenProperties.class);
+    private static final int OTP_MAX_ATTEMPTS = TOKEN_PROPS.maxOtpAttempts();
+    private static final int OTP_CODE_DIGITS = VerificationTokens.OTP_CODE_DIGITS;
+    private static final int RESET_TOKEN_BYTES = 32;
 
     private static final String CODE = "482913";
     private static final String RESET_TOKEN =
@@ -48,7 +53,7 @@ class VerificationTokensTest {
             mock(VerificationTokenRepository.class);
 
     private final VerificationTokens service =
-            new VerificationTokens(repo, props());
+            new VerificationTokens(repo, TOKEN_PROPS, props());
 
     private static VerificationTokens withSecret(
             VerificationTokenRepository repository,
@@ -67,6 +72,7 @@ class VerificationTokensTest {
 
         return new VerificationTokens(
                 repository,
+                TOKEN_PROPS,
                 new AppProperties(
                         security,
                         base.cors(),
@@ -101,6 +107,24 @@ class VerificationTokensTest {
 
     @Nested
     class HappyPaths {
+
+        @Test
+        void issuesInviteTokensWithTheConfiguredInviteLifetime() {
+            when(repo.upsertIfAllowed(any(), any(), eq(VerificationPurpose.PASSWORD_RESET), anyString(), anyInt()))
+                    .thenReturn(Optional.of(EXPIRES));
+
+            service.issueInviteToken(USER_ID, IDENTIFIER_ID).orElseThrow();
+
+            verify(repo).upsertIfAllowed(eq(USER_ID), eq(IDENTIFIER_ID),
+                    eq(VerificationPurpose.PASSWORD_RESET), anyString(), eq(86_400));
+        }
+
+        @Test
+        void exposesTheConfiguredLifetimesForEmails() {
+            assertThat(service.otpTtl()).isEqualTo(Duration.ofMinutes(10));
+            assertThat(service.resetTtl()).isEqualTo(Duration.ofHours(1));
+            assertThat(service.inviteTtl()).isEqualTo(Duration.ofHours(24));
+        }
 
         @Test
         void generatesSixDigitCodesAndStoresTheirHashes() {

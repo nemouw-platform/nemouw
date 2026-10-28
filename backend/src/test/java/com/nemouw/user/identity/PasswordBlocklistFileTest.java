@@ -11,8 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
-import static com.nemouw.user.AuthConstants.PASSWORD_MAX_LENGTH;
-import static com.nemouw.user.AuthConstants.PASSWORD_MIN_LENGTH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** Guards the NCSC list shipped in src/main/resources: if it is dropped, the policy would silently fall back to ~30 words. */
@@ -20,6 +18,8 @@ class PasswordBlocklistFileTest {
 
     private static final String RESOURCE = "/common-passwords.txt";
     private static final String FIELD = "password";
+    private static final int PASSWORD_MIN_LENGTH = PasswordPolicy.MIN_LENGTH;
+    private static final int PASSWORD_MAX_LENGTH = PasswordPolicy.MAX_LENGTH;
 
     private static List<String> loadEntries() throws IOException {
         try (InputStream in = PasswordPolicy.class.getResourceAsStream(RESOURCE)) {

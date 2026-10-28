@@ -9,9 +9,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
-
-import static com.nemouw.user.AuthConstants.PASSWORD_MAX_LENGTH;
-import static com.nemouw.user.AuthConstants.PASSWORD_MIN_LENGTH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PasswordPolicyTest {
@@ -19,6 +16,8 @@ class PasswordPolicyTest {
     private static final String FIELD = "password";
     private static final String FILLER = "vK9#mQ2$xL7!pR4@";
     private static final String EMOJI = "\uD83D\uDE00";
+    private static final int PASSWORD_MIN_LENGTH = PasswordPolicy.MIN_LENGTH;
+    private static final int PASSWORD_MAX_LENGTH = PasswordPolicy.MAX_LENGTH;
 
     private static String filler(int length) {
         return FILLER.repeat(length / FILLER.length() + 1).substring(0, length);

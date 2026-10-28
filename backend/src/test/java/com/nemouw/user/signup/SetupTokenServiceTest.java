@@ -1,5 +1,6 @@
 package com.nemouw.user.signup;
 
+import com.nemouw.support.ShippedProperties;
 import com.nemouw.user.session.Jwts;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncodingException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-import static com.nemouw.user.AuthConstants.SETUP_TTL_SECONDS;
 import static com.nemouw.support.Fixtures.NOW;
 import static com.nemouw.support.Fixtures.USER_ID;
 import static com.nemouw.support.Fixtures.fixedClock;
@@ -22,7 +22,11 @@ import static org.mockito.Mockito.when;
 
 class SetupTokenServiceTest {
 
-    private final SetupTokenService service = new SetupTokenService(Jwts.encoder(), fixedClock());
+    private static final int SETUP_TTL_SECONDS = 15 * 60;
+    private static final SignupProperties SIGNUP_PROPS =
+            ShippedProperties.bind("app.user.signup", SignupProperties.class);
+
+    private final SetupTokenService service = new SetupTokenService(Jwts.encoder(), SIGNUP_PROPS, fixedClock());
 
     @Nested
     class HappyPaths {
@@ -50,6 +54,7 @@ class SetupTokenServiceTest {
 
             assertThat(jwt.getIssuedAt()).isEqualTo(NOW);
             assertThat(jwt.getExpiresAt()).isEqualTo(NOW.plusSeconds(SETUP_TTL_SECONDS));
+            assertThat(service.issue(USER_ID).ttl()).isEqualTo(java.time.Duration.ofSeconds(SETUP_TTL_SECONDS));
         }
 
         @Test
@@ -87,7 +92,7 @@ class SetupTokenServiceTest {
         void propagatesASigningFailureInsteadOfReturningAnUnsignedToken() {
             JwtEncoder brokenEncoder = mock(JwtEncoder.class);
             when(brokenEncoder.encode(any())).thenThrow(new JwtEncodingException("Failed to sign the JWT"));
-            SetupTokenService failing = new SetupTokenService(brokenEncoder, fixedClock());
+            SetupTokenService failing = new SetupTokenService(brokenEncoder, SIGNUP_PROPS, fixedClock());
 
             assertThatThrownBy(() -> failing.issue(USER_ID)).isInstanceOf(JwtEncodingException.class);
         }

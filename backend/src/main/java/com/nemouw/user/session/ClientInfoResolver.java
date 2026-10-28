@@ -3,11 +3,9 @@ package com.nemouw.user.session;
 import com.nemouw.common.util.UserAgentParser;
 import org.springframework.stereotype.Component;
 
-import static com.nemouw.user.AuthConstants.MAX_USER_AGENT_LENGTH;
-
 @Component
 class ClientInfoResolver {
-
+    private static final int MAX_USER_AGENT_LENGTH = 512;
     ClientInfo resolve(String ip, String rawUserAgent) {
         var parsed = UserAgentParser.parse(rawUserAgent);
         String ua = rawUserAgent == null ? null

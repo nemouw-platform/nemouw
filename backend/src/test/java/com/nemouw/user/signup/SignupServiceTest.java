@@ -1,5 +1,6 @@
 package com.nemouw.user.signup;
 
+import com.nemouw.support.ShippedProperties;
 import com.nemouw.user.identity.TestPasswordHasher;
 import com.nemouw.user.session.Jwts;
 import com.nemouw.user.signup.SignupDtos.SignupRequest;
@@ -39,7 +40,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nemouw.user.AuthConstants.OTP_TTL_SECONDS;
 import static com.nemouw.common.util.ValidationLimits.NAME_MAX_LENGTH;
 import static com.nemouw.support.Fixtures.EMAIL;
 import static com.nemouw.support.Fixtures.IDENTIFIER_ID;
@@ -64,18 +64,21 @@ class SignupServiceTest {
     private static final PasswordHasher REAL_HASHER = TestPasswordHasher.real();
     private static final OffsetDateTime OTP_EXPIRES_AT = OffsetDateTime.parse("2026-10-24T09:25:30Z");
     private static final String OTP_CODE = "482913";
+    private static final Duration OTP_TTL = Duration.ofMinutes(10);
 
     private final UserRepository users = mock(UserRepository.class);
     private final EmailSender emailSender = mock(EmailSender.class);
     private final PasswordHasher hasher = spy(REAL_HASHER);
     private final VerificationTokens tokens = mock(VerificationTokens.class);
-    private final SetupTokenService setupTokens = new SetupTokenService(Jwts.encoder(), fixedClock());
+    private final SetupTokenService setupTokens = new SetupTokenService(Jwts.encoder(),
+            ShippedProperties.bind("app.user.signup", SignupProperties.class), fixedClock());
     private final SessionService sessions = mock(SessionService.class);
     private final RecordingTransactions tx = new RecordingTransactions();
     private final SignupService service = new SignupService(users, hasher, tokens, setupTokens, sessions, emailSender, tx.template());
 
     @BeforeEach
     void stubTheWritesASuccessfulSignupMakes() {
+        when(tokens.otpTtl()).thenReturn(OTP_TTL);
         when(users.insertUser(any(), any(), any())).thenReturn(USER_ID);
         when(users.insertEmailIdentifier(any(), any())).thenReturn(IDENTIFIER_ID);
         when(tokens.issueSignupOtp(any(), any())).thenReturn(Optional.of(new VerificationTokens.IssuedOtp(OTP_CODE, OTP_EXPIRES_AT)));
@@ -126,7 +129,7 @@ class SignupServiceTest {
 
                 service.signup(signupRequest());
 
-                verify(emailSender).sendSignupOtp(eq(EMAIL), emailedCode.capture(), eq(Duration.ofSeconds(OTP_TTL_SECONDS)), eq(LocaleCode.EN));
+                verify(emailSender).sendSignupOtp(eq(EMAIL), emailedCode.capture(), eq(OTP_TTL), eq(LocaleCode.EN));
                 verify(tokens).issueSignupOtp(USER_ID, IDENTIFIER_ID);
                 assertThat(emailedCode.getValue()).matches("\\d{6}");
                 assertThat(emailedCode.getValue()).isEqualTo(OTP_CODE);
@@ -145,8 +148,8 @@ class SignupServiceTest {
                 service.signup(new SignupRequest("specialist", "Amira", "Haddad", EMAIL, "fr"));
                 service.signup(new SignupRequest("specialist", "Amira", "Haddad", EMAIL, "de"));
 
-                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(Duration.ofSeconds(OTP_TTL_SECONDS)), eq(LocaleCode.FR));
-                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(Duration.ofSeconds(OTP_TTL_SECONDS)), eq(LocaleCode.EN));
+                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(OTP_TTL), eq(LocaleCode.FR));
+                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(OTP_TTL), eq(LocaleCode.EN));
             }
 
             @Test
@@ -160,7 +163,7 @@ class SignupServiceTest {
                 assertThat(response.otpExpiresAt()).isEqualTo(OTP_EXPIRES_AT);
                 verify(users).updateName(USER_ID, "Layla", "Khoury");
                 verify(users, never()).insertUser(any(), any(), any());
-                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(Duration.ofSeconds(OTP_TTL_SECONDS)), eq(LocaleCode.AR));
+                verify(emailSender).sendSignupOtp(eq(EMAIL), anyString(), eq(OTP_TTL), eq(LocaleCode.AR));
             }
         }
 
@@ -393,7 +396,7 @@ class SignupServiceTest {
 
             service.resendOtp(new ResendOtpRequest(EMAIL, "fr"));
 
-            verify(emailSender).sendSignupOtp(eq(EMAIL), emailedCode.capture(), eq(Duration.ofSeconds(OTP_TTL_SECONDS)), eq(LocaleCode.FR));
+            verify(emailSender).sendSignupOtp(eq(EMAIL), emailedCode.capture(), eq(OTP_TTL), eq(LocaleCode.FR));
             assertThat(emailedCode.getValue()).matches("\\d{6}");
         }
 

@@ -15,11 +15,7 @@ import com.nemouw.common.mail.EmailSender;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import  com.nemouw.user.token.VerificationTokens.IssuedResetToken;
-
-import java.time.Duration;
 import java.util.UUID;
-
-import static com.nemouw.user.AuthConstants.INVITE_TTL_SECONDS;
 
 /**
  * Accounts that someone else creates (syndicate staff now, admins later). The account starts pending and the
@@ -84,6 +80,6 @@ public class InviteService {
 
     /** Call only after the transaction that created the invite has committed. */
     public void sendInvite(Invite invite, LocaleCode locale) {
-        emailSender.sendInvite(invite.email(), invite.token().token(), Duration.ofSeconds(INVITE_TTL_SECONDS), locale);
+        emailSender.sendInvite(invite.email(), invite.token().token(), tokens.inviteTtl(), locale);
     }
 }

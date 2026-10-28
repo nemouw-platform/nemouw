@@ -1,5 +1,6 @@
 package com.nemouw.user.session;
 
+import com.nemouw.support.ShippedProperties;
 import com.nemouw.user.identity.TestPasswordHasher;
 import com.nemouw.user.session.SessionDtos.LoginRequest;
 import com.nemouw.user.identity.PasswordHasher;
@@ -56,7 +57,9 @@ class AuthServiceTest {
     private final SessionRepository sessionRepo = mock(SessionRepository.class);
     private final PasswordHasher hasher = spy(REAL_HASHER);
     private final RecordingTransactions tx = new RecordingTransactions();
-    private final SessionService sessions = new SessionService(props(), sessionRepo, Jwts.encoder(), fixedClock());
+    private final SessionService sessions = new SessionService(props(),
+            ShippedProperties.bind("app.user.session", SessionProperties.class),
+            sessionRepo, Jwts.encoder(), fixedClock());
     private final AuthService service = new AuthService(users, hasher, sessions, tx.template());
 
     private static LoginRow loginRow(String status, String hash) {

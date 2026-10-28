@@ -12,22 +12,25 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 
-import static com.nemouw.user.AuthConstants.*;
+import static com.nemouw.user.session.TokenClaims.PASSWORD_SETUP_SCOPE;
+import static com.nemouw.user.session.TokenClaims.SCOPE;
 
 @Service
 class SetupTokenService {
     private static final JwsHeader JWS_HEADER = JwsHeader.with(MacAlgorithm.HS256).build();
 
     private final JwtEncoder jwtEncoder;
+    private final SignupProperties props;
     private final Clock clock;
 
     @Autowired
-    SetupTokenService(JwtEncoder jwtEncoder) {
-        this(jwtEncoder, Clock.systemUTC());
+    SetupTokenService(JwtEncoder jwtEncoder, SignupProperties props) {
+        this(jwtEncoder, props, Clock.systemUTC());
     }
 
-    SetupTokenService(JwtEncoder jwtEncoder, Clock clock) {
+    SetupTokenService(JwtEncoder jwtEncoder, SignupProperties props, Clock clock) {
         this.jwtEncoder = jwtEncoder;
+        this.props = props;
         this.clock = clock;
     }
 
@@ -35,11 +38,11 @@ class SetupTokenService {
         Instant now = clock.instant();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject(userId.toString())
-                .claim(CLAIM_SCOPE, PASSWORD_SETUP_SCOPE)
+                .claim(SCOPE, PASSWORD_SETUP_SCOPE)
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(SETUP_TTL_SECONDS))
+                .expiresAt(now.plus(props.setupTtl()))
                 .build();
         String token = jwtEncoder.encode(JwtEncoderParameters.from(JWS_HEADER, claims)).getTokenValue();
-        return new IssuedSetupToken(token, userId);
+        return new IssuedSetupToken(token, userId, props.setupTtl());
     }
 }

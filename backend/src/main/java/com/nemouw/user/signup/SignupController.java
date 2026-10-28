@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.nemouw.user.AuthConstants.SETUP_TTL_SECONDS;
-
 @RestController
 @RequestMapping("/auth")
 public class SignupController {
@@ -46,9 +44,10 @@ public class SignupController {
     @PostMapping("/verify-otp")
     ResponseEntity<PasswordSetupResponse> verifyOtp(@RequestBody VerifyOtpRequest req) {
         IssuedSetupToken setup = signup.verifyOtp(req);
+        int ttlSeconds = (int) setup.ttl().toSeconds();
         return ResponseEntity.ok()
-                .headers(cookies.setupHeaders(setup.token(), SETUP_TTL_SECONDS))
-                .body(new PasswordSetupResponse(SETUP_TTL_SECONDS));
+                .headers(cookies.setupHeaders(setup.token(), ttlSeconds))
+                .body(new PasswordSetupResponse(ttlSeconds));
     }
 
     @PostMapping("/resend-otp")

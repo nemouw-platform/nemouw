@@ -16,10 +16,7 @@ import com.nemouw.user.token.VerificationTokens;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.time.Duration;
-
 import static com.nemouw.common.util.TextNormalizer.emailLocalPart;
-import static com.nemouw.user.AuthConstants.RESET_TTL_SECONDS;
 import static com.nemouw.user.password.PasswordDtos.ForgotPasswordRequest;
 import static com.nemouw.user.password.PasswordDtos.ResetPasswordRequest;
 
@@ -61,7 +58,7 @@ class PasswordResetService {
                                 tokens.secondsUntilAllowed(identity.identifierId(),
                                         VerificationPurpose.PASSWORD_RESET)))));
         LocaleCode locale = LocaleCode.orDefault(req.locale());
-        emailSender.sendPasswordReset(email, issued.token(), Duration.ofSeconds(RESET_TTL_SECONDS), locale);
+        emailSender.sendPasswordReset(email, issued.token(), tokens.resetTtl(), locale);
     }
 
     void resetPassword(ResetPasswordRequest req) {

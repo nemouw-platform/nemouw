@@ -4,6 +4,7 @@ import com.nemouw.common.config.AppProperties;
 import com.nemouw.common.enums.UserRole;
 import com.nemouw.common.web.ClientIpResolver;
 import com.nemouw.common.web.TraceIdFilter;
+import com.nemouw.user.session.TokenClaims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.nemouw.user.AuthConstants.CLAIM_ROLE;
-import static com.nemouw.user.AuthConstants.PASSWORD_SETUP_SCOPE;
-import static com.nemouw.user.session.AuthCookies.ACCESS;
 import static com.nemouw.common.ApiPaths.API_PREFIX;
+import static com.nemouw.user.session.AuthCookies.ACCESS;
 
 /**
  * Four stateless filter chains; the first whose matcher fits handles the request:
@@ -102,7 +101,7 @@ public class SecurityConfig {
         return http
                 .securityMatcher(API + "/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, PASSWORD_SETUP).hasAuthority("SCOPE_" + PASSWORD_SETUP_SCOPE)
+                        .requestMatchers(HttpMethod.POST, PASSWORD_SETUP).hasAuthority("SCOPE_" + TokenClaims.PASSWORD_SETUP_SCOPE)
                         .requestMatchers(HttpMethod.DELETE, API + "/conditions/**").hasRole(ADMIN)
                         .requestMatchers(API + "/conditions/**").hasAnyRole(ADMIN, STAFF)
                         .requestMatchers(API + "/countries/**", API + "/specialties/**").hasRole(ADMIN)
@@ -158,7 +157,7 @@ public class SecurityConfig {
     private static JwtAuthenticationConverter authoritiesConverter() {
         var scopes = new JwtGrantedAuthoritiesConverter();
         var roles = new JwtGrantedAuthoritiesConverter();
-        roles.setAuthoritiesClaimName(CLAIM_ROLE);
+        roles.setAuthoritiesClaimName(TokenClaims.ROLE);
         roles.setAuthorityPrefix("ROLE_");
 
         var converter = new JwtAuthenticationConverter();

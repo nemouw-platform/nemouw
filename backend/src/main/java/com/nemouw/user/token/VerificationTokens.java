@@ -15,11 +15,8 @@ import java.util.HexFormat;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.nemouw.user.AuthConstants.INVITE_TTL_SECONDS;
-import static com.nemouw.user.AuthConstants.OTP_CODE_DIGITS;
-import static com.nemouw.user.AuthConstants.OTP_CODE_SPACE;
-import static com.nemouw.user.AuthConstants.OTP_MAX_ATTEMPTS;
-import static com.nemouw.user.AuthConstants.RESET_TOKEN_BYTES;
+import java.time.Duration;
+
 import static com.nemouw.user.token.VerificationPurpose.PASSWORD_RESET;
 import static com.nemouw.user.token.VerificationPurpose.SIGNUP_OTP;
 
@@ -34,44 +31,68 @@ public class VerificationTokens {
     public record IssuedResetToken(String token, OffsetDateTime expiresAt) {
     }
 
+    public static final int OTP_CODE_DIGITS = 6;
+
+    private static final int OTP_CODE_SPACE = (int) Math.pow(10, OTP_CODE_DIGITS);   // 1,000,000
     private static final String OTP_FORMAT = "%0" + OTP_CODE_DIGITS + "d";
+    private static final int LINK_TOKEN_BYTES = 32;
+
     private final VerificationTokenRepository repo;
+    private final TokenProperties props;
     private final SecureRandom random = new SecureRandom();
     private final byte[] key;
 
-    VerificationTokens(VerificationTokenRepository repo, AppProperties props) {
+    VerificationTokens(VerificationTokenRepository repo, TokenProperties props, AppProperties appProps) {
         this.repo = repo;
-        this.key = props.security().otpHashSecret().getBytes(StandardCharsets.UTF_8);
+        this.props = props;
+        this.key = appProps.security().otpHashSecret().getBytes(StandardCharsets.UTF_8);
     }
 
-    /** Empty means throttled (cooldown or caps). */
+    public Duration otpTtl() {
+        return props.otp().ttl();
+    }
+
+    public Duration resetTtl() {
+        return props.reset().ttl();
+    }
+
+    public Duration inviteTtl() {
+        return props.inviteTtl();
+    }
+
+    /**
+     * Empty means throttled (cooldown or caps).
+     */
     public Optional<IssuedOtp> issueSignupOtp(UUID userId, UUID identifierId) {
         String code = String.format(OTP_FORMAT, random.nextInt(OTP_CODE_SPACE));
-        return repo.upsertIfAllowed(userId, identifierId, SIGNUP_OTP, hashOtp(userId, code))
-                .map(expiresAt -> new IssuedOtp(code, expiresAt));
+        return repo.upsertIfAllowed(userId, identifierId, SIGNUP_OTP, hashOtp(userId, code)).map(expiresAt -> new IssuedOtp(code, expiresAt));
     }
 
     public Optional<IssuedResetToken> issueResetToken(UUID userId, UUID identifierId) {
         String token = newLinkToken();
-        return repo.upsertIfAllowed(userId, identifierId, PASSWORD_RESET, hashLinkToken(token))
-                .map(expiresAt -> new IssuedResetToken(token, expiresAt));
+        return repo.upsertIfAllowed(userId, identifierId, PASSWORD_RESET, hashLinkToken(token)).map(expiresAt -> new IssuedResetToken(token, expiresAt));
     }
 
-    /** A reset token with a 24 h lifetime, so the normal reset endpoint accepts it. */
+    /**
+     * A reset token with a 24 h lifetime, so the normal reset endpoint accepts it.
+     */
     public Optional<IssuedResetToken> issueInviteToken(UUID userId, UUID identifierId) {
         String token = newLinkToken();
-        return repo.upsertIfAllowed(userId, identifierId, PASSWORD_RESET, hashLinkToken(token), INVITE_TTL_SECONDS)
-                .map(expiresAt -> new IssuedResetToken(token, expiresAt));
+        return repo.upsertIfAllowed(userId, identifierId, PASSWORD_RESET, hashLinkToken(token), props.inviteTtlSeconds()).map(expiresAt -> new IssuedResetToken(token, expiresAt));
     }
 
-    /** 0 means allowed right now. Read-only: a hint, not a guarantee. */
+    /**
+     * 0 means allowed right now. Read-only: a hint, not a guarantee.
+     */
     public int secondsUntilAllowed(UUID identifierId, VerificationPurpose purpose) {
         return repo.secondsUntilAllowed(identifierId, purpose);
     }
 
-    /** Spends one attempt. Never throws on a wrong code, so the spent attempt is not rolled back. */
+    /**
+     * Spends one attempt. Never throws on a wrong code, so the spent attempt is not rolled back.
+     */
     public boolean consumeSignupOtp(UUID userId, String code) {
-        var claimed = repo.claimAttempt(userId, SIGNUP_OTP, OTP_MAX_ATTEMPTS);
+        var claimed = repo.claimAttempt(userId, SIGNUP_OTP, props.maxOtpAttempts());
         if (claimed.isEmpty() || !sameHash(hashOtp(userId, code), claimed.get().tokenHash())) {
             return false;
         }
@@ -79,12 +100,16 @@ public class VerificationTokens {
         return true;
     }
 
-    /** Cheap read before Argon2: the email a live reset token belongs to. */
+    /**
+     * Cheap read before Argon2: the email a live reset token belongs to.
+     */
     public Optional<String> findLiveResetEmail(String token) {
         return repo.findLiveIdentifier(PASSWORD_RESET, hashLinkToken(token));
     }
 
-    /** Atomic single use: only one concurrent caller gets the row. */
+    /**
+     * Atomic single use: only one concurrent caller gets the row.
+     */
     public Optional<ConsumedToken> consumeResetToken(String token) {
         return repo.consumeByHash(PASSWORD_RESET, hashLinkToken(token));
     }
@@ -94,7 +119,7 @@ public class VerificationTokens {
     }
 
     private String newLinkToken() {
-        byte[] bytes = new byte[RESET_TOKEN_BYTES];
+        byte[] bytes = new byte[LINK_TOKEN_BYTES];
         random.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }

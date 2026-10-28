@@ -3,8 +3,6 @@ package com.nemouw.user.identity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import static com.nemouw.user.AuthConstants.PASSWORD_MAX_LENGTH;
-
 @Component
 public class PasswordHasher {
     private final PasswordEncoder encoder;
@@ -25,7 +23,7 @@ public class PasswordHasher {
     public boolean verify(String password, String hash) {
         if (password == null || hash == null) return false;
         // Over-long input can never match a stored hash (signup rejects it); bail out before spending memory/CPU on it.
-        if (password.codePointCount(0, password.length()) > PASSWORD_MAX_LENGTH) return false;
+        if (password.codePointCount(0, password.length()) > PasswordPolicy.MAX_LENGTH) return false;
         return encoder.matches(password, hash);
     }
 

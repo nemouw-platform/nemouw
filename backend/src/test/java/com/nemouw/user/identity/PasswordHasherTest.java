@@ -7,10 +7,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.nemouw.user.AuthConstants.ARGON2_ITERATIONS;
-import static com.nemouw.user.AuthConstants.ARGON2_MEMORY_KB;
-import static com.nemouw.user.AuthConstants.ARGON2_PARALLELISM;
-import static com.nemouw.user.AuthConstants.PASSWORD_MAX_LENGTH;
 import static com.nemouw.support.Fixtures.PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -25,7 +21,9 @@ import static org.mockito.Mockito.when;
 class PasswordHasherTest {
 
     /** The production encoder, so the Argon2 parameters under test are the ones that ship. */
-    private static final PasswordEncoder ENCODER = new PasswordConfig().passwordEncoder();
+    private static final PasswordEncoder ENCODER = new PasswordConfig().passwordEncoder(TestPasswordHasher.shippedProps());
+    private static final PasswordProperties.Argon2 ARGON2 = TestPasswordHasher.shippedProps().argon2();
+    private static final int PASSWORD_MAX_LENGTH = PasswordPolicy.MAX_LENGTH;
     private static PasswordHasher hasher;
     private static String storedHash;
 
@@ -42,7 +40,7 @@ class PasswordHasherTest {
         void producesAnArgon2idHashWithTheConfiguredCostParameters() {
             assertThat(storedHash)
                     .startsWith("$argon2id$")
-                    .contains("m=" + ARGON2_MEMORY_KB + ",t=" + ARGON2_ITERATIONS + ",p=" + ARGON2_PARALLELISM);
+                    .contains("m=" + ARGON2.memoryKb() + ",t=" + ARGON2.iterations() + ",p=" + ARGON2.parallelism());
         }
 
         @Test

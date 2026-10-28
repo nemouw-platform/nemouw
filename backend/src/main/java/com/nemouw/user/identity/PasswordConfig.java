@@ -5,14 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.nemouw.user.AuthConstants.*;
-
 @Configuration(proxyBeanMethods = false)
 class PasswordConfig {
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new Argon2PasswordEncoder(ARGON2_SALT_LENGTH, ARGON2_HASH_LENGTH,
-                ARGON2_PARALLELISM, ARGON2_MEMORY_KB, ARGON2_ITERATIONS);
+    PasswordEncoder passwordEncoder(PasswordProperties props) {
+        PasswordProperties.Argon2 a = props.argon2();
+        return new Argon2PasswordEncoder(a.saltLength(), a.hashLength(),
+                a.parallelism(), a.memoryKb(), a.iterations());
     }
 }

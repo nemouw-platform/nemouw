@@ -4,8 +4,6 @@ import com.nemouw.common.exception.FieldError;
 import com.nemouw.common.exception.FieldErrors;
 import com.nemouw.common.util.TextNormalizer;
 
-import static com.nemouw.user.AuthConstants.*;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,20 +30,18 @@ public final class PasswordPolicy {
     // Baseline replaces the resource file if missing
     private static final Set<String> COMMON = loadBlocklist();
 
+    public static final int MIN_LENGTH = 8;
+    public static final int MAX_LENGTH = 64;
+
     private static Set<String> loadBlocklist() {
-        Set<String> set = new HashSet<>(Set.of(
-                "password", "passwd", "qwerty", "qwertyuiop", "azerty", "letmein", "welcome", "admin",
-                "administrator", "iloveyou", "monkey", "dragon", "football", "baseball", "sunshine",
-                "princess", "master", "login", "changeme", "trustno", "abcdefgh", "secret", "superman",
-                "batman", "shadow", "12345678", "123456789", "1234567890", "specialist", "patient"));
+        Set<String> set = new HashSet<>(Set.of("password", "passwd", "qwerty", "qwertyuiop", "azerty", "letmein", "welcome", "admin", "administrator", "iloveyou", "monkey", "dragon", "football", "baseball", "sunshine", "princess", "master", "login", "changeme", "trustno", "abcdefgh", "secret", "superman", "batman", "shadow", "12345678", "123456789", "1234567890", "specialist", "patient"));
         try (InputStream in = PasswordPolicy.class.getResourceAsStream(BLOCKLIST_RESOURCE)) {
             if (in != null) {
                 try (BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = r.readLine()) != null) {
                         line = line.trim().toLowerCase(Locale.ROOT);
-                        if (!line.isEmpty())
-                            set.add(line);
+                        if (!line.isEmpty()) set.add(line);
                     }
                 }
             }
@@ -57,12 +53,11 @@ public final class PasswordPolicy {
 
     /**
      * @param personalInfo values the password must not contain (email local part).
-     * Nulls and blanks are ignored.
+     *                     Nulls and blanks are ignored.
      */
     public static List<FieldError> check(String field, String password, String... personalInfo) {
         List<FieldError> errors = new ArrayList<>();
-        if (password == null || password.isEmpty())
-            return errors;
+        if (password == null || password.isEmpty()) return errors;
 
         if (password.isBlank()) {
             errors.add(FieldErrors.required(field));
@@ -70,21 +65,16 @@ public final class PasswordPolicy {
         }
 
         int rawLength = password.codePointCount(0, password.length());
-        if (rawLength > PASSWORD_MAX_LENGTH)
-            errors.add(FieldErrors.tooLong(field, PASSWORD_MAX_LENGTH));
-        if (rawLength < PASSWORD_MIN_LENGTH)
-            errors.add(FieldErrors.tooShort(field, PASSWORD_MIN_LENGTH));
+        if (rawLength > MAX_LENGTH) errors.add(FieldErrors.tooLong(field, MAX_LENGTH));
+        if (rawLength < MIN_LENGTH) errors.add(FieldErrors.tooShort(field, MIN_LENGTH));
 
-        if (!errors.isEmpty())
-            return errors; // fail early
+        if (!errors.isEmpty()) return errors; // fail early
 
         String normalizedPw = TextNormalizer.nfc(password);
         String[] forms = normalizedForms(normalizedPw);
 
-        if (isCommon(forms))
-            errors.add(FieldErrors.tooCommon(field));
-        if (containsContextWord(forms, personalInfo))
-            errors.add(FieldErrors.containsPersonalInfo(field));
+        if (isCommon(forms)) errors.add(FieldErrors.tooCommon(field));
+        if (containsContextWord(forms, personalInfo)) errors.add(FieldErrors.containsPersonalInfo(field));
 
         return errors;
     }
@@ -96,26 +86,21 @@ public final class PasswordPolicy {
     private static String[] normalizedForms(String password) {
         String lower = password.toLowerCase(Locale.ROOT);
         String lettersOnly = lower.replaceAll("[^\\p{L}]", "");
-        String leetDecoded = lower.replace('@', 'a').replace('0', 'o').replace('3', 'e')
-                .replace('$', 's').replace('5', 's').replace('7', 't').replace('1', 'i')
-                .replaceAll("[^\\p{L}]", "");
+        String leetDecoded = lower.replace('@', 'a').replace('0', 'o').replace('3', 'e').replace('$', 's').replace('5', 's').replace('7', 't').replace('1', 'i').replaceAll("[^\\p{L}]", "");
 
         // Prevent validation anomalies with strings that strip out entirely into empty
         // values
         List<String> list = new ArrayList<>();
         list.add(lower);
-        if (!lettersOnly.isEmpty())
-            list.add(lettersOnly);
-        if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly))
-            list.add(leetDecoded);
+        if (!lettersOnly.isEmpty()) list.add(lettersOnly);
+        if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly)) list.add(leetDecoded);
 
         return list.toArray(new String[0]);
     }
 
     private static boolean isCommon(String[] forms) {
         for (String f : forms)
-            if (COMMON.contains(f))
-                return true;
+            if (COMMON.contains(f)) return true;
         return false;
     }
 
@@ -123,15 +108,13 @@ public final class PasswordPolicy {
         Set<String> words = new HashSet<>(SERVICE_WORDS);
         if (personalInfo != null) {
             for (String part : personalInfo) {
-                if (part == null)
-                    continue;
+                if (part == null) continue;
                 addPersonalWord(words, TextNormalizer.nfc(part.trim()).toLowerCase(Locale.ROOT));
             }
         }
         for (String w : words)
             for (String f : forms)
-                if (f.contains(w))
-                    return true;
+                if (f.contains(w)) return true;
         return false;
     }
 
@@ -140,10 +123,8 @@ public final class PasswordPolicy {
      * type the name of their mailbox without the dots, dashes, underscores or plus tags.
      */
     private static void addPersonalWord(Set<String> words, String value) {
-        if (value.length() >= MIN_PERSONAL_PART)
-            words.add(value);
+        if (value.length() >= MIN_PERSONAL_PART) words.add(value);
         String compact = value.replaceAll("[^\\p{L}\\p{N}]", "");
-        if (compact.length() >= MIN_PERSONAL_PART)
-            words.add(compact);
+        if (compact.length() >= MIN_PERSONAL_PART) words.add(compact);
     }
 }

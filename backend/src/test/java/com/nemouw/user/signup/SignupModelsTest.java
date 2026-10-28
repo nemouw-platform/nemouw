@@ -3,6 +3,8 @@ package com.nemouw.user.signup;
 import com.nemouw.user.signup.SignupDtos.PasswordSetupResponse;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static com.nemouw.support.Fixtures.USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +14,8 @@ class SignupModelsTest {
     void keepsTheTokenOutOfAnIssuedSetupTokensToString() {
         IssuedSetupToken setup = new IssuedSetupToken(
                 "eyJhbGciOiJIUzI1NiJ9.setup.sig",
-                USER_ID
+                USER_ID,
+                Duration.ofMinutes(15)
         );
 
         assertThat(setup.toString())
@@ -24,7 +27,8 @@ class SignupModelsTest {
     void exposesOnlyTheLifetimeAfterEmailVerificationAndNeitherTheTokenNorTheUserId() {
         IssuedSetupToken setup = new IssuedSetupToken(
                 "eyJhbGciOiJIUzI1NiJ9.setup.sig",
-                USER_ID
+                USER_ID,
+                Duration.ofMinutes(15)
         );
 
         PasswordSetupResponse response = new PasswordSetupResponse(900);

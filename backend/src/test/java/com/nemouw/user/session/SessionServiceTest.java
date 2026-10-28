@@ -1,5 +1,6 @@
 package com.nemouw.user.session;
 
+import com.nemouw.support.ShippedProperties;
 import com.nemouw.user.session.SessionRepository.ReplayedSession;
 import com.nemouw.user.session.SessionRepository.RotatedSession;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.nemouw.user.AuthConstants.REFRESH_REUSE_GRACE_SECONDS;
 import static com.nemouw.support.Fixtures.NOW;
 import static com.nemouw.support.Fixtures.SESSION_ID;
 import static com.nemouw.support.Fixtures.USER_ID;
@@ -34,11 +34,15 @@ import static org.mockito.Mockito.when;
 
 class SessionServiceTest {
 
+    private static final SessionProperties SESSION_PROPS =
+            ShippedProperties.bind("app.user.session", SessionProperties.class);
+    private static final int REFRESH_REUSE_GRACE_SECONDS = (int) SESSION_PROPS.refreshReuseGrace().toSeconds();
+
     private static final String ROLE = "specialist";
     private static final String PRESENTED_REFRESH_TOKEN = "Hq7-Lm2_Xv9Tn4Rb1Zp8Cw5Kd3Fs0Ja6Ye2Ui7OgBnM";
 
     private final SessionRepository sessions = mock(SessionRepository.class);
-    private final SessionService service = new SessionService(props(), sessions, Jwts.encoder(), fixedClock());
+    private final SessionService service = new SessionService(props(), SESSION_PROPS, sessions, Jwts.encoder(), fixedClock());
 
     @Nested
     class HappyPaths {
@@ -224,7 +228,7 @@ class SessionServiceTest {
             JwtEncoder brokenEncoder = mock(JwtEncoder.class);
             when(brokenEncoder.encode(any())).thenThrow(new JwtEncodingException("Failed to sign the JWT"));
             when(sessions.insert(any(), any(), any(), anyInt())).thenReturn(SESSION_ID);
-            SessionService failing = new SessionService(props(), sessions, brokenEncoder, fixedClock());
+            SessionService failing = new SessionService(props(), SESSION_PROPS, sessions, brokenEncoder, fixedClock());
 
             assertThatThrownBy(() -> failing.issue(USER_ID, ROLE, clientInfo()))
                     .isInstanceOf(JwtEncodingException.class);

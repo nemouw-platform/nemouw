@@ -19,6 +19,7 @@ import com.nemouw.common.exception.ValidationException;
 import com.nemouw.common.mail.EmailSender;
 import com.nemouw.support.Fixtures.RecordingTransactions;
 import com.nemouw.user.token.VerificationTokens;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,7 +32,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nemouw.user.AuthConstants.RESET_TTL_SECONDS;
 import static com.nemouw.support.Fixtures.EMAIL;
 import static com.nemouw.support.Fixtures.IDENTIFIER_ID;
 import static com.nemouw.support.Fixtures.TOKEN_ID;
@@ -56,6 +56,7 @@ class PasswordResetServiceTest {
     private static final OffsetDateTime TOKEN_EXPIRES_AT = OffsetDateTime.parse("2026-10-24T10:15:30Z");
     private static final String RESET_TOKEN = "Zx9-Kq2_mT7vLb4NwR1pYc8HdJ5sUe0AfG3iOa6BkQ";
     private static final String NEW_PASSWORD = "mauve otter lantern quartz";
+    private static final Duration RESET_TTL = Duration.ofMinutes(42);
 
     private final UserRepository users = mock(UserRepository.class);
     private final SessionService sessions = mock(SessionService.class);
@@ -88,6 +89,11 @@ class PasswordResetServiceTest {
     @Nested
     class ForgotPassword {
 
+        @BeforeEach
+        void stubResetTtl() {
+            when(tokens.resetTtl()).thenReturn(RESET_TTL);
+        }
+
         @ParameterizedTest
         @ValueSource(strings = {"active", "pending"})
         void emailsAResetLinkForActiveAndPendingAccounts(String status) {
@@ -99,7 +105,7 @@ class PasswordResetServiceTest {
 
             verify(tokens).issueResetToken(USER_ID, IDENTIFIER_ID);
             verify(emailSender).sendPasswordReset(EMAIL, RESET_TOKEN,
-                    Duration.ofSeconds(RESET_TTL_SECONDS), LocaleCode.EN);
+                    RESET_TTL, LocaleCode.EN);
             assertThat(tx.commits()).isEqualTo(1);
         }
 
@@ -112,7 +118,7 @@ class PasswordResetServiceTest {
             service.forgotPassword(new ForgotPasswordRequest("  Amira.Haddad@ClinicMail.org ", "ar"));
 
             verify(emailSender).sendPasswordReset(EMAIL, RESET_TOKEN,
-                    Duration.ofSeconds(RESET_TTL_SECONDS), LocaleCode.AR);
+                    RESET_TTL, LocaleCode.AR);
         }
 
         @Test
@@ -124,7 +130,7 @@ class PasswordResetServiceTest {
             service.forgotPassword(new ForgotPasswordRequest(EMAIL, null));
 
             verify(emailSender).sendPasswordReset(EMAIL, RESET_TOKEN,
-                    Duration.ofSeconds(RESET_TTL_SECONDS), LocaleCode.EN);
+                    RESET_TTL, LocaleCode.EN);
         }
 
         @Test
