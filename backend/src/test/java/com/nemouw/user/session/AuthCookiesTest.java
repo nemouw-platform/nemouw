@@ -1,6 +1,5 @@
 package com.nemouw.user.session;
 
-import static com.nemouw.user.AuthConstants.SETUP_TTL_SECONDS;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AuthCookiesTest {
 
+    private static final int SETUP_TTL_SECONDS = 15 * 60;
     private static final IssuedSession SESSION =
             new IssuedSession("eyJhbGciOiJIUzI1NiJ9.access.sig", "Hq7-Lm2_Xv9Tn4Rb1Zp8", USER_ID, "specialist");
     private static final String SETUP_TOKEN = "eyJhbGciOiJIUzI1NiJ9.setup.sig";
