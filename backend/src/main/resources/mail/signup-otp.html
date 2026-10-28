@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout.html :: layout(~{::section})}">
+<body>
+<section>
+    <h1 class="c-head" style="margin:0 0 12px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:24px;line-height:30px;font-weight:700;color:#2E1840;"
+        th:text="#{mail.signup_otp.heading}">Verify your email</h1>
+    <!-- The code comes first, straight after the heading, then the explanation (helps code detectors) -->
+    <div th:replace="~{components.html :: codeBox(#{mail.signup_otp.codeline}, ${code})}"></div>
+
+    <p class="c-body" style="margin:0 0 12px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:16px;line-height:24px;color:#4B4256;"
+       th:text="#{mail.signup_otp.intro}">Intro</p>
+
+    <p class="c-muted" style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:14px;line-height:20px;color:#6B6277;"
+       th:text="#{mail.signup_otp.expires(${minutes})}">Expires in 10 minutes.</p>
+
+    <p class="c-muted c-rule" style="margin:20px 0 0 0;padding-top:16px;border-top:1px solid #DCD0E6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Tahoma,Arial,sans-serif;font-size:13px;line-height:18px;color:#6B6277;"
+       th:text="#{mail.signup_otp.security}">Never share this code.</p>
+</section>
+</body>
+</html>

@@ -1,21 +1,37 @@
-# ---- Build stage ----
-FROM maven:3.9-eclipse-temurin-17 AS build
+# ---- Dev stage (Maven + JDK, the target docker compose uses) ----
+FROM maven:3.9-eclipse-temurin-25 AS dev
 WORKDIR /app
+COPY pom.xml ./
+RUN --mount=type=cache,target=/root/.m2 mvn dependency:go-offline -B
 
-# Copy pom first so dependency downloads are cached across rebuilds
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
 
-# Now copy the source and build the fat jar
+# ---- Build stage ----
+FROM dev AS build
 COPY src ./src
-RUN mvn package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn package -Dmaven.test.skip=true -B
+
+
+# ---- Extract layers ----
+# Splits the jar into layers (dependencies, loader, snapshot dependencies, application) for Docker caching.
+FROM eclipse-temurin:25-jdk-jammy AS extract
+WORKDIR /extract
+COPY --from=build /app/target/*.jar application.jar
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 
 # ---- Runtime stage ----
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:25-jre-jammy
 WORKDIR /app
 
-COPY --from=build /app/target/nemouw-backend-1.0-SNAPSHOT.jar /app/backend.jar
+RUN groupadd -r app && useradd -r -g app app
 
-EXPOSE 4567
-ENTRYPOINT ["java", "-jar", "/app/backend.jar"]
+# One COPY per layer: Docker keeps the first three cached and only re-copies the application layer on code changes
+COPY --from=extract /extract/extracted/dependencies/ ./
+COPY --from=extract /extract/extracted/spring-boot-loader/ ./
+COPY --from=extract /extract/extracted/snapshot-dependencies/ ./
+COPY --from=extract /extract/extracted/application/ ./
+
+# Run as a non-root user
+USER app
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "application.jar"]

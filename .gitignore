@@ -3,19 +3,22 @@
 .env.*
 !.env.example
 
-# Target build artifacts
-**/target/
-*.jar
-*.war
-*.ear
+# Logs
+*.log
+logs/
 
-# Maven dependency reduction file
-dependency-reduced-pom.xml
+# Build output (generic, covers a future frontend)
+build/
+dist/
 
 # IntelliJ IDEA
 .idea/
 *.iml
 *.iws
+*.ipr
+
+# VS Code
+.vscode/
 
 # Eclipse
 .settings/
@@ -23,21 +26,22 @@ dependency-reduced-pom.xml
 .classpath
 .factorypath
 
+# Spring Tool Suite (STS)
+.apt_generated
+.settings
+.springBeans
+.sts4-cache
+
 # NetBeans
 nbproject/private/
-build/
 nbbuild/
-dist/
+nbdist/
 nbrls/
-
-# Log files
-*.log
-logs/
-backend/logs/
+.nb-gradle/
 
 # OS-specific files
 .DS_Store
 Thumbs.db
 
-# Ignore any zip files
+# Archives
 *.zip

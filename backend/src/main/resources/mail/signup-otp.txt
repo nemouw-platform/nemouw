@@ -1,0 +1,14 @@
+[[${brand}]]
+
+[[#{mail.signup_otp.heading}]]
+
+[[#{mail.signup_otp.codeline}]]
+[[${code}]]
+
+[[#{mail.signup_otp.intro}]]
+
+[[#{mail.signup_otp.expires(${minutes})}]]
+
+[[#{mail.signup_otp.security}]]
+
+[[#{mail.footer.unrequested}]]
