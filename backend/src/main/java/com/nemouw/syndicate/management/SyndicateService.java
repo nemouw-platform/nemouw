@@ -1,13 +1,10 @@
 package com.nemouw.syndicate.management;
 
+import com.nemouw.common.exception.*;
 import com.nemouw.user.api.InviteService;
 import com.nemouw.user.api.InviteService.Invite;
 import com.nemouw.common.enums.LocaleCode;
 import com.nemouw.common.enums.UserRole;
-import com.nemouw.common.exception.ApiException;
-import com.nemouw.common.exception.ErrorCode;
-import com.nemouw.common.exception.FieldErrors;
-import com.nemouw.common.exception.ValidationException;
 import com.nemouw.common.util.TextNormalizer;
 import com.nemouw.common.util.Validator;
 import com.nemouw.country.CountryLookup;
@@ -67,8 +64,8 @@ class SyndicateService {
     }
 
     private Created createInTransaction(SyndicateCreateRequest r) {
-        if (!specialtyLookup.existsById(r.specialtyId())) throw unknown("specialty_id", "unknown specialty");
-        if (!countryLookup.existsById(r.countryId())) throw unknown("country_id", "unknown country");
+        if (!specialtyLookup.existsById(r.specialtyId())) throw Errors.invalidField("specialty_id", "unknown specialty");
+        if (!countryLookup.existsById(r.countryId())) throw Errors.invalidField("country_id", "unknown country");
         if (syndicates.existsByCountryAndSpecialty(r.countryId(), r.specialtyId())) {
             throw new ApiException(ErrorCode.SYNDICATE_EXISTS);
         }
@@ -105,10 +102,6 @@ class SyndicateService {
 
     private Syndicate find(UUID id) {
         return syndicates.findById(id).orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));
-    }
-
-    private static ValidationException unknown(String field, String message) {
-        return new ValidationException(List.of(FieldErrors.invalidFormat(field, message)));
     }
 
     private static void validate(SyndicateCreateRequest r) {

@@ -1,5 +1,7 @@
 package com.nemouw.common.exception;
 
+import java.util.List;
+
 /**
  * Named factories for the errors services and filters raise, so call sites read
  * {@code throw Errors.emailTaken()}. Codes, statuses and messages live in {@link ErrorCode}.
@@ -61,5 +63,10 @@ public final class Errors {
     }
     public static ApiException specialistNotFound() {
         return new ApiException(ErrorCode.SPECIALIST_NOT_FOUND);
+    }
+
+    // ---- Validation ----
+    public static ValidationException invalidField(String field, String message) {
+        return new ValidationException(List.of(FieldErrors.invalidFormat(field, message)));
     }
 }

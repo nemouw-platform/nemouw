@@ -4,7 +4,6 @@ import com.nemouw.common.exception.ApiException;
 import com.nemouw.common.exception.ErrorCode;
 import com.nemouw.common.exception.Errors;
 import com.nemouw.common.exception.FieldErrors;
-import com.nemouw.common.exception.ValidationException;
 import com.nemouw.common.util.Validator;
 import com.nemouw.specialist.profile.SpecialistDtos.SpecialistOnboardingRequest;
 import com.nemouw.specialist.profile.SpecialistDtos.SpecialistResponse;
@@ -13,11 +12,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
@@ -50,9 +45,9 @@ class SpecialistService {
                 .throwIfInvalid();
 
         if (specialists.findByUserId(userId).isPresent()) throw new ApiException(ErrorCode.PROFILE_ALREADY_EXISTS);
-        if (!specialists.syndicateExists(req.syndicateId())) throw unknown("syndicate_id", "unknown syndicate");
+        if (!specialists.syndicateExists(req.syndicateId())) throw Errors.invalidField("syndicate_id", "unknown syndicate");
 
-        String username = normalizeUsername(req.username());
+        String username = normalizeUsername(Objects.requireNonNull(req.username()));
         String memberNumber = req.syndicateMemberNumber().trim();
         if (specialists.usernameTaken(username, null)) throw new ApiException(ErrorCode.USERNAME_TAKEN);
         if (specialists.memberNumberTaken(req.syndicateId(), memberNumber, null)) {
@@ -158,7 +153,7 @@ class SpecialistService {
             if (cur.verificationStatus() == SpecialistVerificationStatus.ACTIVE) {
                 throw new ApiException(ErrorCode.SYNDICATE_LOCKED);
             }
-            if (!specialists.syndicateExists(syndicateId)) throw unknown("syndicate_id", "unknown syndicate");
+            if (!specialists.syndicateExists(syndicateId)) throw Errors.invalidField("syndicate_id", "unknown syndicate");
             changes.put("syndicate_id", syndicateId);
         }
         if (syndicateChanged || !memberNumber.equals(cur.syndicateMemberNumber())) {
@@ -186,16 +181,12 @@ class SpecialistService {
 
     private void requireUsableMedia(String field, UUID id, UUID currentId, UUID specialistId) {
         if (id != null && !id.equals(currentId) && !specialists.mediaAvailable(id, specialistId)) {
-            throw unknown(field, "unknown media or already in use");
+            throw Errors.invalidField(field, "unknown media or already in use");
         }
     }
 
     private static String normalizeUsername(String raw) {
         return raw.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private static ValidationException unknown(String field, String message) {
-        return new ValidationException(List.of(FieldErrors.invalidFormat(field, message)));
     }
 
     /** Maps the unique index that fired to the contract's error. Anything else is a real bug: rethrow. */
@@ -206,8 +197,8 @@ class SpecialistService {
         if (m.contains("specialists_username_key") || m.contains("uq_user_identifiers_type_identifier")) {
             return new ApiException(ErrorCode.USERNAME_TAKEN);
         }
-        if (m.contains("uq_specialists_profile_picture")) return unknown("profile_picture_id", "already in use");
-        if (m.contains("uq_specialists_cover_image")) return unknown("cover_image_id", "already in use");
+        if (m.contains("uq_specialists_profile_picture")) return Errors.invalidField("profile_picture_id", "already in use");
+        if (m.contains("uq_specialists_cover_image")) return Errors.invalidField("cover_image_id", "already in use");
         return e;
     }
 
@@ -215,10 +206,10 @@ class SpecialistService {
         String m = String.valueOf(e.getMostSpecificCause().getMessage());
         if (m.contains("syndicate_id cannot change")) return new ApiException(ErrorCode.SYNDICATE_LOCKED);   // verified between our read and write
         if (m.contains("ck_specialists_age_range")) {
-            return unknown("min_age_treated", "min_age_treated must be less than or equal to max_age_treated");
+            return Errors.invalidField("min_age_treated", "min_age_treated must be less than or equal to max_age_treated");
         }
         if (m.contains("ck_specialists_picture_cover_differ")) {
-            return unknown("cover_image_id", "must differ from profile_picture_id");
+            return Errors.invalidField("cover_image_id", "must differ from profile_picture_id");
         }
         return e;
     }
