@@ -15,6 +15,6 @@ public class SpecialistLookup {
     }
 
     public UUID requireIdOf(UUID userId) {
-        return specialists.findIdByUserId(userId).orElseThrow(Errors::specialistNotFound);
+        return specialists.findIdByUserId(userId).orElseThrow(Errors::onboardingRequired);
     }
 }
