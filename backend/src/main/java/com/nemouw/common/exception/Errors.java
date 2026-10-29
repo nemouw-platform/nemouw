@@ -54,4 +54,12 @@ public final class Errors {
     public static ApiException forbidden() {
         return new ApiException(ErrorCode.FORBIDDEN);
     }
+
+    // ---- Specialist ----
+    public static ApiException onboardingRequired() {
+        return new ApiException(ErrorCode.ONBOARDING_REQUIRED);
+    }
+    public static ApiException specialistNotFound() {
+        return new ApiException(ErrorCode.SPECIALIST_NOT_FOUND);
+    }
 }

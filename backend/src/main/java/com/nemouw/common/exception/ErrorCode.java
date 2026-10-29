@@ -21,9 +21,11 @@ public enum ErrorCode {
     ACCOUNT_NOT_VERIFIED(403, "Your account is not verified yet. Please verify your email to log in."),
     ACCOUNT_SUSPENDED(403, "This account has been suspended for violating our terms of service. "
             + "Please contact support if you believe this is a mistake."),
+    ONBOARDING_REQUIRED(403, "Complete onboarding first"),
 
     // 404
     NOT_FOUND(404, "Resource not found"),
+    SPECIALIST_NOT_FOUND(404, "Specialist not found, complete onboarding first"),
 
     // 409
     EMAIL_TAKEN(409, "Email is already registered"),
@@ -36,6 +38,10 @@ public enum ErrorCode {
     OWNER_CANNOT_BE_REMOVED(409, "The syndicate owner cannot be removed"),
     ALREADY_OWNER(409, "This staff member is already the owner"),
     ACCOUNT_ALREADY_ACTIVE(409, "This account is already active, so its email cannot be changed"),
+    USERNAME_TAKEN(409, "Username is already taken"),
+    MEMBER_NUMBER_TAKEN(409, "This member number is already registered with the syndicate"),
+    PROFILE_ALREADY_EXISTS(409, "A specialist profile already exists for this account"),
+    SYNDICATE_LOCKED(409, "The syndicate cannot be changed after verification"),
 
     // 422
     VALIDATION_ERROR(422, "Validation failed"),

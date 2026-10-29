@@ -18,6 +18,7 @@ public final class Validator {
     private static final Pattern ISO_CODE = Pattern.compile("^[A-Za-z]{2}$");           // country, ISO 3166-1 alpha-2
     private static final Pattern CURRENCY_CODE = Pattern.compile("^[A-Za-z]{3}$");      // ISO 4217
     private static final Pattern PHONE_CODE = Pattern.compile("^\\+\\d{1,4}$");         // +961
+    private static final Pattern USERNAME = Pattern.compile("^[a-z0-9._-]{3,30}$");
 
     private final List<FieldError> errors = new ArrayList<>();
 
@@ -95,6 +96,11 @@ public final class Validator {
 
     public Validator phoneCode(String field, String v) {
         return format(field, v, PHONE_CODE, "must look like +961");
+    }
+
+    public Validator username(String field, String v) {
+        return format(field, v == null ? null : v.toLowerCase(Locale.ROOT), USERNAME,
+                "use 3 to 30 characters: letters, digits, '.', '_' or '-'");
     }
 
     private Validator format(String field, String v, Pattern pattern, String rule) {

@@ -51,6 +51,7 @@ public class SecurityConfig {
 
     private static final String ADMIN = UserRole.ADMIN.code();
     private static final String STAFF = UserRole.SYNDICATE_STAFF.code();
+    private static final String SPECIALIST = UserRole.SPECIALIST.code();
 
     private static final String[] PUBLIC_AUTH = {
             API + "/auth/signup", API + "/auth/verify-otp", API + "/auth/resend-otp",
@@ -102,6 +103,7 @@ public class SecurityConfig {
                 .securityMatcher(API + "/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, PASSWORD_SETUP).hasAuthority("SCOPE_" + TokenClaims.PASSWORD_SETUP_SCOPE)
+                        .requestMatchers(API + "/specialists/me", API + "/specialists/me/**").hasRole(SPECIALIST)
                         .requestMatchers(HttpMethod.DELETE, API + "/conditions/**").hasRole(ADMIN)
                         .requestMatchers(API + "/conditions/**").hasAnyRole(ADMIN, STAFF)
                         .requestMatchers(API + "/countries/**", API + "/specialties/**").hasRole(ADMIN)
