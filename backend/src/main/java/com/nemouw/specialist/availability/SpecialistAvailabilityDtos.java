@@ -6,14 +6,14 @@ public final class SpecialistAvailabilityDtos {
     private SpecialistAvailabilityDtos() {
     }
 
-    public record SpecialistAvailabilityWriteRequest(UUID locationId, Integer dayOfWeek, String startTime,
+    public record SpecialistAvailabilityWriteRequest(UUID locationId, String dayOfWeek, String startTime,
                                                      String endTime) {
     }
 
-    public record SpecialistAvailabilityResponse(UUID id, UUID locationId, int dayOfWeek, String startTime,
+    public record SpecialistAvailabilityResponse(UUID id, UUID locationId, WeekDay dayOfWeek, String startTime,
                                                  String endTime) {
         static SpecialistAvailabilityResponse from(SpecialistAvailabilityRow r) {
-            return new SpecialistAvailabilityResponse(r.id(), r.locationId(), r.dayOfWeek(),
+            return new SpecialistAvailabilityResponse(r.id(), r.locationId(), WeekDay.fromCode(r.dayOfWeek()),
                     ClockTime.format(r.startTime()), ClockTime.format(r.endTime()));
         }
     }

@@ -61,8 +61,17 @@ public final class Errors {
     public static ApiException onboardingRequired() {
         return new ApiException(ErrorCode.ONBOARDING_REQUIRED);
     }
+
     public static ApiException specialistNotFound() {
         return new ApiException(ErrorCode.SPECIALIST_NOT_FOUND);
+    }
+
+    public static ApiException locationAlreadyExists() {
+        return new ApiException(ErrorCode.LOCATION_ALREADY_EXISTS);
+    }
+
+    public static ApiException primaryLocationRequired() {
+        return new ApiException(ErrorCode.PRIMARY_LOCATION_REQUIRED);
     }
 
     // ---- Validation ----

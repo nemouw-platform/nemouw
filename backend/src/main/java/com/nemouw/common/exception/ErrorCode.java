@@ -42,6 +42,8 @@ public enum ErrorCode {
     MEMBER_NUMBER_TAKEN(409, "This member number is already registered with the syndicate"),
     PROFILE_ALREADY_EXISTS(409, "A specialist profile already exists for this account"),
     SYNDICATE_LOCKED(409, "The syndicate cannot be changed after verification"),
+    LOCATION_ALREADY_EXISTS(409, "This location is already saved"),
+    PRIMARY_LOCATION_REQUIRED(409, "A primary location is required, make another location primary first"),
 
     // 422
     VALIDATION_ERROR(422, "Validation failed"),

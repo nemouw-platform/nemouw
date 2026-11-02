@@ -33,31 +33,49 @@ class SpecialistLocationService {
         return locations.findAll(specialistId).stream().map(SpecialistLocationResponse::from).toList();
     }
 
+    /**
+     * A specialist with any location has exactly one primary. The first location is always the primary one,
+     * whatever the request says; a later one becomes primary only when asked, and then replaces the old one.
+     */
     @Transactional
     SpecialistLocationResponse add(UUID specialistId, SpecialistLocationWriteRequest req) {
         LocationFields fields = validated(req);
-        replacePrimaryIfRequested(specialistId, fields);
-        return SpecialistLocationResponse.from(locations.insert(specialistId, fields));
+        locations.lockOwner(specialistId);
+        rejectDuplicate(specialistId, null, fields);
+
+        boolean primary = Boolean.TRUE.equals(req.primary()) || locations.count(specialistId) == 0;
+        if (primary) locations.clearPrimary(specialistId);
+        return SpecialistLocationResponse.from(locations.insert(specialistId, fields, primary));
     }
 
     @Transactional
     SpecialistLocationResponse update(UUID specialistId, UUID locationId, SpecialistLocationWriteRequest req) {
         LocationFields fields = validated(req);
-        replacePrimaryIfRequested(specialistId, fields);
-        return locations.update(specialistId, locationId, fields)
+        locations.lockOwner(specialistId);
+        SpecialistLocationRow current = locations.find(specialistId, locationId)
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));
+        rejectDuplicate(specialistId, locationId, fields);
+
+        boolean primary = req.primary() == null ? current.isPrimary() : req.primary();
+        if (current.isPrimary() && !primary) throw Errors.primaryLocationRequired();
+        if (primary && !current.isPrimary()) locations.clearPrimary(specialistId);
+
+        return locations.update(specialistId, locationId, fields, primary)
                 .map(SpecialistLocationResponse::from)
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));
     }
 
     @Transactional
     void delete(UUID specialistId, UUID locationId) {
+        locations.lockOwner(specialistId);
+        SpecialistLocationRow current = locations.find(specialistId, locationId)
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));
+        if (current.isPrimary() && locations.count(specialistId) > 1) throw Errors.primaryLocationRequired();
         if (!locations.delete(specialistId, locationId)) throw new ApiException(ErrorCode.NOT_FOUND);
     }
 
-    private void replacePrimaryIfRequested(UUID specialistId, LocationFields fields) {
-        if (!fields.primary()) return;
-        locations.lockOwner(specialistId);
-        locations.clearPrimary(specialistId);
+    private void rejectDuplicate(UUID specialistId, UUID excludeId, LocationFields fields) {
+        if (locations.existsDuplicate(specialistId, excludeId, fields)) throw Errors.locationAlreadyExists();
     }
 
     private LocationFields validated(SpecialistLocationWriteRequest req) {
@@ -78,7 +96,7 @@ class SpecialistLocationService {
 
         return new LocationFields(req.countryId(), blankToNull(req.label()), blankToNull(req.addressLine1()),
                 blankToNull(req.addressLine2()), req.city().trim(), req.latitude(), req.longitude(),
-                blankToNull(req.phone()), Boolean.TRUE.equals(req.primary()));
+                blankToNull(req.phone()));
     }
 
     private static boolean within(BigDecimal value, int limit) {

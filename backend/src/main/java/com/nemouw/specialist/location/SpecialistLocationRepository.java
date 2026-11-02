@@ -31,27 +31,63 @@ class SpecialistLocationRepository {
                 .list();
     }
 
-    SpecialistLocationRow insert(UUID specialistId, LocationFields f) {
+    Optional<SpecialistLocationRow> find(UUID specialistId, UUID id) {
+        return jdbc.sql("SELECT " + COLUMNS + """
+                         FROM specialist_locations
+                        WHERE id = :id AND specialist_id = :specialistId
+                        """)
+                .param("id", id)
+                .param("specialistId", specialistId)
+                .query(SpecialistLocationRow.class)
+                .optional();
+    }
+
+    int count(UUID specialistId) {
+        return jdbc.sql("SELECT count(*) FROM specialist_locations WHERE specialist_id = :specialistId")
+                .param("specialistId", specialistId)
+                .query(Integer.class)
+                .single();
+    }
+
+    boolean existsDuplicate(UUID specialistId, UUID excludeId, LocationFields f) {
+        if (f.latitude() == null || f.longitude() == null) return false;
+        return jdbc.sql("""
+                        SELECT EXISTS (
+                            SELECT 1 FROM specialist_locations
+                             WHERE specialist_id = :specialistId
+                               AND latitude = CAST(:latitude AS numeric(9, 6))
+                               AND longitude = CAST(:longitude AS numeric(9, 6))
+                               AND (CAST(:excludeId AS uuid) IS NULL OR id <> CAST(:excludeId AS uuid)))
+                        """)
+                .param("specialistId", specialistId)
+                .param("latitude", f.latitude())
+                .param("longitude", f.longitude())
+                .param("excludeId", excludeId)
+                .query(Boolean.class)
+                .single();
+    }
+
+    SpecialistLocationRow insert(UUID specialistId, LocationFields f, boolean primary) {
         return bind(jdbc.sql("""
                         INSERT INTO specialist_locations
                             (specialist_id, country_id, label, address_line1, address_line2, city,
                              latitude, longitude, phone, is_primary)
                         VALUES (:specialistId, :countryId, :label, :addressLine1, :addressLine2, :city,
                                 :latitude, :longitude, :phone, :primary)
-                        """ + RETURNING), f)
+                        """ + RETURNING), f, primary)
                 .param("specialistId", specialistId)
                 .query(SpecialistLocationRow.class)
                 .single();
     }
 
-    Optional<SpecialistLocationRow> update(UUID specialistId, UUID id, LocationFields f) {
+    Optional<SpecialistLocationRow> update(UUID specialistId, UUID id, LocationFields f, boolean primary) {
         return bind(jdbc.sql("""
                         UPDATE specialist_locations
                         SET country_id = :countryId, label = :label, address_line1 = :addressLine1,
                             address_line2 = :addressLine2, city = :city, latitude = :latitude,
                             longitude = :longitude, phone = :phone, is_primary = :primary
                         WHERE id = :id AND specialist_id = :specialistId
-                        """ + RETURNING), f)
+                        """ + RETURNING), f, primary)
                 .param("id", id)
                 .param("specialistId", specialistId)
                 .query(SpecialistLocationRow.class)
@@ -71,7 +107,6 @@ class SpecialistLocationRepository {
                 .update();
     }
 
-    /** Serializes primary changes for one specialist, so two requests cannot both claim it. */
     void lockOwner(UUID specialistId) {
         jdbc.sql("SELECT id FROM specialists WHERE id = :id FOR UPDATE")
                 .param("id", specialistId)
@@ -86,7 +121,7 @@ class SpecialistLocationRepository {
                 .single();
     }
 
-    private static StatementSpec bind(StatementSpec spec, LocationFields f) {
+    private static StatementSpec bind(StatementSpec spec, LocationFields f, boolean primary) {
         return spec.param("countryId", f.countryId())
                 .param("label", f.label())
                 .param("addressLine1", f.addressLine1())
@@ -95,6 +130,6 @@ class SpecialistLocationRepository {
                 .param("latitude", f.latitude())
                 .param("longitude", f.longitude())
                 .param("phone", f.phone())
-                .param("primary", f.primary());
+                .param("primary", primary);
     }
 }

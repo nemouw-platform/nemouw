@@ -10,6 +10,9 @@ import com.nemouw.specialist.availability.SpecialistAvailabilityDtos.SpecialistA
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.Optional;
+
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +27,10 @@ class SpecialistAvailabilityService {
 
     @Transactional(readOnly = true)
     List<SpecialistAvailabilityResponse> list(UUID specialistId) {
-        return availabilities.findAll(specialistId).stream().map(SpecialistAvailabilityResponse::from).toList();
+        return availabilities.findAll(specialistId).stream()
+                .map(SpecialistAvailabilityResponse::from)
+                .sorted(Comparator.comparing(SpecialistAvailabilityResponse::dayOfWeek))
+                .toList();
     }
 
     @Transactional
@@ -48,11 +54,8 @@ class SpecialistAvailabilityService {
     }
 
     private AvailabilityFields validated(UUID specialistId, SpecialistAvailabilityWriteRequest req) {
-        Validator v = new Validator().notNull("day_of_week", req.dayOfWeek());
-        if (req.dayOfWeek() != null) {
-            v.check(req.dayOfWeek() >= 0 && req.dayOfWeek() <= 6,
-                    FieldErrors.invalidFormat("day_of_week", "must be between 0 and 6"));
-        }
+        Validator v = new Validator();
+        WeekDay day = parseDay(v, req.dayOfWeek());
         LocalTime start = parseTime(v, "start_time", req.startTime());
         LocalTime end = parseTime(v, "end_time", req.endTime());
         if (start != null && end != null) {
@@ -63,7 +66,7 @@ class SpecialistAvailabilityService {
         if (req.locationId() != null && !availabilities.locationBelongsTo(specialistId, req.locationId())) {
             throw Errors.invalidField("location_id", "unknown location");
         }
-        return new AvailabilityFields(req.locationId(), req.dayOfWeek(), start, end);
+        return new AvailabilityFields(req.locationId(), day, start, end);
     }
 
     private static LocalTime parseTime(Validator v, String field, String text) {
@@ -74,5 +77,15 @@ class SpecialistAvailabilityService {
         LocalTime time = ClockTime.parse(text);
         v.check(time != null, FieldErrors.invalidFormat(field, "must be a time as HH:mm"));
         return time;
+    }
+
+    private static WeekDay parseDay(Validator v, String text) {
+        if (text == null || text.isBlank()) {
+            v.required("day_of_week", text);
+            return null;
+        }
+        Optional<WeekDay> day = WeekDay.tryFrom(text);
+        v.check(day.isPresent(), FieldErrors.invalidFormat("day_of_week", "must be one of " + WeekDay.allCodes()));
+        return day.orElse(null);
     }
 }

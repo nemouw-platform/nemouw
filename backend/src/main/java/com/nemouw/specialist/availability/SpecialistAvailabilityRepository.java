@@ -23,7 +23,7 @@ class SpecialistAvailabilityRepository {
         return jdbc.sql("SELECT " + COLUMNS + """
                          FROM specialist_location_availabilities
                         WHERE specialist_id = :specialistId
-                        ORDER BY day_of_week, start_time, id
+                        ORDER BY start_time, id
                         """)
                 .param("specialistId", specialistId)
                 .query(SpecialistAvailabilityRow.class)
@@ -74,7 +74,7 @@ class SpecialistAvailabilityRepository {
 
     private static StatementSpec bind(StatementSpec spec, AvailabilityFields f) {
         return spec.param("locationId", f.locationId())
-                .param("dayOfWeek", f.dayOfWeek())
+                .param("dayOfWeek", f.dayOfWeek().code())
                 .param("startTime", f.startTime())
                 .param("endTime", f.endTime());
     }
