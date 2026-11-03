@@ -5,6 +5,7 @@ import com.nemouw.common.exception.ErrorCode;
 import com.nemouw.common.exception.Errors;
 import com.nemouw.common.exception.FieldErrors;
 import com.nemouw.common.util.Validator;
+import com.nemouw.media.api.PublicMediaUrls;
 import com.nemouw.specialist.profile.SpecialistDtos.SpecialistOnboardingRequest;
 import com.nemouw.specialist.profile.SpecialistDtos.SpecialistResponse;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,11 +21,11 @@ import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 @Service
 class SpecialistService {
     private final SpecialistRepository specialists;
-    private final MediaUrls mediaUrls;
+    private final PublicMediaUrls publicMediaUrls;
 
-    SpecialistService(SpecialistRepository specialists, MediaUrls mediaUrls) {
+    SpecialistService(SpecialistRepository specialists, PublicMediaUrls publicMediaUrls) {
         this.specialists = specialists;
-        this.mediaUrls = mediaUrls;
+        this.publicMediaUrls = publicMediaUrls;
     }
 
     @Transactional(readOnly = true)
@@ -131,20 +132,6 @@ class SpecialistService {
                     "min_age_treated must be less than or equal to max_age_treated"));
         }
 
-        UUID picture = cur.profilePictureId();
-        UUID cover = cur.coverImageId();
-        if (body.containsKey("profile_picture_id")) {
-            picture = optionalUuid(body, "profile_picture_id", v);
-            changes.put("profile_picture_id", picture);
-        }
-        if (body.containsKey("cover_image_id")) {
-            cover = optionalUuid(body, "cover_image_id", v);
-            changes.put("cover_image_id", cover);
-        }
-        v.check(picture == null || !picture.equals(cover),
-                FieldErrors.invalidFormat("cover_image_id", "must differ from profile_picture_id"));
-        v.throwIfInvalid();
-
         if (!username.equals(cur.username())) {
             if (specialists.usernameTaken(username, cur.id())) throw new ApiException(ErrorCode.USERNAME_TAKEN);
             changes.put("username", username);
@@ -162,8 +149,6 @@ class SpecialistService {
             }
             changes.put("syndicate_member_number", memberNumber);
         }
-        requireUsableMedia("profile_picture_id", picture, cur.profilePictureId(), cur.id());
-        requireUsableMedia("cover_image_id", cover, cur.coverImageId(), cur.id());
 
         try {
             specialists.update(cur.id(), changes);
@@ -176,13 +161,7 @@ class SpecialistService {
     }
 
     private SpecialistResponse respond(SpecialistRow row) {
-        return SpecialistResponse.from(row, mediaUrls);
-    }
-
-    private void requireUsableMedia(String field, UUID id, UUID currentId, UUID specialistId) {
-        if (id != null && !id.equals(currentId) && !specialists.mediaAvailable(id, specialistId)) {
-            throw Errors.invalidField(field, "unknown media or already in use");
-        }
+        return SpecialistResponse.from(row, publicMediaUrls);
     }
 
     private static String normalizeUsername(String raw) {
@@ -197,8 +176,6 @@ class SpecialistService {
         if (m.contains("specialists_username_key") || m.contains("uq_user_identifiers_type_identifier")) {
             return new ApiException(ErrorCode.USERNAME_TAKEN);
         }
-        if (m.contains("uq_specialists_profile_picture")) return Errors.invalidField("profile_picture_id", "already in use");
-        if (m.contains("uq_specialists_cover_image")) return Errors.invalidField("cover_image_id", "already in use");
         return e;
     }
 
@@ -207,9 +184,6 @@ class SpecialistService {
         if (m.contains("syndicate_id cannot change")) return new ApiException(ErrorCode.SYNDICATE_LOCKED);   // verified between our read and write
         if (m.contains("ck_specialists_age_range")) {
             return Errors.invalidField("min_age_treated", "min_age_treated must be less than or equal to max_age_treated");
-        }
-        if (m.contains("ck_specialists_picture_cover_differ")) {
-            return Errors.invalidField("cover_image_id", "must differ from profile_picture_id");
         }
         return e;
     }
@@ -262,9 +236,5 @@ class SpecialistService {
         }
         v.check(false, FieldErrors.invalidFormat(key, "must be a valid UUID"));
         return null;
-    }
-
-    private static UUID optionalUuid(Map<String, Object> b, String key, Validator v) {
-        return b.get(key) == null ? null : uuid(b, key, v);
     }
 }

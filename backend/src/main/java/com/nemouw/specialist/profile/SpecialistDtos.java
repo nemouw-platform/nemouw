@@ -1,5 +1,7 @@
 package com.nemouw.specialist.profile;
 
+import com.nemouw.media.api.PublicMediaUrls;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -18,7 +20,7 @@ public final class SpecialistDtos {
                                      String profilePictureUrl, String coverImageUrl, Integer minAgeTreated,
                                      Integer maxAgeTreated, SpecialistVerificationStatus verificationStatus,
                                      Instant verifiedAt, Instant createdAt, Instant updatedAt) {
-        static SpecialistResponse from(SpecialistRow r, MediaUrls urls) {
+        static SpecialistResponse from(SpecialistRow r, PublicMediaUrls urls) {
             return new SpecialistResponse(r.id(), r.userId(), r.specialtyId(), r.syndicateId(),
                     r.syndicateMemberNumber(), r.username(), r.gender(), r.whatsappNumber(), r.primaryLanguage(),
                     r.yearsOfExperience(), urls.urlFor(r.profilePictureKey()), urls.urlFor(r.coverImageKey()),

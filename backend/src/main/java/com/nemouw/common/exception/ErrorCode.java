@@ -45,6 +45,12 @@ public enum ErrorCode {
     LOCATION_ALREADY_EXISTS(409, "This location is already saved"),
     PRIMARY_LOCATION_REQUIRED(409, "A primary location is required, make another location primary first"),
 
+    // 413
+    FILE_TOO_LARGE(413, "The file exceeds the allowed size"),
+
+    // 415
+    UNSUPPORTED_FILE_TYPE(415, "File type not allowed"),
+
     // 422
     VALIDATION_ERROR(422, "Validation failed"),
 
@@ -52,7 +58,10 @@ public enum ErrorCode {
     TOO_MANY_REQUESTS(429, "Too many requests"),
 
     // 500
-    INTERNAL_ERROR(500, "Something went wrong");
+    INTERNAL_ERROR(500, "Something went wrong"),
+
+    // 503
+    MEDIA_BUSY(503, "Try again shortly");
 
     private final int status;
     private final String defaultMessage;

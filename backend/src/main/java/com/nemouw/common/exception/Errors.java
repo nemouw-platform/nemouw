@@ -74,6 +74,19 @@ public final class Errors {
         return new ApiException(ErrorCode.PRIMARY_LOCATION_REQUIRED);
     }
 
+    // ---- Media ----
+    public static ApiException fileTooLarge() {
+        return new ApiException(ErrorCode.FILE_TOO_LARGE);
+    }
+
+    public static ApiException unsupportedFileType() {
+        return new ApiException(ErrorCode.UNSUPPORTED_FILE_TYPE);
+    }
+
+    public static RetryAfterException mediaBusy(int retryAfterSeconds) {
+        return new RetryAfterException(ErrorCode.MEDIA_BUSY, retryAfterSeconds);
+    }
+
     // ---- Validation ----
     public static ValidationException invalidField(String field, String message) {
         return new ValidationException(List.of(FieldErrors.invalidFormat(field, message)));

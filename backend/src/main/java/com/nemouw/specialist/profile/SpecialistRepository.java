@@ -24,8 +24,7 @@ class SpecialistRepository {
             """;
 
     private static final Set<String> UPDATABLE = Set.of("username", "syndicate_id", "syndicate_member_number",
-            "gender", "whatsapp_number", "primary_language", "years_of_experience", "profile_picture_id",
-            "cover_image_id", "min_age_treated", "max_age_treated");
+            "gender", "whatsapp_number", "primary_language", "years_of_experience", "min_age_treated", "max_age_treated");
 
     private final JdbcClient jdbc;
 
@@ -83,23 +82,6 @@ class SpecialistRepository {
                 .param("syndicateId", syndicateId)
                 .param("number", memberNumber)
                 .param("excludeId", excludeId)
-                .query(Boolean.class)
-                .single();
-    }
-
-    /** The media exists and is not a credential document or another specialist's picture or cover. */
-    boolean mediaAvailable(UUID mediaId, UUID specialistId) {
-        return jdbc.sql("""
-                        SELECT EXISTS (
-                            SELECT 1 FROM media m
-                            WHERE m.id = :mediaId
-                              AND NOT EXISTS (SELECT 1 FROM specialist_credentials c WHERE c.document_id = m.id)
-                              AND NOT EXISTS (SELECT 1 FROM specialists s
-                                              WHERE s.id <> :specialistId
-                                                AND (s.profile_picture_id = m.id OR s.cover_image_id = m.id)))
-                        """)
-                .param("mediaId", mediaId)
-                .param("specialistId", specialistId)
                 .query(Boolean.class)
                 .single();
     }

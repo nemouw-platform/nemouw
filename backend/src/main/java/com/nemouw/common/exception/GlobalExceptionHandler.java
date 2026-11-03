@@ -17,6 +17,8 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,13 +42,25 @@ public class GlobalExceptionHandler {
         return respond(e.status(), e.code(), e.getMessage(), e.fieldErrors(), e.responseHeaders());
     }
 
-    /** Failed @Valid (also covers MethodArgumentNotValidException). */
+    /**
+     * Failed @Valid (also covers MethodArgumentNotValidException).
+     */
     @ExceptionHandler(BindException.class)
     ResponseEntity<ErrorBody> handleBinding(BindException e) {
         List<FieldError> errors = e.getBindingResult().getFieldErrors().stream()
                 .map(GlobalExceptionHandler::toFieldError)
                 .toList();
         return handleApi(new ValidationException(errors));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    ResponseEntity<ErrorBody> handleUploadTooLarge(MaxUploadSizeExceededException e) {
+        return handleApi(Errors.fileTooLarge());
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    ResponseEntity<ErrorBody> handleBrokenUpload(MultipartException e) {
+        return handleApi(Errors.invalidField("file", "the file could not be read"));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
