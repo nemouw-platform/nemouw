@@ -5,6 +5,8 @@ import com.nemouw.common.config.AppProperties;
 import com.nemouw.support.ShippedProperties;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.dao.QueryTimeoutException;
 
@@ -79,6 +81,17 @@ class VerificationTokensTest {
                         base.rateLimit(),
                         base.mail()
                 )
+        );
+    }
+
+    /** The shipped token settings with only the dev fixed OTP swapped. */
+    private static TokenProperties withFixedOtp(String fixedOtp) {
+        return new TokenProperties(
+                TOKEN_PROPS.maxOtpAttempts(),
+                TOKEN_PROPS.inviteTtl(),
+                TOKEN_PROPS.otp(),
+                TOKEN_PROPS.reset(),
+                fixedOtp
         );
     }
 
@@ -614,6 +627,87 @@ class VerificationTokensTest {
             assertThatThrownBy(() ->
                     service.findLiveResetEmail(RESET_TOKEN)
             ).isInstanceOf(QueryTimeoutException.class);
+        }
+    }
+
+    @Nested
+    class DevFixedOtp {
+
+        private VerificationTokens fileModeService(String fixedOtp) {
+            return new VerificationTokens(
+                    repo,
+                    withFixedOtp(fixedOtp),
+                    propsWithMailDelivery(AppProperties.Mail.Delivery.FILE)
+            );
+        }
+
+        @Test
+        void isOffInTheShippedConfiguration() {
+            assertThat(TOKEN_PROPS.devFixedOtp()).isNullOrEmpty();
+        }
+
+        @Test
+        void issuesTheSameCodeEveryTimeAndStillStoresAWorkingHash() {
+            allowIssuance(VerificationPurpose.SIGNUP_OTP);
+            VerificationTokens fixed = fileModeService("123456");
+
+            VerificationTokens.IssuedOtp first = fixed.issueSignupOtp(USER_ID, IDENTIFIER_ID).orElseThrow();
+            VerificationTokens.IssuedOtp second = fixed.issueSignupOtp(USER_ID, IDENTIFIER_ID).orElseThrow();
+
+            assertThat(first.code()).isEqualTo("123456");
+            assertThat(second.code()).isEqualTo("123456");
+
+            ArgumentCaptor<String> hashes = ArgumentCaptor.forClass(String.class);
+            verify(repo, times(2)).upsertIfAllowed(
+                    eq(USER_ID), eq(IDENTIFIER_ID), eq(VerificationPurpose.SIGNUP_OTP), hashes.capture());
+            when(repo.claimAttempt(USER_ID, VerificationPurpose.SIGNUP_OTP, OTP_MAX_ATTEMPTS))
+                    .thenReturn(Optional.of(new ClaimedToken(TOKEN_ID, hashes.getAllValues().getFirst())));
+
+            assertThat(fixed.consumeSignupOtp(USER_ID, "654321")).isFalse();   // any other code still fails
+            verify(repo, never()).delete(any());
+
+            assertThat(fixed.consumeSignupOtp(USER_ID, "123456")).isTrue();
+            verify(repo).delete(TOKEN_ID);
+        }
+
+        @Test
+        void aBlankValueKeepsCodesRandom() {
+            allowIssuance(VerificationPurpose.SIGNUP_OTP);
+            VerificationTokens random = fileModeService("");
+
+            List<String> codes = IntStream.range(0, 200)
+                    .mapToObj(i -> random.issueSignupOtp(USER_ID, IDENTIFIER_ID).orElseThrow().code())
+                    .toList();
+
+            assertThat(codes.stream().distinct().count()).isGreaterThan(150);
+        }
+
+        @Test
+        void doesNotAffectResetTokens() {
+            allowIssuance(VerificationPurpose.PASSWORD_RESET);
+            VerificationTokens fixed = fileModeService("123456");
+
+            String first = fixed.issueResetToken(USER_ID, IDENTIFIER_ID).orElseThrow().token();
+            String second = fixed.issueResetToken(USER_ID, IDENTIFIER_ID).orElseThrow().token();
+
+            assertThat(first).hasSize(43).isNotEqualTo(second);
+        }
+
+        @Test
+        void refusesToStartWhenMailDeliveryIsLive() {
+            TokenProperties withFixed = withFixedOtp("123456");
+
+            assertThatThrownBy(() -> new VerificationTokens(repo, withFixed, props()))   // props() is LIVE
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("MAIL_DELIVERY=file");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"12ab", "12345", "1234567", "12 456"})
+        void refusesAValueThatIsNotExactlySixDigits(String value) {
+            assertThatThrownBy(() -> fileModeService(value))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("digits");
         }
     }
 }

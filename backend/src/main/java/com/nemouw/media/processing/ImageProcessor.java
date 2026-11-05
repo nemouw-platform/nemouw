@@ -28,8 +28,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Re-encodes images to WebP on a dedicated bounded pool, so image work never competes with request
- * threads or the mail executor. A full queue or a timeout answers 503 with Retry-After.
+ * Re-encodes images to WebP on a dedicated bounded pool.
  */
 @Component
 public class ImageProcessor {

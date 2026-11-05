@@ -14,7 +14,8 @@ record TokenProperties(
         @Min(1) int maxOtpAttempts,
         @NotNull Duration inviteTtl,
         @Valid @NotNull Throttle otp,
-        @Valid @NotNull Throttle reset) {
+        @Valid @NotNull Throttle reset,
+        String devFixedOtp) {
 
     record Throttle(
             @NotNull Duration ttl,
