@@ -74,6 +74,11 @@ public final class Errors {
         return new ApiException(ErrorCode.PRIMARY_LOCATION_REQUIRED);
     }
 
+    // ---- Specialist Credentials ----
+    public static ApiException credentialVerified() {
+        return new ApiException(ErrorCode.CREDENTIAL_VERIFIED);
+    }
+
     // ---- Media ----
     public static ApiException fileTooLarge() {
         return new ApiException(ErrorCode.FILE_TOO_LARGE);

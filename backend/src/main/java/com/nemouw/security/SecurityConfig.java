@@ -108,6 +108,7 @@ public class SecurityConfig {
                         .requestMatchers(API + "/conditions/**").hasAnyRole(ADMIN, STAFF)
                         .requestMatchers(API + "/countries/**", API + "/specialties/**").hasRole(ADMIN)
                         .requestMatchers(API + "/syndicates/**").hasAnyRole(ADMIN, STAFF)
+                        .requestMatchers(API + "/credentials/**").hasAnyRole(ADMIN, STAFF)
                         .anyRequest().denyAll())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(errors)

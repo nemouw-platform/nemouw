@@ -44,6 +44,7 @@ public enum ErrorCode {
     SYNDICATE_LOCKED(409, "The syndicate cannot be changed after verification"),
     LOCATION_ALREADY_EXISTS(409, "This location is already saved"),
     PRIMARY_LOCATION_REQUIRED(409, "A primary location is required, make another location primary first"),
+    CREDENTIAL_VERIFIED(409, "A verified credential cannot be changed, withdraw it and submit a new one"),
 
     // 413
     FILE_TOO_LARGE(413, "The file exceeds the allowed size"),
