@@ -1,6 +1,8 @@
 package com.nemouw.user.token;
 
 import com.nemouw.common.config.AppProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -31,6 +33,8 @@ public class VerificationTokens {
     public record IssuedResetToken(String token, OffsetDateTime expiresAt) {
     }
 
+    private static final Logger log = LoggerFactory.getLogger(VerificationTokens.class);
+
     public static final int OTP_CODE_DIGITS = 6;
 
     private static final int OTP_CODE_SPACE = (int) Math.pow(10, OTP_CODE_DIGITS);   // 1,000,000
@@ -40,12 +44,24 @@ public class VerificationTokens {
     private final VerificationTokenRepository repo;
     private final TokenProperties props;
     private final SecureRandom random = new SecureRandom();
+    private final String fixedOtp;
     private final byte[] key;
 
     VerificationTokens(VerificationTokenRepository repo, TokenProperties props, AppProperties appProps) {
         this.repo = repo;
         this.props = props;
         this.key = appProps.security().otpHashSecret().getBytes(StandardCharsets.UTF_8);
+
+        String fixed = props.devFixedOtp();
+        if (fixed == null || fixed.isBlank()) {
+            this.fixedOtp = null;
+            return;
+        }
+        if (!fixed.matches("\\d{" + OTP_CODE_DIGITS + "}")) {
+            throw new IllegalStateException("DEV_FIXED_OTP must be exactly " + OTP_CODE_DIGITS + " digits");
+        }
+        this.fixedOtp = fixed;
+        log.warn("DEV_FIXED_OTP is active: every signup code is the fixed value. Never use this outside local development.");
     }
 
     public Duration otpTtl() {
@@ -64,7 +80,7 @@ public class VerificationTokens {
      * Empty means throttled (cooldown or caps).
      */
     public Optional<IssuedOtp> issueSignupOtp(UUID userId, UUID identifierId) {
-        String code = String.format(OTP_FORMAT, random.nextInt(OTP_CODE_SPACE));
+        String code = fixedOtp != null ? fixedOtp : String.format(OTP_FORMAT, random.nextInt(OTP_CODE_SPACE));
         return repo.upsertIfAllowed(userId, identifierId, SIGNUP_OTP, hashOtp(userId, code)).map(expiresAt -> new IssuedOtp(code, expiresAt));
     }
 
