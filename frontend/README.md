@@ -46,5 +46,6 @@ import { Button } from "@workspace/ui/components/button"
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm build
 ```
