@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "title": "Nemouw",
+    "description": "Trouvez des spécialistes paramédicaux vérifiés au Liban."
+  },
+  "Common": {
+    "toggleTheme": "Changer de thème",
+    "language": "Langue"
+  },
+  "HomePage": {
+    "tagline": "Site public pour les patients et les spécialistes."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas.",
+    "backHome": "Retour à l'accueil"
+  }
+}

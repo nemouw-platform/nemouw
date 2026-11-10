@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "title": "Nemouw",
+    "description": "Find verified allied health specialists in Lebanon."
+  },
+  "Common": {
+    "toggleTheme": "Toggle theme",
+    "language": "Language"
+  },
+  "HomePage": {
+    "tagline": "Public site for patients and specialists."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist.",
+    "backHome": "Back to home"
+  }
+}
