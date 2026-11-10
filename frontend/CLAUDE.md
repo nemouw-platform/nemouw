@@ -15,6 +15,7 @@ apps/
 packages/
   ui/                 shadcn components, Nova theme (globals.css), cn()   -> @workspace/ui
   api/                Spring Boot client: error types, fetch helpers      -> @workspace/api
+  i18n/               supported locales, names, text direction            -> @workspace/i18n
   eslint-config/      shared ESLint configs
   typescript-config/  shared tsconfig bases
 ```
@@ -32,6 +33,7 @@ Inside each app, code lives in `src/`; `@/*` maps to that app's `src/*`:
 - A change in `packages/*` affects both apps; keep shared packages stable and check both apps when changing them.
 - `packages/api` is **plain TypeScript**: no React, no `next/*` imports, no browser-only APIs beyond `fetch`. Next-specific glue (reading cookies on the server, redirects) belongs in the app.
 - `packages/ui` holds generic UI primitives only, never business logic or API calls.
+- `packages/i18n` is plain TypeScript too (no next-intl, no React). UI primitives take translated strings as props (e.g. `ThemeToggle label`), never translate themselves.
 
 ## Commands
 
@@ -60,6 +62,19 @@ Next.js 16 differs from older versions. Check `node_modules/next/dist/docs/` (in
 - Add UI primitives with the shadcn CLI instead of writing them by hand.
 - Style with Tailwind classes and the theme's CSS variables (`bg-background`, `text-muted-foreground`, ...). No hard-coded colors.
 - Prefer Server Components; add `"use client"` only where state, effects or browser APIs are needed.
+
+## Internationalization
+
+Locales are `en`, `fr` and `ar` (Arabic is right-to-left), matching the backend's `LocaleCode`. Both apps use [next-intl](https://next-intl.dev) with the locale in every URL (`/en/...`, `/fr/...`, `/ar/...`).
+
+- Every route lives under `src/app/[locale]/`; that layout is the root layout and sets `<html lang dir>`. `src/proxy.ts` redirects paths without a locale (cookie `NEXT_LOCALE`, then `Accept-Language`, then `en`).
+- No hard-coded user-facing text. Strings live in each app's `messages/{en,fr,ar}.json`; `en.json` is the source of the key types, so add a key there first, then to `fr` and `ar`.
+- Read them with `useTranslations("Namespace")` (Server and Client Components) or `await getTranslations("Namespace")` in async server code and `generateMetadata`.
+- Import `Link`, `redirect`, `useRouter` and `usePathname` from `@/i18n/navigation`, never from `next/link` / `next/navigation`, so links keep the current locale.
+- Change the locale only with a full page load (as `src/components/locale-switcher.tsx` does), never `<Link locale>` or `router.replace(..., { locale })`: the locale is the root layout's param, and a client-side switch re-renders the root layout in the browser (React then warns about next-themes' inline `<script>`).
+- Write direction-neutral styles: logical utilities (`ms-*`, `me-*`, `ps-*`, `pe-*`, `start-*`, `end-*`, `text-start`) instead of `ml-*`/`mr-*`/`left-*`/`text-left`, and `rtl:` for the rare exception (e.g. flipping an arrow icon).
+- Arabic uses IBM Plex Sans Arabic instead of Geist (`src/lib/fonts.ts`).
+- Send the current locale (`useLocale()` / `getLocale()`) as `locale` on sign-up and password-reset requests so emails arrive in the same language.
 
 ## Talking to the backend
 
