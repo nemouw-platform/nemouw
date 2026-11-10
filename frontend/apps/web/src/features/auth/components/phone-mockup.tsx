@@ -31,7 +31,7 @@ export function PhoneMockup({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="absolute inset-s-1/2 top-4 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-device rtl:translate-x-1/2" />
+      <div className="inset-s-1/2 absolute top-4 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-device rtl:translate-x-1/2" />
 
       <div className="flex h-full flex-col gap-3 overflow-hidden rounded-[2.25rem] bg-background px-4 pt-3 pb-6 text-foreground">
         <StatusBar />
