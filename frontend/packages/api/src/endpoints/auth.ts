@@ -39,6 +39,13 @@ export function createAuthApi(client: ApiClient) {
     login: (body: LoginRequest, options?: CallOptions) =>
       client.post<SessionResponse>("/auth/login", body, options),
 
+    /**
+     * Rotates both cookies using the refresh cookie and returns the session
+     * (role included). 401 INVALID_TOKEN when there is no live session.
+     */
+    refresh: (options?: CallOptions) =>
+      client.post<SessionResponse>("/auth/refresh", undefined, options),
+
     /** Always 204; clears both cookies. */
     logout: (options?: CallOptions) =>
       client.post<void>("/auth/logout", undefined, options),

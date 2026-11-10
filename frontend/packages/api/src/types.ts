@@ -23,3 +23,5 @@ export type LoginRequest = Schemas["LoginRequest"]
 export type SessionResponse = Schemas["SessionResponse"]
 export type ForgotPasswordRequest = Schemas["ForgotPasswordRequest"]
 export type ResetPasswordRequest = Schemas["ResetPasswordRequest"]
+
+export type SpecialistResponse = Schemas["SpecialistResponse"]
