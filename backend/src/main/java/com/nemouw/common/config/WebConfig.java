@@ -10,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix(ApiPaths.API_PREFIX,type -> type.isAnnotationPresent(RestController.class));
+        configurer.addPathPrefix(ApiPaths.API_PREFIX,
+                type -> type.isAnnotationPresent(RestController.class) && type.getPackageName().startsWith("com.nemouw"));
     }
 }

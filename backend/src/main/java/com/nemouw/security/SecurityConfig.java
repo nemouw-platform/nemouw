@@ -7,6 +7,7 @@ import com.nemouw.common.web.TraceIdFilter;
 import com.nemouw.user.session.TokenClaims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -63,6 +64,17 @@ public class SecurityConfig {
     private static final String[] PUBLIC_READS = {
             API + "/countries/**", API + "/specialties/**", API + "/conditions/**",
             API + "/syndicates", API + "/syndicates/*"};
+
+    /** Only exists when app.docs.enabled=true (local development). */
+    @Bean
+    @Order(0)
+    @ConditionalOnProperty(name = "app.docs.enabled", havingValue = "true")
+    SecurityFilterChain docsChain(HttpSecurity http) {
+        return http
+                .securityMatcher("/openapi.yaml", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .build();
+    }
 
     @Bean
     @Order(1)
