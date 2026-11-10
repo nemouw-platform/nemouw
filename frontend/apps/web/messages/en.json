@@ -14,5 +14,85 @@
     "title": "Page not found",
     "description": "The page you are looking for does not exist.",
     "backHome": "Back to home"
+  },
+  "Auth": {
+    "brand": {
+      "headline": "Let patients across Lebanon <em>find you</em>.",
+      "description": "Nemouw helps patients find verified speech, occupational and psychomotor therapists, special educators and other allied health specialists."
+    },
+    "copyright": "© {year} Nemouw",
+    "errors": {
+      "network": "We can't reach Nemouw right now. Check your connection and try again.",
+      "unexpected": "Something went wrong on our side. Please try again.",
+      "field": {
+        "REQUIRED": "This field is required",
+        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
+        "TOO_SHORT": "This is too short",
+        "TOO_LONG": "This is too long",
+        "TOO_COMMON": "This password is too common",
+        "CONTAINS_PERSONAL_INFO": "Don't include your name, email or \"nemouw\"",
+        "INVALID_ROLE": "Only specialists can create an account",
+        "INVALID_FORMAT": "Check the format and try again"
+      }
+    },
+    "phone": {
+      "search": "Speech therapy in Beirut",
+      "filterLanguage": "Arabic",
+      "filterWeek": "This week",
+      "results": "Speech therapists near you",
+      "verified": "Verified",
+      "nextSlot": "Next: {slot}",
+      "viewProfile": "View profile",
+      "people": {
+        "rana": {
+          "name": "Rana Haddad",
+          "initials": "RH",
+          "role": "Speech therapist",
+          "place": "Achrafieh, Beirut",
+          "slot": "Tue, 4:00 PM"
+        },
+        "karim": {
+          "name": "Karim Nassar",
+          "initials": "KN",
+          "role": "Speech therapist",
+          "place": "Hamra, Beirut",
+          "slot": "Wed, 10:30 AM"
+        },
+        "maya": {
+          "name": "Maya Khoury",
+          "initials": "MK",
+          "role": "Speech therapist",
+          "place": "Verdun, Beirut",
+          "slot": "Thu, 2:00 PM"
+        }
+      }
+    }
+  },
+  "Signup": {
+    "metaTitle": "Create your specialist account",
+    "metaDescription": "Create your specialist account on Nemouw so patients across Lebanon can find your practice.",
+    "title": "Create your specialist account",
+    "description": "Step 1 of 3. We'll email you a 6-digit code to confirm your email.",
+    "firstName": "First name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "email": "Email address",
+    "emailPlaceholder": "john.doe@example.com",
+    "submit": "Send my code",
+    "submitting": "Sending code…",
+    "haveAccount": "Already have an account?",
+    "logIn": "Log in",
+    "errors": {
+      "firstNameRequired": "Enter your first name",
+      "lastNameRequired": "Enter your last name",
+      "emailRequired": "Enter your email address",
+      "emailInvalid": "Enter an email address like name@example.com",
+      "nameTooLong": "Use {max} characters or fewer",
+      "emailTooLong": "Use {max} characters or fewer",
+      "emailTaken": "An account already uses this email.",
+      "logInInstead": "Log in instead",
+      "codeAlreadySent": "We sent a code to this email less than a minute ago. Check your inbox, or try again in {seconds, plural, one {# second} other {# seconds}}."
+    }
   }
 }

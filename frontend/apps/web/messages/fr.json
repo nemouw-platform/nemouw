@@ -14,5 +14,85 @@
     "title": "Page introuvable",
     "description": "La page que vous recherchez n'existe pas.",
     "backHome": "Retour à l'accueil"
+  },
+  "Auth": {
+    "brand": {
+      "headline": "Faites-vous <em>trouver par les patients</em> partout au Liban.",
+      "description": "Nemouw aide les patients à trouver des orthophonistes, ergothérapeutes, psychomotriciens, éducateurs spécialisés et autres spécialistes paramédicaux vérifiés."
+    },
+    "copyright": "© {year} Nemouw",
+    "errors": {
+      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
+      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
+      "field": {
+        "REQUIRED": "Ce champ est obligatoire",
+        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
+        "TOO_SHORT": "C'est trop court",
+        "TOO_LONG": "C'est trop long",
+        "TOO_COMMON": "Ce mot de passe est trop courant",
+        "CONTAINS_PERSONAL_INFO": "N'incluez pas votre nom, votre e-mail ni « nemouw »",
+        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
+        "INVALID_FORMAT": "Vérifiez le format et réessayez"
+      }
+    },
+    "phone": {
+      "search": "Orthophonie à Beyrouth",
+      "filterLanguage": "Arabe",
+      "filterWeek": "Cette semaine",
+      "results": "Orthophonistes près de chez vous",
+      "verified": "Vérifié",
+      "nextSlot": "Prochain : {slot}",
+      "viewProfile": "Voir le profil",
+      "people": {
+        "rana": {
+          "name": "Rana Haddad",
+          "initials": "RH",
+          "role": "Orthophoniste",
+          "place": "Achrafieh, Beyrouth",
+          "slot": "mar. 16h00"
+        },
+        "karim": {
+          "name": "Karim Nassar",
+          "initials": "KN",
+          "role": "Orthophoniste",
+          "place": "Hamra, Beyrouth",
+          "slot": "mer. 10h30"
+        },
+        "maya": {
+          "name": "Maya Khoury",
+          "initials": "MK",
+          "role": "Orthophoniste",
+          "place": "Verdun, Beyrouth",
+          "slot": "jeu. 14h00"
+        }
+      }
+    }
+  },
+  "Signup": {
+    "metaTitle": "Créez votre compte spécialiste",
+    "metaDescription": "Créez votre compte spécialiste sur Nemouw pour que les patients de tout le Liban trouvent votre cabinet.",
+    "title": "Créez votre compte spécialiste",
+    "description": "Étape 1 sur 3. Nous vous enverrons un code à 6 chiffres par e-mail pour confirmer votre adresse.",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "jean.dupont@exemple.com",
+    "submit": "Recevoir mon code",
+    "submitting": "Envoi du code…",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "logIn": "Se connecter",
+    "errors": {
+      "firstNameRequired": "Saisissez votre prénom",
+      "lastNameRequired": "Saisissez votre nom",
+      "emailRequired": "Saisissez votre adresse e-mail",
+      "emailInvalid": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
+      "nameTooLong": "{max} caractères maximum",
+      "emailTooLong": "{max} caractères maximum",
+      "emailTaken": "Un compte utilise déjà cette adresse e-mail.",
+      "logInInstead": "Se connecter",
+      "codeAlreadySent": "Nous avons envoyé un code à cette adresse il y a moins d'une minute. Consultez votre boîte de réception ou réessayez dans {seconds, plural, one {# seconde} other {# secondes}}."
+    }
   }
 }
