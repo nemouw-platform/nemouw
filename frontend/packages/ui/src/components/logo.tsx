@@ -1,20 +1,20 @@
 import { cn } from "cn"
 
-import logo from "../assets/logo.png"
-
 type LogoProps = Omit<
   React.ComponentProps<"img">,
   "src" | "alt" | "width" | "height"
->
+> & {
+  locale?: "en" | "ar"
+}
 
-// Raster PNG cut out of the brand JPEG. Replace with an inline SVG
-// component once a real vector logo exists (sharper, theme-aware colors).
-function Logo({ className, ...props }: LogoProps) {
+// Served from each app's public folder (logo_en.svg / logo_ar.svg).
+// The SVGs share a 2:1 viewBox, so width/height only reserve layout space.
+function Logo({ locale = "en", className, ...props }: LogoProps) {
   return (
     <img
-      src={logo.src}
-      width={logo.width}
-      height={logo.height}
+      src={`/logo_${locale}.svg`}
+      width={200}
+      height={100}
       alt="Nemouw"
       className={cn("h-10 w-auto", className)}
       {...props}
