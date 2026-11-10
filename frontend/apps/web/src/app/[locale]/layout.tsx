@@ -16,7 +16,11 @@ export function generateStaticParams() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Metadata")
-  return { title: t("title"), description: t("description") }
+  return {
+    // Pages set their own title; the brand follows it ("Sign up · Nemouw")
+    title: { default: t("title"), template: `%s · ${t("title")}` },
+    description: t("description"),
+  }
 }
 
 export default async function LocaleLayout({
@@ -29,7 +33,7 @@ export default async function LocaleLayout({
       lang={locale}
       dir={localeDirection(locale)}
       suppressHydrationWarning
-      className={cn("antialiased font-sans", fontClassNames(locale))}
+      className={cn("font-sans antialiased", fontClassNames(locale))}
     >
       <body>
         <NextIntlClientProvider>
