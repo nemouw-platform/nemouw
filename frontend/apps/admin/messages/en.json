@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "title": "Nemouw Admin",
+    "description": "Staff dashboard for credential review and moderation."
+  },
+  "Common": {
+    "toggleTheme": "Toggle theme",
+    "language": "Language"
+  },
+  "Dashboard": {
+    "tagline": "Staff dashboard: credential review and moderation."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist.",
+    "backHome": "Back to home"
+  }
+}
