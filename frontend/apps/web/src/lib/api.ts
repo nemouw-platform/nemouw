@@ -1,4 +1,8 @@
-import { createApiClient, createAuthApi } from "@workspace/api"
+import {
+  createApiClient,
+  createAuthApi,
+  createSpecialistsApi,
+} from "@workspace/api"
 
 // Inlined into the browser bundle at build time (see .env.example)
 const baseUrl = process.env.NEXT_PUBLIC_API_URL
@@ -13,3 +17,5 @@ if (!baseUrl) {
 export const apiClient = createApiClient({ baseUrl })
 
 export const authApi = createAuthApi(apiClient)
+
+export const specialistsApi = createSpecialistsApi(apiClient)
