@@ -1,18 +1,11 @@
 "use client"
 
-import { isAbortError, useRequest } from "@workspace/ui/hooks/use-request"
 import { useLocale, useTranslations } from "next-intl"
-import * as React from "react"
 import type { UseFormReturn } from "react-hook-form"
 
-import {
-  fieldErrorMessage,
-  generalErrorMessage,
-} from "@/features/auth/lib/error-messages"
-import {
-  classifySignupError,
-  type SignupFailure,
-} from "@/features/auth/signup/signup-errors"
+import { fieldErrorMessage } from "@/features/auth/lib/api-errors"
+import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
+import { classifySignupError } from "@/features/auth/signup/signup-errors"
 import type { SignupValues } from "@/features/auth/signup/signup-schema"
 import { useRouter } from "@/i18n/navigation"
 import { authApi } from "@/lib/api"
@@ -30,48 +23,48 @@ export function useSignup(form: UseFormReturn<SignupValues>) {
   const router = useRouter()
   const tSignup = useTranslations("Signup.errors")
   const tAuth = useTranslations("Auth.errors")
-  const [formError, setFormError] = React.useState<string | null>(null)
 
-  const signup = useRequest((signal, values: SignupValues) =>
-    authApi.signup({ ...values, role: "specialist", locale }, { signal })
+  const signup = useAuthRequest(
+    (signal, values: SignupValues) =>
+      authApi.signup({ ...values, role: "specialist", locale }, { signal }),
+    {
+      onSuccess: ({ email }) =>
+        router.push({
+          pathname: "/signup/verify",
+          query: { email: email ?? form.getValues("email") },
+        }),
+      onError: (error) => {
+        const failure = classifySignupError(error)
+        switch (failure.kind) {
+          case "fields":
+            failure.fields.forEach(({ name, code }) =>
+              form.setError(name, { message: fieldErrorMessage(code, tAuth) })
+            )
+            return true
+          case "emailTaken":
+            form.setError(
+              "email",
+              { type: EMAIL_TAKEN, message: tSignup("emailTaken") },
+              { shouldFocus: true }
+            )
+            return true
+          case "codeAlreadySent":
+            signup.setFormError(
+              tSignup("codeAlreadySent", {
+                seconds: failure.retryAfterSeconds,
+              })
+            )
+            return true
+          case "general":
+            return false
+        }
+      },
+    }
   )
 
-  const showFailure = (failure: SignupFailure) => {
-    switch (failure.kind) {
-      case "fields":
-        failure.fields.forEach(({ name, code }) =>
-          form.setError(name, { message: fieldErrorMessage(code, tAuth) })
-        )
-        return
-      case "emailTaken":
-        form.setError(
-          "email",
-          { type: EMAIL_TAKEN, message: tSignup("emailTaken") },
-          { shouldFocus: true }
-        )
-        return
-      case "codeAlreadySent":
-        setFormError(
-          tSignup("codeAlreadySent", { seconds: failure.retryAfterSeconds })
-        )
-        return
-      case "general":
-        setFormError(generalErrorMessage(failure.error, tAuth))
-    }
+  return {
+    submit: form.handleSubmit((values) => signup.run(values)),
+    isPending: signup.isPending,
+    formError: signup.formError,
   }
-
-  const submit = form.handleSubmit(async (values) => {
-    setFormError(null)
-    try {
-      const result = await signup.runAsync(values)
-      router.push({
-        pathname: "/signup/verify",
-        query: { email: result.email ?? values.email },
-      })
-    } catch (error) {
-      if (!isAbortError(error)) showFailure(classifySignupError(error))
-    }
-  })
-
-  return { submit, isPending: signup.isPending, formError }
 }

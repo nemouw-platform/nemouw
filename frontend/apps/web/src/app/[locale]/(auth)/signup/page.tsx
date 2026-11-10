@@ -2,8 +2,13 @@ import type { Metadata } from "next"
 import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 
+import {
+  AuthPrompt,
+  AuthPromptLink,
+} from "@/features/auth/components/auth-prompt"
+import { AuthStepHeader } from "@/features/auth/components/auth-step-header"
+import { SIGNUP_STEPS } from "@/features/auth/lib/constants"
 import { SignupForm } from "@/features/auth/signup/signup-form"
-import { Link } from "@/i18n/navigation"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Signup")
@@ -15,24 +20,15 @@ export default function SignupPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-balance">
-          {t("title")}
-        </h1>
-        <p className="text-sm text-muted-foreground">{t("description")}</p>
-      </div>
-
+      <AuthStepHeader
+        title={t("title")}
+        description={t("description")}
+        step={SIGNUP_STEPS.details}
+      />
       <SignupForm />
-
-      <p className="text-center text-sm text-muted-foreground">
-        {t("haveAccount")}{" "}
-        <Link
-          href="/login"
-          className="font-medium text-foreground underline underline-offset-4"
-        >
-          {t("logIn")}
-        </Link>
-      </p>
+      <AuthPrompt prompt={t("haveAccount")}>
+        <AuthPromptLink href="/login">{t("logIn")}</AuthPromptLink>
+      </AuthPrompt>
     </div>
   )
 }
