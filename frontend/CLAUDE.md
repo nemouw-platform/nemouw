@@ -63,6 +63,7 @@ Next.js 16 differs from older versions. Check `node_modules/next/dist/docs/` (in
 - Style with Tailwind classes and the theme's CSS variables (`bg-background`, `text-muted-foreground`, ...). No hard-coded colors.
 - Prefer Server Components; add `"use client"` only where state, effects or browser APIs are needed.
 - Follow SOLID with a few focused files: when a hook, component or module has several parts, give it a folder of about 4 to 6 files, split by responsibility (public `index.ts`, `types.ts`, framework-free core logic, pure state/helpers, the thin hook or component that wires them). See `packages/ui/src/hooks/use-request/` and `packages/api/src/client/`. Tiny helpers stay inside the file that uses them rather than getting their own file. Test the core logic and the public hook or component.
+- Don't repeat yourself, especially in UI: when a second screen needs the same markup or logic (a step header, a submit button with spinner, an error alert, submit and error state), extract a shared component or hook and move the first caller onto it. Feature-wide pieces live in `src/features/<feature>/components` or `lib`; app-agnostic ones (generic hooks, primitives) in `packages/ui`.
 
 ## Internationalization
 
