@@ -19,7 +19,9 @@ export const localeNames: Record<Locale, string> = {
 const rtlLocales: ReadonlySet<Locale> = new Set(["ar"])
 
 export function isLocale(value: unknown): value is Locale {
-  return typeof value === "string" && (locales as readonly string[]).includes(value)
+  return (
+    typeof value === "string" && (locales as readonly string[]).includes(value)
+  )
 }
 
 export function localeDirection(locale: Locale): "ltr" | "rtl" {
