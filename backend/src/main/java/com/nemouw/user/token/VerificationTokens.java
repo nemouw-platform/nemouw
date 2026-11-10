@@ -60,9 +60,6 @@ public class VerificationTokens {
         if (!fixed.matches("\\d{" + OTP_CODE_DIGITS + "}")) {
             throw new IllegalStateException("DEV_FIXED_OTP must be exactly " + OTP_CODE_DIGITS + " digits");
         }
-        if (appProps.mail().delivery() != AppProperties.Mail.Delivery.FILE) {
-            throw new IllegalStateException("DEV_FIXED_OTP is only allowed with MAIL_DELIVERY=file");
-        }
         this.fixedOtp = fixed;
         log.warn("DEV_FIXED_OTP is active: every signup code is the fixed value. Never use this outside local development.");
     }
