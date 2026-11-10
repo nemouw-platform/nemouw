@@ -57,7 +57,16 @@ public final class Fixtures {
                 new AppProperties.Security(JWT_SECRET, OTP_SECRET, cookieSecure, trustProxy, 900, 90),
                 new AppProperties.Cors(List.of("https://app.nemouw.com"), false),
                 new AppProperties.RateLimit(20),
-                new AppProperties.Mail("re_live_7Hq2Zk9Xw4", "Nemouw <no-reply@nemouw.com>", "https://app.nemouw.com"));
+                new AppProperties.Mail("re_live_7Hq2Zk9Xw4", "Nemouw <no-reply@nemouw.com>", "https://app.nemouw.com",
+                        AppProperties.Mail.Delivery.LIVE, "target/dev-mails"));
+    }
+
+    /** The default props() with only the mail delivery mode swapped. */
+    public static AppProperties propsWithMailDelivery(AppProperties.Mail.Delivery delivery) {
+        AppProperties base = props();
+        AppProperties.Mail mail = base.mail();
+        return new AppProperties(base.security(), base.cors(), base.rateLimit(),
+                new AppProperties.Mail(mail.resendApiKey(), mail.from(), mail.urlBase(), delivery, mail.fileDir()));
     }
 
     public static ClientInfo clientInfo() {

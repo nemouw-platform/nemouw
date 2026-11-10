@@ -1,0 +1,4048 @@
+openapi: 3.0.3
+info:
+  title: Nemouw
+  version: 0.1.0
+  description: |
+    Authentication, account provisioning, specialist onboarding and verification, and public discovery.
+
+    **Signup** takes three steps: `signup`, `verifySignupOtp`, `setInitialPassword`.
+
+    **Errors** use the `Error` schema. `422` adds a field-level `errors` array. `trace_id` identifies the request in server logs.
+
+    **Uploads** are sent as `multipart/form-data` to the resource they belong to and stored as WebP when they are images. Profile and cover images are public; credential documents are private. 
+
+    Browser calls are limited to allowlisted origins; other origins get a plain-text `403` from the CORS layer.
+servers:
+  - url: "http://localhost:8080/v1"
+    description: Local development
+  - url: "https://staging-api.nemouw.com/v1"
+    description: Staging
+  - url: "https://api.nemouw.com/v1"
+    description: Production
+tags:
+  - name: Auth
+    description: Signup, login, session, and password management
+  - name: Account
+    description: The authenticated user's own account
+  - name: Admins
+    description: Admin provisioning and access
+  - name: User Management
+    description: Admin-only account management across roles
+  - name: Specialties & Conditions
+    description: Reference data
+  - name: Countries
+    description: Reference data
+  - name: Syndicates
+    description: Syndicate directory and staff management
+  - name: Specialist Management
+    description: Specialist rosters for syndicate staff and admins
+  - name: Verification
+    description: Credential review and specialist moderation
+  - name: Specialists
+    description: The specialist's own profile, images, and onboarding
+  - name: Specialist Profile Content
+    description: Per-locale profile content
+  - name: Profile Management
+    description: Locations, availability, treated conditions, and template
+  - name: Credentials
+    description: The specialist's own credentials and their documents
+  - name: Specialist Analytics
+    description: The specialist's own performance figures
+  - name: Discovery
+    description: Public search and profile browsing
+  - name: Analytics
+    description: Public event tracking
+security:
+  - cookieAuth: []
+paths:
+  # ---------------------------------------------------------------------
+  # Auth
+  # ---------------------------------------------------------------------
+  /auth/signup:
+    post:
+      operationId: signup
+      tags:
+        - Auth
+      summary: Sign up (step 1 of 3)
+      description: |
+        Creates a pending account and emails a one-time code. Next: verifySignupOtp. Only SignupRole roles can self-register.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "201":
+          description: Account created, code sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignupResponse"
+        "400":
+          $ref: "#/components/responses/MalformedJson"
+        "409":
+          description: The email belongs to a non-pending account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: EMAIL_TAKEN
+                message: Email is already registered
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/verify-otp:
+    post:
+      operationId: verifySignupOtp
+      tags:
+        - Auth
+      summary: Verify the signup code (step 2 of 3)
+      description: |
+        Proves mailbox ownership and sets a short-lived setup cookie, accepted only by setInitialPassword. Every failure returns the same 400.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtpRequest"
+      responses:
+        "200":
+          description: Mailbox verified, setup cookie set
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/SetSetupCookie"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PasswordSetupResponse"
+        "400":
+          $ref: "#/components/responses/InvalidOrExpiredToken"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/resend-otp:
+    post:
+      operationId: resendSignupOtp
+      tags:
+        - Auth
+      summary: Resend the signup code
+      description: |
+        Always 202, so account existence is not revealed. Throttled per account.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendOtpRequest"
+      responses:
+        "202":
+          description: Code re-sent if the account is eligible
+        "400":
+          $ref: "#/components/responses/MalformedJson"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/password/setup:
+    post:
+      operationId: setInitialPassword
+      tags:
+        - Auth
+      summary: Choose a password and start the session (step 3 of 3)
+      description: |
+        Sets the first password, activates the account, and starts a session. Needs the setup cookie from verifySignupOtp.
+      security:
+        - passwordSetupCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetPasswordRequest"
+      responses:
+        "200":
+          description: Password set, session started
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/SetAuthCookies"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "400":
+          $ref: "#/components/responses/MalformedJson"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/login:
+    post:
+      operationId: login
+      tags:
+        - Auth
+      summary: Log in
+      description: |
+        identifier is an email, phone, or username. Wrong credentials, unknown identifiers, and deleted accounts all return 401; only a correct password reveals a suspended or unverified account (403).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated, session cookies set
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/SetAuthCookies"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "400":
+          $ref: "#/components/responses/MalformedJson"
+        "401":
+          $ref: "#/components/responses/InvalidCredentials"
+        "403":
+          description: The password was correct but the account cannot log in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                suspended:
+                  value:
+                    status: 403
+                    code: ACCOUNT_SUSPENDED
+                    message: This account has been suspended for violating our terms of service. Please contact support if you believe this is a mistake.
+                notVerified:
+                  value:
+                    status: 403
+                    code: ACCOUNT_NOT_VERIFIED
+                    message: Your account is not verified yet. Please verify your email to log in.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags:
+        - Auth
+      summary: Rotate the session
+      description: |
+        Rotates both cookies. Refresh tokens are single-use; reuse after a short grace window revokes the session.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/RefreshTokenCookie"
+      responses:
+        "200":
+          description: Session rotated
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/SetAuthCookies"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "401":
+          $ref: "#/components/responses/InvalidRefreshToken"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/logout:
+    post:
+      operationId: logout
+      tags:
+        - Auth
+      summary: Log out
+      description: Revokes the refresh token if present and clears both cookies. Always `204`.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/RefreshTokenCookie"
+      responses:
+        "204":
+          description: Session ended, cookies cleared
+          headers:
+            Set-Cookie:
+              $ref: "#/components/headers/ClearAuthCookies"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/password/forgot:
+    post:
+      operationId: forgotPassword
+      tags:
+        - Auth
+      summary: Request a password reset email
+      description: |
+        Always `202`, so account existence is not revealed. Throttled per account; `429` carries `Retry-After`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+      responses:
+        "202":
+          description: Email sent if the account exists
+        "400":
+          $ref: "#/components/responses/MalformedJson"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  /auth/password/reset:
+    post:
+      operationId: resetPassword
+      tags:
+        - Auth
+      summary: Complete a password reset or invite
+      description: |
+        Sets a new password from a single-use, expiring token. Also sets the first password for invited admins and syndicate staff, activating a pending account. Success revokes all sessions.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+      responses:
+        "200":
+          description: Password set
+        "400":
+          $ref: "#/components/responses/InvalidOrExpiredToken"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+  # ---------------------------------------------------------------------
+  # Account
+  # ---------------------------------------------------------------------
+  /users/me:
+    delete:
+      operationId: deleteMyAccount
+      tags:
+        - Account
+      summary: Delete the authenticated user's account
+      description: |
+        Marks the account deleted, revokes all sessions, and removes a specialist profile from discovery. Data is purged at purge_scheduled_for. Not available to admin or syndicate staff.
+      responses:
+        "200":
+          description: Account deleted, purge scheduled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountDeletionResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  # ---------------------------------------------------------------------
+  # Admins
+  # ---------------------------------------------------------------------
+  /admins:
+    post:
+      operationId: inviteAdmin
+      tags:
+        - Admins
+      summary: Invite an admin
+      description: Creates a `pending` admin and emails a first-password link.
+      x-required-roles:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminInviteRequest"
+      responses:
+        "201":
+          description: Admin invited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      operationId: listAdmins
+      tags:
+        - Admins
+      summary: List admins
+      x-required-roles:
+        - admin
+      responses:
+        "200":
+          description: Admin list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  "/admins/{userId}":
+    get:
+      operationId: getAdmin
+      tags:
+        - Admins
+      summary: Get an admin
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/admins/{userId}/suspend":
+    post:
+      operationId: suspendAdmin
+      tags:
+        - Admins
+      summary: Suspend an admin
+      description: Blocks login. Reversible with `unsuspendAdmin`.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Admin suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/admins/{userId}/unsuspend":
+    post:
+      operationId: unsuspendAdmin
+      tags:
+        - Admins
+      summary: Lift an admin's suspension
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Suspension lifted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  # ---------------------------------------------------------------------
+  # User Management
+  # ---------------------------------------------------------------------
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags:
+        - User Management
+      summary: List users of any role
+      description: Account-level view. Specialists who have not onboarded appear here but in no syndicate roster.
+      x-required-roles:
+        - admin
+      parameters:
+        - name: role
+          in: query
+          schema:
+            $ref: "#/components/schemas/Role"
+        - name: user_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserStatus"
+        - name: search
+          in: query
+          description: Matches first name, last name, or email.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: User page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  "/admin/users/{userId}":
+    get:
+      operationId: getUser
+      tags:
+        - User Management
+      summary: Get a user of any role
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateUser
+      tags:
+        - User Management
+      summary: Update a user's account fields
+      description: Account-level fields only. Role, status, and verification change through their own endpoints.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/admin/users/{userId}/suspend":
+    post:
+      operationId: suspendUser
+      tags:
+        - User Management
+      summary: Suspend a non-admin user
+      description: |
+        Sets `UserStatus` to `suspended`, blocking login. Specialist verification is unchanged. Suspended accounts are never purged.
+
+        `409` for admin targets (use `suspendAdmin`) and deleted accounts.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: User suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The target is an admin or a deleted account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: INVALID_TARGET
+                message: Target account cannot be suspended through this endpoint
+  "/admin/users/{userId}/unsuspend":
+    post:
+      operationId: unsuspendUser
+      tags:
+        - User Management
+      summary: Lift a non-admin user's suspension
+      description: |
+        Sets `UserStatus` back to `active`. Specialist verification is unchanged.
+
+        `409` for admin targets (use `unsuspendAdmin`) and deleted accounts.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Suspension lifted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The target is an admin or a deleted account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: INVALID_TARGET
+                message: Target account cannot be unsuspended through this endpoint
+  # ---------------------------------------------------------------------
+  # Specialties & Conditions
+  # ---------------------------------------------------------------------
+  /specialties:
+    get:
+      operationId: listSpecialties
+      tags:
+        - Specialties & Conditions
+      summary: List specialties
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/IsActive"
+      responses:
+        "200":
+          description: Specialty list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Specialty"
+    post:
+      operationId: createSpecialty
+      tags:
+        - Specialties & Conditions
+      summary: Add a specialty
+      x-required-roles:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialtyWriteRequest"
+      responses:
+        "201":
+          description: Specialty created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Specialty"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/specialties/{specialtyId}":
+    patch:
+      operationId: updateSpecialty
+      tags:
+        - Specialties & Conditions
+      summary: Update a specialty
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/SpecialtyId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialtyWriteRequest"
+      responses:
+        "200":
+          description: Specialty updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Specialty"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /conditions:
+    get:
+      operationId: listConditions
+      tags:
+        - Specialties & Conditions
+      summary: List conditions
+      description: Global list, not scoped by specialty.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/IsActive"
+        - name: search
+          in: query
+          description: Matches name or label.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Condition list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Condition"
+    post:
+      operationId: createCondition
+      tags:
+        - Specialties & Conditions
+      summary: Add a condition
+      x-required-roles:
+        - admin
+        - "syndicate_staff:any"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConditionWriteRequest"
+      responses:
+        "201":
+          description: Condition created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Condition"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/conditions/{conditionId}":
+    patch:
+      operationId: updateCondition
+      tags:
+        - Specialties & Conditions
+      summary: Update a condition
+      x-required-roles:
+        - admin
+        - "syndicate_staff:any"
+      parameters:
+        - $ref: "#/components/parameters/ConditionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConditionWriteRequest"
+      responses:
+        "200":
+          description: Condition updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Condition"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteCondition
+      tags:
+        - Specialties & Conditions
+      summary: Delete a condition
+      description: Admin only; syndicate staff can create and edit but not delete.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/ConditionId"
+      responses:
+        "204":
+          description: Condition deleted
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  # ---------------------------------------------------------------------
+  # Countries
+  # ---------------------------------------------------------------------
+  /countries:
+    get:
+      operationId: listCountries
+      tags:
+        - Countries
+      summary: List countries
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/IsActive"
+      responses:
+        "200":
+          description: Country list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+    post:
+      operationId: createCountry
+      tags:
+        - Countries
+      summary: Add a country
+      x-required-roles:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CountryWriteRequest"
+      responses:
+        "201":
+          description: Country created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/countries/{countryId}":
+    get:
+      operationId: getCountry
+      tags:
+        - Countries
+      summary: Get a country
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CountryId"
+      responses:
+        "200":
+          description: Country
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateCountry
+      tags:
+        - Countries
+      summary: Update a country
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/CountryId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CountryWriteRequest"
+      responses:
+        "200":
+          description: Country updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteCountry
+      tags:
+        - Countries
+      summary: Delete a country
+      description: Fails with `409` while the country is in use.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/CountryId"
+      responses:
+        "204":
+          description: Country deleted
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  # ---------------------------------------------------------------------
+  # Syndicates
+  # ---------------------------------------------------------------------
+  /syndicates:
+    get:
+      operationId: listSyndicates
+      tags:
+        - Syndicates
+      summary: List syndicates
+      description: Public. Used by specialists to pick a syndicate during onboarding.
+      security: []
+      parameters:
+        - name: specialty_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: country_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Syndicate list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SyndicateSummary"
+    post:
+      operationId: createSyndicate
+      tags:
+        - Syndicates
+      summary: Create a syndicate with its owner
+      description: |
+        Creates the syndicate and a pending owner, then emails the owner a first-password link. One syndicate per country and specialty.
+      x-required-roles:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateCreateRequest"
+      responses:
+        "201":
+          description: Syndicate created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: The country and specialty already have a syndicate, or the owner email is taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                syndicateExists:
+                  value:
+                    status: 409
+                    code: SYNDICATE_EXISTS
+                    message: A syndicate for this specialty and country already exists
+                emailTaken:
+                  value:
+                    status: 409
+                    code: EMAIL_TAKEN
+                    message: Email is already registered
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/syndicates/{syndicateId}":
+    get:
+      operationId: getSyndicate
+      tags:
+        - Syndicates
+      summary: Get a syndicate
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+      responses:
+        "200":
+          description: Syndicate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateSummary"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateSyndicate
+      tags:
+        - Syndicates
+      summary: Update a syndicate
+      description: Specialty and country are fixed at creation.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:owner_of_same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateUpdateRequest"
+      responses:
+        "200":
+          description: Syndicate updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/syndicates/{syndicateId}/staff":
+    get:
+      operationId: listSyndicateStaff
+      tags:
+        - Syndicates
+      summary: List a syndicate's staff
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+      responses:
+        "200":
+          description: Staff list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: inviteSyndicateStaff
+      tags:
+        - Syndicates
+      summary: Invite staff to a syndicate
+      description: Creates a `pending` non-owner staff account and emails a first-password link.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:owner_of_same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateStaffInviteRequest"
+      responses:
+        "201":
+          description: Staff invited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/syndicates/{syndicateId}/staff/{staffId}":
+    get:
+      operationId: getSyndicateStaff
+      tags:
+        - Syndicates
+      summary: Get a staff member
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - $ref: "#/components/parameters/StaffId"
+      responses:
+        "200":
+          description: Staff member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateSyndicateStaff
+      tags:
+        - Syndicates
+      summary: Update a staff member's title
+      x-required-roles:
+        - admin
+        - "syndicate_staff:owner_of_same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - $ref: "#/components/parameters/StaffId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateStaffUpdateRequest"
+      responses:
+        "200":
+          description: Staff member updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: removeSyndicateStaff
+      tags:
+        - Syndicates
+      summary: Remove a staff member
+      description: |
+        Deletes the staff association and the user account; access is revoked immediately. The owner cannot be removed; hand over ownership first with `changeSyndicateOwner`.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:owner_of_same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - $ref: "#/components/parameters/StaffId"
+      responses:
+        "204":
+          description: Staff removed
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The target is the syndicate owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: OWNER_CANNOT_BE_REMOVED
+                message: The syndicate owner cannot be removed
+  "/syndicates/{syndicateId}/staff/{staffId}/email":
+    put:
+      operationId: changePendingStaffEmail
+      tags:
+        - Syndicates
+      summary: Fix a pending staff email and re-send the invite
+      description: |
+        Fixes a mistyped or expired invite while the account is pending, and re-sends it. Bypasses the resend throttle.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - $ref: "#/components/parameters/StaffId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateStaffEmailRequest"
+      responses:
+        "200":
+          description: Email updated, invite re-sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The account is already active, or the email is taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                alreadyActive:
+                  value:
+                    status: 409
+                    code: ACCOUNT_ALREADY_ACTIVE
+                    message: This account is already active, so its email cannot be changed here
+                emailTaken:
+                  value:
+                    status: 409
+                    code: EMAIL_TAKEN
+                    message: Email is already registered
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/syndicates/{syndicateId}/owner":
+    put:
+      operationId: changeSyndicateOwner
+      tags:
+        - Syndicates
+      summary: Hand ownership to another staff member
+      description: |
+        The new owner must already be staff of this syndicate. The previous owner stays as regular staff.
+      x-required-roles:
+        - admin
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyndicateOwnerChangeRequest"
+      responses:
+        "200":
+          description: Ownership changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyndicateStaffResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The staff member is already the owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: ALREADY_OWNER
+                message: This staff member is already the owner
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  # ---------------------------------------------------------------------
+  # Specialist Management
+  # ---------------------------------------------------------------------
+  "/syndicates/{syndicateId}/specialists":
+    get:
+      operationId: listSyndicateSpecialists
+      tags:
+        - Specialist Management
+      summary: List a syndicate's specialists
+      description: Every specialist of the syndicate in any verification or account status, unlike public discovery.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - name: verification_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/SpecialistVerificationStatus"
+        - name: user_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserStatus"
+        - name: search
+          in: query
+          description: Matches username.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Specialist page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistManagementPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /admin/specialists:
+    get:
+      operationId: listAllSpecialists
+      tags:
+        - Specialist Management
+      summary: List all specialists
+      description: Global counterpart of `listSyndicateSpecialists`.
+      x-required-roles:
+        - admin
+      parameters:
+        - name: verification_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/SpecialistVerificationStatus"
+        - name: user_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserStatus"
+        - name: syndicate_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: specialty_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: country_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: search
+          in: query
+          description: Matches username.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Specialist page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistManagementPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  # ---------------------------------------------------------------------
+  # Verification
+  # ---------------------------------------------------------------------
+  "/syndicates/{syndicateId}/credentials":
+    get:
+      operationId: listSyndicateCredentialQueue
+      tags:
+        - Verification
+      summary: List a syndicate's credential review queue
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate"
+      parameters:
+        - $ref: "#/components/parameters/SyndicateId"
+        - name: verification_status
+          in: query
+          schema:
+            $ref: "#/components/schemas/CredentialsVerificationStatus"
+      responses:
+        "200":
+          description: Credential queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  "/credentials/{credentialId}/verify":
+    post:
+      operationId: verifyCredential
+      tags:
+        - Verification
+      summary: Approve a credential
+      description: Independent of the specialist's overall verification, which only changes through `verifySpecialist`.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      responses:
+        "200":
+          description: Credential verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/credentials/{credentialId}/reject":
+    post:
+      operationId: rejectCredential
+      tags:
+        - Verification
+      summary: Reject a credential
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectionRequest"
+      responses:
+        "200":
+          description: Credential rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/credentials/{credentialId}/document":
+    get:
+      operationId: getCredentialDocumentLink
+      tags:
+        - Verification
+      summary: Get a temporary link to a credential's document
+      description: Returns a temporary link to the private document, for review.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      responses:
+        "200":
+          description: Temporary link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentAccessResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/specialists/by-id/{specialistId}":
+    get:
+      operationId: getSpecialistForReview
+      tags:
+        - Verification
+      summary: Get a specialist for staff review
+      description: Bypasses the discovery gate, so pending and rejected profiles are included.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/SpecialistId"
+      responses:
+        "200":
+          description: Specialist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/specialists/by-id/{specialistId}/verify":
+    post:
+      operationId: verifySpecialist
+      tags:
+        - Verification
+      summary: Verify a specialist
+      description: Makes the profile eligible for discovery. Does not affect login.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/SpecialistId"
+      responses:
+        "200":
+          description: Specialist verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/specialists/by-id/{specialistId}/reject":
+    post:
+      operationId: rejectSpecialist
+      tags:
+        - Verification
+      summary: Reject a specialist
+      description: Removes the profile from discovery. Does not affect login. A later `verifySpecialist` reinstates it.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/SpecialistId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectionRequest"
+      responses:
+        "200":
+          description: Specialist rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/specialists/by-id/{specialistId}/suspend":
+    post:
+      operationId: suspendSpecialist
+      tags:
+        - Verification
+      summary: Suspend a specialist
+      description: |
+        Same effect as `suspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/SpecialistId"
+      responses:
+        "200":
+          description: Specialist suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/AccountDeleted"
+  "/specialists/by-id/{specialistId}/unsuspend":
+    post:
+      operationId: unsuspendSpecialist
+      tags:
+        - Verification
+      summary: Lift a specialist's suspension
+      description: |
+        Same effect as `unsuspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
+      x-required-roles:
+        - admin
+        - "syndicate_staff:same_syndicate_as_specialist"
+      parameters:
+        - $ref: "#/components/parameters/SpecialistId"
+      responses:
+        "200":
+          description: Suspension lifted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/AccountDeleted"
+  # ---------------------------------------------------------------------
+  # Specialists
+  # ---------------------------------------------------------------------
+  /specialists/me:
+    post:
+      operationId: createMySpecialistProfile
+      tags:
+        - Specialists
+      summary: Complete onboarding
+      description: |
+        Creates the specialist profile with the required fields; everything else starts `null`. `specialty_id` is derived from `syndicate_id`; `verification_status` starts `pending`.
+
+        Until this succeeds, other `/specialists/me/**` endpoints, including image and credential-document uploads, return `403 ONBOARDING_REQUIRED`.
+      x-required-roles:
+        - "specialist:not_onboarded"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistOnboardingRequest"
+      responses:
+        "201":
+          description: Profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      operationId: getMySpecialistProfile
+      tags:
+        - Specialists
+      summary: Get the authenticated specialist's profile
+      description: Locale-specific content lives under `/specialists/me/profiles/{locale}`.
+      responses:
+        "200":
+          description: Specialist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "404":
+          description: Onboarding is not complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 404
+                code: SPECIALIST_NOT_FOUND
+                message: Specialist not found, complete onboarding first
+    patch:
+      operationId: updateMySpecialistProfile
+      tags:
+        - Specialists
+      summary: Update the authenticated specialist's profile
+      description: |
+        Partial update. syndicate_id is locked after verification and needs syndicate_member_number in the same request. min_age_treated must not exceed max_age_treated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistUpdateRequest"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "409":
+          description: Username or member number taken, or syndicate locked after verification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: SYNDICATE_LOCKED
+                message: The syndicate cannot be changed after verification
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  # ---------------------------------------------------------------------
+  # Specialist Profile Content
+  # ---------------------------------------------------------------------
+  /specialists/me/profiles:
+    get:
+      operationId: listMyProfileContent
+      tags:
+        - Specialist Profile Content
+      summary: List profile content for all locales
+      responses:
+        "200":
+          description: One row per existing locale
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecialistProfileResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+  "/specialists/me/profiles/{locale}":
+    get:
+      operationId: getMyProfileContent
+      tags:
+        - Specialist Profile Content
+      summary: Get profile content for a locale
+      parameters:
+        - $ref: "#/components/parameters/LocalePath"
+      responses:
+        "200":
+          description: Profile content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistProfileResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: upsertMyProfileContent
+      tags:
+        - Specialist Profile Content
+      summary: Create or replace profile content for a locale
+      parameters:
+        - $ref: "#/components/parameters/LocalePath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistProfileWriteRequest"
+      responses:
+        "200":
+          description: Profile content saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistProfileResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteMyProfileContent
+      tags:
+        - Specialist Profile Content
+      summary: Remove profile content for a locale
+      description: Public lookups for that locale then fall back to the default.
+      parameters:
+        - $ref: "#/components/parameters/LocalePath"
+      responses:
+        "204":
+          description: Profile content removed
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  # ---------------------------------------------------------------------
+  # Profile Management
+  # ---------------------------------------------------------------------
+  /specialists/me/locations:
+    get:
+      operationId: listMyLocations
+      tags:
+        - Profile Management
+      summary: List locations
+      responses:
+        "200":
+          description: Location list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecialistLocation"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+    post:
+      operationId: addLocation
+      tags:
+        - Profile Management
+      summary: Add a location
+      description: |
+        The first location is always primary; a later one becomes primary only with is_primary: true. Duplicate coordinates return 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistLocationWriteRequest"
+      responses:
+        "201":
+          description: Location created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistLocation"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "409":
+          description: A location with these coordinates already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: LOCATION_ALREADY_EXISTS
+                message: This location is already saved
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/specialists/me/locations/{locationId}":
+    put:
+      operationId: updateLocation
+      tags:
+        - Profile Management
+      summary: Replace a location
+      description: |
+        Full replacement. Demoting the current primary is refused with 409.
+      parameters:
+        - $ref: "#/components/parameters/LocationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistLocationWriteRequest"
+      responses:
+        "200":
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistLocation"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Duplicate coordinates, or the current primary was demoted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: PRIMARY_LOCATION_REQUIRED
+                message: A primary location is required, make another location primary first
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteLocation
+      tags:
+        - Profile Management
+      summary: Remove a location
+      description: |
+        Also removes its availability windows. The primary can’t be removed while others exist.
+      parameters:
+        - $ref: "#/components/parameters/LocationId"
+      responses:
+        "204":
+          description: Location removed
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The primary location cannot be removed while others exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                status: 409
+                code: PRIMARY_LOCATION_REQUIRED
+                message: A primary location is required, make another location primary first
+  /specialists/me/availabilities:
+    get:
+      operationId: listMyAvailabilities
+      tags:
+        - Profile Management
+      summary: List availability windows
+      description: Ordered by weekday starting Monday, then by `start_time`.
+      responses:
+        "200":
+          description: Availability list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecialistAvailability"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+    post:
+      operationId: addAvailability
+      tags:
+        - Profile Management
+      summary: Add an availability window
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistAvailabilityWriteRequest"
+      responses:
+        "201":
+          description: Availability created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistAvailability"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  "/specialists/me/availabilities/{availabilityId}":
+    put:
+      operationId: updateAvailability
+      tags:
+        - Profile Management
+      summary: Replace an availability window
+      parameters:
+        - $ref: "#/components/parameters/AvailabilityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistAvailabilityWriteRequest"
+      responses:
+        "200":
+          description: Availability updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistAvailability"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteAvailability
+      tags:
+        - Profile Management
+      summary: Remove an availability window
+      parameters:
+        - $ref: "#/components/parameters/AvailabilityId"
+      responses:
+        "204":
+          description: Availability removed
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /specialists/me/conditions:
+    get:
+      operationId: listMyTreatedConditions
+      tags:
+        - Profile Management
+      summary: List treated condition ids
+      responses:
+        "200":
+          description: Condition ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+    put:
+      operationId: replaceMyTreatedConditions
+      tags:
+        - Profile Management
+      summary: Replace treated conditions
+      description: Full replacement, not a diff.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TreatedConditionsWriteRequest"
+      responses:
+        "200":
+          description: Updated condition ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /specialists/me/template:
+    get:
+      operationId: getMyTemplate
+      tags:
+        - Profile Management
+      summary: Get the profile template
+      responses:
+        "200":
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistTemplateResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: updateMyTemplate
+      tags:
+        - Profile Management
+      summary: Update the profile template
+      description: Partial update. An omitted field is unchanged; an explicit `null` clears it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialistTemplateWriteRequest"
+      responses:
+        "200":
+          description: Template saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistTemplateResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  # ---------------------------------------------------------------------
+  # Specialist Images
+  # ---------------------------------------------------------------------
+  /specialists/me/profile-picture:
+    put:
+      operationId: setMyProfilePicture
+      tags:
+        - Specialists
+      summary: Set or replace the profile picture
+      description: Replaces the current picture and returns its public url. JPEG, PNG, or WebP.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ImageUploadRequest"
+      responses:
+        "200":
+          description: Picture saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "413":
+          $ref: "#/components/responses/FileTooLarge"
+        "415":
+          $ref: "#/components/responses/UnsupportedFileType"
+        "422":
+          $ref: "#/components/responses/InvalidFile"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/MediaBusy"
+    delete:
+      operationId: deleteMyProfilePicture
+      tags:
+        - Specialists
+      summary: Remove the profile picture
+      description: Removes the picture. Succeeds even when none is set.
+      responses:
+        "204":
+          description: Picture removed
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+  /specialists/me/cover-image:
+    put:
+      operationId: setMyCoverImage
+      tags:
+        - Specialists
+      summary: Set or replace the cover image
+      description: Replaces the current cover image and returns its public url. JPEG, PNG, or WebP.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ImageUploadRequest"
+      responses:
+        "200":
+          description: Cover image saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "413":
+          $ref: "#/components/responses/FileTooLarge"
+        "415":
+          $ref: "#/components/responses/UnsupportedFileType"
+        "422":
+          $ref: "#/components/responses/InvalidFile"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/MediaBusy"
+    delete:
+      operationId: deleteMyCoverImage
+      tags:
+        - Specialists
+      summary: Remove the cover image
+      description: Removes the cover image. Succeeds even when none is set.
+      responses:
+        "204":
+          description: Cover image removed
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+  # ---------------------------------------------------------------------
+  # Credentials
+  # ---------------------------------------------------------------------
+  /specialists/me/credentials:
+    get:
+      operationId: listMyCredentials
+      tags:
+        - Credentials
+      summary: List credentials
+      responses:
+        "200":
+          description: Credential list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+    post:
+      operationId: submitCredential
+      tags:
+        - Credentials
+      summary: Submit a credential
+      description: Sent with its private document as multipart/form-data (JPEG, PNG, WebP, or PDF) and routed to the review queue of the specialist’s syndicate.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CredentialCreateRequest"
+      responses:
+        "201":
+          description: Credential submitted as `pending`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "413":
+          $ref: "#/components/responses/FileTooLarge"
+        "415":
+          $ref: "#/components/responses/UnsupportedFileType"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/MediaBusy"
+  "/specialists/me/credentials/{credentialId}":
+    get:
+      operationId: getMyCredential
+      tags:
+        - Credentials
+      summary: Get a credential
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      responses:
+        "200":
+          description: Credential
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateCredential
+      tags:
+        - Credentials
+      summary: Edit a credential
+      description:
+        Allowed while pending or rejected; a rejected credential returns to pending for review. 
+        A verified credential cannot be edited; withdraw it and submit a new one.
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialUpdateRequest"
+      responses:
+        "200":
+          description: Credential updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/CredentialVerified"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: withdrawCredential
+      tags:
+        - Credentials
+      summary: Withdraw a credential
+      description: Allowed in any status. Also deletes the attached document.
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      responses:
+        "204":
+          description: Credential withdrawn
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/specialists/me/credentials/{credentialId}/document":
+    put:
+      operationId: replaceCredentialDocument
+      tags:
+        - Credentials
+      summary: Replace a pending credential's document
+      description:
+        Allowed while pending or rejected (a rejected credential returns to pending). Verified credentials can’t be changed.
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CredentialDocumentUploadRequest"
+      responses:
+        "200":
+          description: Document replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/CredentialVerified"
+        "413":
+          $ref: "#/components/responses/FileTooLarge"
+        "415":
+          $ref: "#/components/responses/UnsupportedFileType"
+        "422":
+          $ref: "#/components/responses/InvalidFile"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/MediaBusy"
+    get:
+      operationId: getMyCredentialDocumentLink
+      tags:
+        - Credentials
+      summary: Get a temporary link to the credential's document
+      description: Returns a temporary link to the private document.
+      parameters:
+        - $ref: "#/components/parameters/CredentialId"
+      responses:
+        "200":
+          description: Temporary link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentAccessResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  # ---------------------------------------------------------------------
+  # Specialist Analytics
+  # ---------------------------------------------------------------------
+  /specialists/me/analytics:
+    get:
+      operationId: getMyAnalytics
+      tags:
+        - Specialist Analytics
+      summary: Get daily analytics
+      description: Daily rows for charts. For a summary, use `getMyDashboard`.
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Daily rows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummaryResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+  /specialists/me/dashboard:
+    get:
+      operationId: getMyDashboard
+      tags:
+        - Specialist Analytics
+      summary: Get the dashboard summary
+      description: Totals, trailing-window figures, verification status, and display fields for the home screen. For daily figures, use `getMyAnalytics`.
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResponse"
+        "403":
+          $ref: "#/components/responses/OnboardingRequired"
+  # ---------------------------------------------------------------------
+  # Discovery and public analytics
+  # ---------------------------------------------------------------------
+  /specialists:
+    get:
+      operationId: searchSpecialists
+      tags:
+        - Discovery
+      summary: Search specialists
+      description: Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`).
+      security: []
+      parameters:
+        - name: search
+          in: query
+          description: Matches username and the resolved title.
+          schema:
+            type: string
+        - name: specialty_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: country_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: condition_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: gender
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/LocaleQuery"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistSearchPage"
+  "/specialists/{username}":
+    get:
+      operationId: getPublicSpecialistProfile
+      tags:
+        - Discovery
+      summary: Get a public profile
+      description: |
+        Public. `404` unless the specialist is discoverable. Hide the contact button when `whatsapp_number` is `null`. The response `locale` reports the locale actually used. `credentials` lists only verified credentials that have not expired.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Username"
+        - $ref: "#/components/parameters/LocaleQuery"
+      responses:
+        "200":
+          description: Public profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistPublicProfile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  "/specialists/{username}/events":
+    post:
+      operationId: recordAnalyticsEvent
+      tags:
+        - Analytics
+      summary: Record a profile view or WhatsApp click
+      description: |
+        Public. Events are deduplicated per specialist, visitor, and event type per day; duplicates still return `202`. Events without `visitor_id` count toward totals but not unique visitors. The username is resolved to the specialist id before storage.
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Username"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticsEventRequest"
+      responses:
+        "202":
+          description: Event accepted
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: |
+        Session access token, set as an `HttpOnly; Secure; SameSite=Lax` cookie by login, password setup, and refresh. Browsers send it automatically.
+    passwordSetupCookie:
+      type: apiKey
+      in: cookie
+      name: access_token
+      description: Short-lived setup token set by `verifySignupOtp`. Accepted only by `setInitialPassword`.
+  headers:
+    SetAuthCookies:
+      description: |
+        Sets two cookies:
+        - `access_token`: `HttpOnly; Secure; SameSite=Lax; Path=/`
+        - `refresh_token`: `HttpOnly; Secure; SameSite=Strict`, scoped to the auth endpoints
+      schema:
+        type: string
+        example: access_token=eyJ...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=<seconds>
+    SetSetupCookie:
+      description: Sets `access_token` (`HttpOnly; Secure; SameSite=Lax; Path=/`) with no `refresh_token`, so it cannot become a session.
+      schema:
+        type: string
+        example: access_token=eyJ...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=<seconds>
+    ClearAuthCookies:
+      description: Expires `access_token` and `refresh_token` with the same attributes they were set with.
+      schema:
+        type: string
+        example: access_token=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0
+  parameters:
+    RefreshTokenCookie:
+      name: refresh_token
+      in: cookie
+      required: false
+      schema:
+        type: string
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 20
+    IsActive:
+      name: is_active
+      in: query
+      schema:
+        type: boolean
+    LocaleQuery:
+      name: locale
+      in: query
+      description: Locale for localized fields; falls back to the default.
+      schema:
+        $ref: "#/components/schemas/Locale"
+    LocalePath:
+      name: locale
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Locale"
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SyndicateId:
+      name: syndicateId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StaffId:
+      name: staffId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ConditionId:
+      name: conditionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CredentialId:
+      name: credentialId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SpecialistId:
+      name: specialistId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LocationId:
+      name: locationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AvailabilityId:
+      name: availabilityId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SpecialtyId:
+      name: specialtyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CountryId:
+      name: countryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Username:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Role:
+      type: string
+      enum:
+        - admin
+        - syndicate_staff
+        - specialist
+        - patient
+    SignupRole:
+      type: string
+      description: Roles that can self-register.
+      enum:
+        - specialist
+    UserStatus:
+      type: string
+      description: |
+        Account login status.
+        - `pending`: signed up or invited, not yet activated.
+        - `active`: can log in.
+        - `suspended`: blocked by moderation; never purged.
+        - `deleted`: blocked; purged after a retention period.
+      enum:
+        - pending
+        - active
+        - suspended
+        - deleted
+    SpecialistVerificationStatus:
+      type: string
+      description: |
+        Verification status of a specialist profile, independent of `UserStatus`. Suspend and unsuspend change only `UserStatus`; verify and reject change only this field.
+        Login requires `UserStatus = active`. Discovery requires `UserStatus = active` and verification `active`.
+      enum:
+        - pending
+        - active
+        - rejected
+      default: pending
+    Locale:
+      type: string
+      enum:
+        - en
+        - ar
+        - fr
+      default: en
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+        user_status:
+          $ref: "#/components/schemas/UserStatus"
+        created_at:
+          type: string
+          format: date-time
+    UserDetail:
+      allOf:
+        - $ref: "#/components/schemas/UserSummary"
+        - type: object
+          properties:
+            country_id:
+              type: string
+              format: uuid
+              nullable: true
+            preferred_language:
+              type: string
+              nullable: true
+            last_login_at:
+              type: string
+              format: date-time
+              nullable: true
+            deleted_at:
+              type: string
+              format: date-time
+              nullable: true
+    UserUpdateRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        country_id:
+          type: string
+          format: uuid
+          nullable: true
+        preferred_language:
+          type: string
+          nullable: true
+    UserPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDetail"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+    SignupRequest:
+      type: object
+      required:
+        - role
+        - first_name
+        - last_name
+        - email
+      properties:
+        role:
+          $ref: "#/components/schemas/SignupRole"
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        locale:
+          $ref: "#/components/schemas/Locale"
+    SignupResponse:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        otp_expires_at:
+          type: string
+          format: date-time
+    VerifyOtpRequest:
+      type: object
+      required:
+        - email
+        - code
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          example: "482913"
+    ResendOtpRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        locale:
+          $ref: "#/components/schemas/Locale"
+    PasswordSetupResponse:
+      type: object
+      required:
+        - expires_in
+      properties:
+        expires_in:
+          type: integer
+          description: Setup cookie lifetime in seconds.
+          example: 900
+    SetPasswordRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 64
+    LoginRequest:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: Email, phone, or username.
+        password:
+          type: string
+          format: password
+    SessionResponse:
+      type: object
+      required:
+        - user_id
+        - role
+        - expires_in
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        role:
+          $ref: "#/components/schemas/Role"
+        expires_in:
+          type: integer
+          description: Access token lifetime in seconds.
+          example: 900
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        locale:
+          $ref: "#/components/schemas/Locale"
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 64
+    AdminInviteRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+    SyndicateSummary:
+      type: object
+      description: Public-safe shape with no contact or staff detail.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        specialty_id:
+          type: string
+          format: uuid
+        country_id:
+          type: string
+          format: uuid
+    SyndicateCreateRequest:
+      type: object
+      required:
+        - name
+        - specialty_id
+        - country_id
+        - contact_email
+        - owner_first_name
+        - owner_last_name
+        - owner_email
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        specialty_id:
+          type: string
+          format: uuid
+        country_id:
+          type: string
+          format: uuid
+        contact_email:
+          type: string
+          format: email
+        contact_phone:
+          type: string
+        owner_first_name:
+          type: string
+          maxLength: 100
+        owner_last_name:
+          type: string
+          maxLength: 100
+        owner_email:
+          type: string
+          format: email
+    SyndicateUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        contact_email:
+          type: string
+          format: email
+        contact_phone:
+          type: string
+    SyndicateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        specialty_id:
+          type: string
+          format: uuid
+        country_id:
+          type: string
+          format: uuid
+        contact_email:
+          type: string
+          format: email
+        contact_phone:
+          type: string
+        status:
+          type: string
+        owner:
+          $ref: "#/components/schemas/SyndicateStaffResponse"
+        created_at:
+          type: string
+          format: date-time
+    SyndicateStaffInviteRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - title
+      properties:
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        title:
+          type: string
+          maxLength: 100
+          example: Registrar
+    SyndicateStaffUpdateRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          maxLength: 100
+    SyndicateStaffResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        syndicate_id:
+          type: string
+          format: uuid
+        user:
+          $ref: "#/components/schemas/UserSummary"
+        title:
+          type: string
+          nullable: true
+        is_owner:
+          type: boolean
+          description: Exactly one staff member per syndicate is the owner.
+        created_at:
+          type: string
+          format: date-time
+    SyndicateStaffEmailRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+    SyndicateOwnerChangeRequest:
+      type: object
+      required:
+        - staff_id
+      properties:
+        staff_id:
+          type: string
+          format: uuid
+    SpecialistManagementRow:
+      type: object
+      description: Management-table row; includes status fields the public search result omits.
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        syndicate_id:
+          type: string
+          format: uuid
+        syndicate_member_number:
+          type: string
+        specialty_id:
+          type: string
+          format: uuid
+        verification_status:
+          $ref: "#/components/schemas/SpecialistVerificationStatus"
+        user_status:
+          $ref: "#/components/schemas/UserStatus"
+        pending_credentials_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    SpecialistManagementPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpecialistManagementRow"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+    Username:
+      type: string
+      description: Stored lowercase. Reserved words are rejected. Used as the public URL slug, never as an internal key.
+      minLength: 3
+      maxLength: 30
+      pattern: "^[A-Za-z0-9._-]+$"
+      example: dr.jane-doe
+    SpecialistOnboardingRequest:
+      type: object
+      required:
+        - username
+        - syndicate_id
+        - syndicate_member_number
+      properties:
+        username:
+          $ref: "#/components/schemas/Username"
+        syndicate_id:
+          type: string
+          format: uuid
+        syndicate_member_number:
+          type: string
+    SpecialistUpdateRequest:
+      type: object
+      properties:
+        syndicate_id:
+          type: string
+          format: uuid
+        syndicate_member_number:
+          type: string
+        username:
+          $ref: "#/components/schemas/Username"
+        gender:
+          type: string
+          nullable: true
+        whatsapp_number:
+          type: string
+          nullable: true
+        primary_language:
+          type: string
+          nullable: true
+        years_of_experience:
+          type: integer
+          nullable: true
+        min_age_treated:
+          type: integer
+          nullable: true
+          minimum: 0
+        max_age_treated:
+          type: integer
+          nullable: true
+          minimum: 0
+    SpecialistResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        specialty_id:
+          type: string
+          format: uuid
+          readOnly: true
+        syndicate_id:
+          type: string
+          format: uuid
+        syndicate_member_number:
+          type: string
+        username:
+          type: string
+        gender:
+          type: string
+          nullable: true
+        whatsapp_number:
+          type: string
+          nullable: true
+        primary_language:
+          type: string
+          nullable: true
+        years_of_experience:
+          type: integer
+          nullable: true
+        profile_picture_url:
+          type: string
+          nullable: true
+        cover_image_url:
+          type: string
+          nullable: true
+        min_age_treated:
+          type: integer
+          nullable: true
+        max_age_treated:
+          type: integer
+          nullable: true
+        verification_status:
+          $ref: "#/components/schemas/SpecialistVerificationStatus"
+        verified_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    AccountDeletionResponse:
+      type: object
+      properties:
+        deleted_at:
+          type: string
+          format: date-time
+        purge_scheduled_for:
+          type: string
+          format: date-time
+    SpecialistProfileResponse:
+      type: object
+      properties:
+        specialist_id:
+          type: string
+          format: uuid
+        locale_code:
+          $ref: "#/components/schemas/Locale"
+        title:
+          type: string
+          nullable: true
+        headline:
+          type: string
+          nullable: true
+          maxLength: 150
+        bio:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    SpecialistProfileWriteRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 100
+        headline:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+          maxLength: 2000
+    SpecialistLocation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        country_id:
+          type: string
+          format: uuid
+        label:
+          type: string
+          nullable: true
+        city:
+          type: string
+        address_line1:
+          type: string
+          nullable: true
+        address_line2:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        is_primary:
+          type: boolean
+    SpecialistLocationWriteRequest:
+      type: object
+      required:
+        - country_id
+        - city
+      properties:
+        country_id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        address_line1:
+          type: string
+        address_line2:
+          type: string
+        city:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        phone:
+          type: string
+        is_primary:
+          type: boolean
+          description: See `addLocation` and `updateLocation` for how this is applied.
+    WeekDay:
+      type: string
+      enum:
+        - monday
+        - tuesday
+        - wednesday
+        - thursday
+        - friday
+        - saturday
+        - sunday
+    ClockTime:
+      type: string
+      description: 24-hour `HH:mm`.
+      pattern: "^([01]\\d|2[0-3]):[0-5]\\d$"
+      example: "09:00"
+    SpecialistAvailability:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        location_id:
+          type: string
+          format: uuid
+          nullable: true
+        day_of_week:
+          $ref: "#/components/schemas/WeekDay"
+        start_time:
+          $ref: "#/components/schemas/ClockTime"
+        end_time:
+          $ref: "#/components/schemas/ClockTime"
+    SpecialistAvailabilityWriteRequest:
+      type: object
+      required:
+        - day_of_week
+        - start_time
+        - end_time
+      properties:
+        location_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Omit for a window not tied to a location.
+        day_of_week:
+          $ref: "#/components/schemas/WeekDay"
+        start_time:
+          $ref: "#/components/schemas/ClockTime"
+        end_time:
+          allOf:
+            - $ref: "#/components/schemas/ClockTime"
+          description: Must be after `start_time`.
+    TreatedConditionsWriteRequest:
+      type: object
+      required:
+        - condition_ids
+      properties:
+        condition_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    SpecialistTemplateResponse:
+      type: object
+      properties:
+        specialist_id:
+          type: string
+          format: uuid
+        content:
+          type: object
+          description: Free-form, template-defined JSON.
+        primary_color:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    SpecialistTemplateWriteRequest:
+      type: object
+      properties:
+        content:
+          type: object
+        primary_color:
+          type: string
+          nullable: true
+    ImageUploadRequest:
+      type: object
+      required:
+        - file
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The image file.
+    ImageResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Public URL. Changes on every upload.
+        mime_type:
+          type: string
+          example: image/webp
+    CredentialDocumentUploadRequest:
+      type: object
+      required:
+        - document
+      properties:
+        document:
+          type: string
+          format: binary
+          description: The document file.
+    CredentialDocument:
+      type: object
+      description: File metadata. The file itself is private.
+      properties:
+        mime_type:
+          type: string
+          example: application/pdf
+        uploaded_at:
+          type: string
+          format: date-time
+    DocumentAccessResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Temporary link. Do not store or share it.
+        expires_at:
+          type: string
+          format: date-time
+    CredentialType:
+      type: string
+      enum:
+        - degree
+        - license
+        - certification
+        - membership
+    CredentialsVerificationStatus:
+      type: string
+      enum:
+        - pending
+        - verified
+        - rejected
+    CredentialUpdateRequest:
+      type: object
+      required:
+        - credential_type
+        - title
+        - issuing_organization
+      properties:
+        credential_type:
+          $ref: "#/components/schemas/CredentialType"
+        title:
+          type: string
+        issuing_organization:
+          type: string
+        credential_number:
+          type: string
+        issue_date:
+          type: string
+          format: date
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+    CredentialCreateRequest:
+      allOf:
+        - $ref: "#/components/schemas/CredentialUpdateRequest"
+        - type: object
+          required:
+            - document
+          properties:
+            document:
+              type: string
+              format: binary
+              description: The document file.
+    RejectionRequest:
+      type: object
+      required:
+        - rejection_reason
+      properties:
+        rejection_reason:
+          type: string
+    CredentialResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        specialist_id:
+          type: string
+          format: uuid
+        credential_type:
+          $ref: "#/components/schemas/CredentialType"
+        title:
+          type: string
+        issuing_organization:
+          type: string
+        credential_number:
+          type: string
+          nullable: true
+        issue_date:
+          type: string
+          format: date
+          nullable: true
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        document:
+          $ref: "#/components/schemas/CredentialDocument"
+        verification_status:
+          $ref: "#/components/schemas/CredentialsVerificationStatus"
+        reviewed_by:
+          type: string
+          format: uuid
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        rejection_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Specialty:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        label_fr:
+          type: string
+        label_ar:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+    SpecialtyWriteRequest:
+      type: object
+      description: "`code`, `name`, and `label` are required on create."
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        label_fr:
+          type: string
+        label_ar:
+          type: string
+        description:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+    Condition:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        label_fr:
+          type: string
+        label_ar:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+    ConditionWriteRequest:
+      type: object
+      description: "`code`, `name`, and `label` are required on create."
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        label_fr:
+          type: string
+        label_ar:
+          type: string
+        description:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+    Country:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        iso_code:
+          type: string
+          example: LB
+        currency_code:
+          type: string
+          example: LBP
+        phone_code:
+          type: string
+          example: "+961"
+        region:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CountryWriteRequest:
+      type: object
+      description: "`iso_code`, `name`, `currency_code`, and `phone_code` are required on create."
+      properties:
+        name:
+          type: string
+        iso_code:
+          type: string
+        currency_code:
+          type: string
+        phone_code:
+          type: string
+        region:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+    SpecialistSearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        title:
+          type: string
+          nullable: true
+        headline:
+          type: string
+          nullable: true
+        specialty_id:
+          type: string
+          format: uuid
+        city:
+          type: string
+          nullable: true
+        country_id:
+          type: string
+          format: uuid
+          nullable: true
+        profile_picture_url:
+          type: string
+          nullable: true
+        years_of_experience:
+          type: integer
+          nullable: true
+        primary_language:
+          type: string
+          nullable: true
+    SpecialistSearchPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpecialistSearchResult"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+    SpecialistPublicProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        locale:
+          allOf:
+            - $ref: "#/components/schemas/Locale"
+          description: Locale actually used for `title`, `headline`, and `bio`.
+        title:
+          type: string
+          nullable: true
+        headline:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        specialty_id:
+          type: string
+          format: uuid
+        gender:
+          type: string
+          nullable: true
+        years_of_experience:
+          type: integer
+          nullable: true
+        primary_language:
+          type: string
+          nullable: true
+        whatsapp_number:
+          type: string
+          nullable: true
+        min_age_treated:
+          type: integer
+          nullable: true
+        max_age_treated:
+          type: integer
+          nullable: true
+        profile_picture_url:
+          type: string
+          nullable: true
+        cover_image_url:
+          type: string
+          nullable: true
+        treated_condition_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpecialistLocation"
+        availabilities:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpecialistAvailability"
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicCredential"
+    PublicCredential:
+      type: object
+      description: Verified, unexpired credentials only.
+      properties:
+        credential_type:
+          $ref: "#/components/schemas/CredentialType"
+        title:
+          type: string
+        issuing_organization:
+          type: string
+        issue_date:
+          type: string
+          format: date
+          nullable: true
+        expiry_date:
+          type: string
+          format: date
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+        verified_by_syndicate:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+    AnalyticsEventType:
+      type: string
+      enum:
+        - profile_view
+        - whatsapp_click
+    AnalyticsEventRequest:
+      type: object
+      required:
+        - event_type
+      properties:
+        event_type:
+          $ref: "#/components/schemas/AnalyticsEventType"
+        visitor_id:
+          type: string
+          description: Client-generated id used for deduplication and unique-visitor counts.
+    AnalyticsDailyRow:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        profile_views:
+          type: integer
+        unique_visitors:
+          type: integer
+        whatsapp_clicks:
+          type: integer
+    AnalyticsSummaryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsDailyRow"
+    DashboardResponse:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        profile_picture_url:
+          type: string
+          nullable: true
+        verification_status:
+          $ref: "#/components/schemas/SpecialistVerificationStatus"
+        pending_credentials_count:
+          type: integer
+        total_profile_views:
+          type: integer
+        total_unique_visitors:
+          type: integer
+        total_whatsapp_clicks:
+          type: integer
+        profile_views_last_7_days:
+          type: integer
+        profile_views_last_30_days:
+          type: integer
+        whatsapp_clicks_last_7_days:
+          type: integer
+        whatsapp_clicks_last_30_days:
+          type: integer
+    Error:
+      type: object
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          description: HTTP status code.
+        code:
+          type: string
+          description: Stable, machine-readable error code.
+        message:
+          type: string
+          description: Human-readable summary.
+        trace_id:
+          type: string
+          nullable: true
+          description: Correlation id to quote to support.
+          example: 01J8Z3F8N6K9X2Q4R7T1V5W8YB
+    ValidationErrorBody:
+      description: Returned only for `422`.
+      allOf:
+        - $ref: "#/components/schemas/Error"
+        - type: object
+          required:
+            - errors
+          properties:
+            errors:
+              type: array
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/FieldError"
+    FieldError:
+      type: object
+      required:
+        - field
+        - code
+        - message
+      properties:
+        field:
+          type: string
+          description: Dot-notation for nested fields.
+        code:
+          type: string
+          enum:
+            - REQUIRED
+            - MUST_BE_EMAIL
+            - TOO_SHORT
+            - TOO_LONG
+            - TOO_COMMON
+            - CONTAINS_PERSONAL_INFO
+            - INVALID_ROLE
+            - INVALID_FORMAT
+        message:
+          type: string
+  responses:
+    ValidationError:
+      description: Request failed validation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorBody"
+          example:
+            status: 422
+            code: VALIDATION_ERROR
+            message: Validation failed
+            errors:
+              - field: email
+                code: MUST_BE_EMAIL
+                message: must be a valid email address
+    Conflict:
+      description: The resource already exists or the state does not allow the change
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 409
+            code: USERNAME_TAKEN
+            message: Username is already taken
+    AccountDeleted:
+      description: The account is deleted and awaiting purge
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 409
+            code: ACCOUNT_DELETED
+            message: The account is deleted and awaiting purge
+    CredentialVerified:
+      description: The credential is already verified
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 409
+            code: CREDENTIAL_VERIFIED
+            message: A verified credential cannot be changed, withdraw it and submit a new one
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 404
+            code: NOT_FOUND
+            message: Resource not found
+    Forbidden:
+      description: Authenticated but not allowed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 403
+            code: FORBIDDEN
+            message: You do not have permission to perform this action
+    OnboardingRequired:
+      description: The specialist has not completed onboarding
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 403
+            code: ONBOARDING_REQUIRED
+            message: Complete onboarding first
+    MalformedJson:
+      description: Request body is missing or not valid JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 400
+            code: MALFORMED_JSON
+            message: Request body is not valid JSON
+    Unauthorized:
+      description: No session cookie, or the cookie is invalid, expired, or revoked
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            unauthenticated:
+              value:
+                status: 401
+                code: UNAUTHENTICATED
+                message: Authentication required
+            invalidToken:
+              value:
+                status: 401
+                code: INVALID_TOKEN
+                message: Invalid or expired access token
+    InvalidCredentials:
+      description: Wrong password, unknown identifier, or an account with no password
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 401
+            code: INVALID_CREDENTIALS
+            message: Invalid email or password
+    InvalidRefreshToken:
+      description: The refresh cookie is missing, invalid, expired, or already rotated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 401
+            code: INVALID_TOKEN
+            message: Invalid or expired refresh token
+    InvalidOrExpiredToken:
+      description: The token or code is invalid, expired, or already used
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 400
+            code: INVALID_OR_EXPIRED_TOKEN
+            message: The code is invalid or has expired
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds until the caller may retry
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 429
+            code: TOO_MANY_REQUESTS
+            message: Too many requests
+    FileTooLarge:
+      description: The file exceeds the limit for this upload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 413
+            code: FILE_TOO_LARGE
+            message: The file exceeds the allowed size
+    UnsupportedFileType:
+      description: The file type is not allowed for this upload
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 415
+            code: UNSUPPORTED_FILE_TYPE
+            message: File type not allowed
+    InvalidFile:
+      description: The file is missing or unreadable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorBody"
+          example:
+            status: 422
+            code: VALIDATION_ERROR
+            message: Validation failed
+            errors:
+              - field: file
+                code: INVALID_FORMAT
+                message: the file could not be read
+    MediaBusy:
+      description: Processing is at capacity; retry shortly
+      headers:
+        Retry-After:
+          description: Seconds until the caller may retry
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 503
+            code: MEDIA_BUSY
+            message: Try again shortly

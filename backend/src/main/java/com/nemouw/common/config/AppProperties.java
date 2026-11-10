@@ -31,7 +31,8 @@ public record AppProperties(
             boolean trustProxy,
             @Min(1) @DefaultValue("900") int accessTtlSeconds,
             @Min(1) @DefaultValue("90") int refreshTtlDays
-    ) {}
+    ) {
+    }
 
     public record Cors(
             @NotEmpty List<String> allowedOrigins,
@@ -42,8 +43,12 @@ public record AppProperties(
     }
 
     public record Mail(
-            @NotBlank String resendApiKey,
+            String resendApiKey,
             @NotBlank String from,
-            @NotBlank String urlBase) {
+            @NotBlank String urlBase,
+            @NotNull Delivery delivery,
+            @NotBlank String fileDir) {
+
+        public enum Delivery {LIVE, FILE}
     }
 }
