@@ -16,6 +16,13 @@ export const localeNames: Record<Locale, string> = {
   ar: "العربية",
 }
 
+// Short labels for tight spaces (mobile headers); pair them with localeNames as the accessible name.
+export const localeShortNames: Record<Locale, string> = {
+  en: "EN",
+  fr: "FR",
+  ar: "ع",
+}
+
 const rtlLocales: ReadonlySet<Locale> = new Set(["ar"])
 
 export function isLocale(value: unknown): value is Locale {
