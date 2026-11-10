@@ -147,8 +147,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
+  /* Tailwind v4 dropped the browser default, so buttons showed an arrow.
+     Disabled ones keep the default cursor; base layer, so a utility such as
+     cursor-not-allowed on a component still wins. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
