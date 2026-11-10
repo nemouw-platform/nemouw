@@ -9,3 +9,10 @@ declare module "next-intl" {
     Messages: typeof messages
   }
 }
+
+declare module "react" {
+  interface InputHTMLAttributes<T> {
+    /** Safari: rules its password generator follows, e.g. "minlength: 8;" */
+    passwordrules?: string
+  }
+}
