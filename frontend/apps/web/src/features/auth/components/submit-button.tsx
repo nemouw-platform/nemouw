@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@workspace/ui/components/button"
 import { LoaderCircleIcon } from "lucide-react"
 
@@ -15,7 +17,15 @@ export function SubmitButton({
   pendingLabel,
 }: SubmitButtonProps) {
   return (
-    <Button type="submit" size="lg" className="w-full" disabled={pending}>
+    <Button
+      type="submit"
+      size="lg"
+      className="w-full"
+      disabled={pending}
+      // Keep focus in the field on press. Otherwise the field's blur shows
+      // its error, the button moves down, and the release misses it: no click
+      onMouseDown={(event) => event.preventDefault()}
+    >
       {pending && (
         <LoaderCircleIcon className="animate-spin" data-icon="inline-start" />
       )}
