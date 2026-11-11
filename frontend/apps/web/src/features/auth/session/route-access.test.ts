@@ -17,6 +17,7 @@ describe("routeAccess", () => {
     ["/signup/verify", "guestOnly"],
     ["/login", "guestOnly"],
     ["/forgot-password", "guestOnly"],
+    ["/reset-password", "guestOnly"],
     ["/onboarding", "protected"],
     ["/", "public"],
     ["/loginx", "public"], // prefix match needs a path boundary

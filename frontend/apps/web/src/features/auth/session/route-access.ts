@@ -31,6 +31,7 @@ const RULES: readonly Rule[] = [
   { prefix: "/signup", access: "guestOnly" },
   { prefix: "/login", access: "guestOnly" },
   { prefix: "/forgot-password", access: "guestOnly" },
+  { prefix: "/reset-password", access: "guestOnly" },
   { prefix: "/onboarding", access: "protected", roles: ["specialist"] },
 ]
 

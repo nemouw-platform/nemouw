@@ -21,7 +21,12 @@ test.describe("proxy redirects", () => {
   test("signed in: guest pages send you home", async ({ page }) => {
     await signUp(page, uniqueEmail("guest"))
 
-    for (const path of ["/en/login", "/en/signup", "/en/forgot-password"]) {
+    for (const path of [
+      "/en/login",
+      "/en/signup",
+      "/en/forgot-password",
+      "/en/reset-password",
+    ]) {
       await page.goto(path)
       await expect(page).toHaveURL(/\/en$/)
     }
