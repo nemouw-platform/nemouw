@@ -13,8 +13,9 @@ final class ClockTime {
     private ClockTime() {
     }
 
-    /** Null when the text is not a valid HH:mm. */
+    /** Null when the text is null or not a valid HH:mm. */
     static LocalTime parse(String text) {
+        if (text == null) return null;
         try {
             return LocalTime.parse(text.trim(), HH_MM);
         } catch (DateTimeParseException e) {
