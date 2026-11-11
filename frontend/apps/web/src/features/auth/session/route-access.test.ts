@@ -32,6 +32,11 @@ describe("redirectFor", () => {
     )
   })
 
+  it("keeps protected pages to their roles", () => {
+    const admin: CookieSession = { kind: "session", role: "admin" }
+    expect(redirectFor("/onboarding", admin)).toBe("/")
+  })
+
   it("lets signed-in users into protected pages", () => {
     expect(redirectFor("/onboarding", signedIn)).toBeNull()
   })
