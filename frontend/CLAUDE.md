@@ -42,6 +42,7 @@ Use **pnpm** only. Run from `frontend/` (the monorepo root):
 - `pnpm dev` runs both apps (web :3000, admin :3001)
 - `pnpm dev --filter=web` / `pnpm dev --filter=admin` runs one app
 - `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` run across all workspaces (Turborepo caches results). Unit tests use Vitest (`*.test.ts` next to the code)
+- `pnpm --filter web test:e2e` runs the Playwright end-to-end suite (`apps/web/e2e/`) against a production build and the real local backend; setup in `apps/web/e2e/README.md`. Run it after changing any auth flow
 - Add a dependency to one workspace: `pnpm add <pkg> --filter=web`
 - Add a shadcn component (lands in `packages/ui`): `pnpm dlx shadcn@latest add <component> -c apps/web`
   Import it as `import { Button } from "@workspace/ui/components/button"`.
@@ -91,6 +92,13 @@ API docs live in `../docs/backend/` (auth, errors, architecture). The OpenAPI co
 - Errors share one shape: `{ status, code, message, trace_id }`, plus `errors: [{ field, code, message }]` on 422. Every failure is thrown as `ApiError` (`status`, `code`, `fieldError(field)`, `retryAfter` from 429s), including `NETWORK_ERROR` (status 0) and `UNEXPECTED_RESPONSE` (no standard body). Branch on `code`, never on `message`.
 - Local testing: with `MAIL_DELIVERY=file` and `DEV_FIXED_OTP=000000` in `backend/.env`, sign-up codes are always `000000` and emails are written to files instead of being sent.
 - The backend allows CORS only from origins in `CORS_ALLOWED_ORIGINS` (or any localhost port when `ALLOW_LOCALHOST_ORIGINS=true`).
+
+## Sessions and redirects (web)
+
+- `src/proxy.ts` reads the access cookie's JWT payload (role, setup scope, expiry; the signature is the backend's job) and redirects by the table in `features/auth/session/route-access.ts`: protected pages (optionally per role) send signed-out visitors to `/login?next=…`, guest pages (login, sign-up) send signed-in users home, sign-up step 3 needs the password-setup token. A new protected page is one line in that table.
+- The proxy only sees the access cookie (15 min). Returning users with a live refresh cookie land on the login page, which refreshes quietly and continues to `next` (`use-resume-session.ts`). `next` must pass `safeNextPath` (internal paths only).
+- When an API call's 401 survives the refresh, the client signs out (clearing the cookies, retrying after a 429 since the rate limit counts the logout too) and loads `/login?next=…` (`session/end-session.ts`).
+- Production needs the access cookie to reach the Next server: the backend must set it on the parent domain, or the API must be served from the same origin. Until then the proxy cannot see sessions there.
 
 ## Secrets
 
