@@ -184,5 +184,30 @@
       "invalidLink": "انتهت صلاحية هذا الرابط أو سبق استخدامه.",
       "requestNewLink": "اطلب رابطًا جديدًا"
     }
+  },
+  "Onboarding": {
+    "metaTitle": "إعداد ملفك",
+    "title": "أعدّ ملفك",
+    "description": "اختر اسم المستخدم العام وأكّد عضويتك في نقابتك. يمكنك إكمال باقي ملفك بعد ذلك.",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "dr.rana-haddad",
+    "usernameHint": "من 3 إلى 30 حرفًا أو رقمًا أو نقطة أو شرطة أو شرطة سفلية. يصبح رابط ملفك العام.",
+    "syndicate": "النقابة",
+    "syndicatePlaceholder": "اختر نقابتك",
+    "syndicatesLoading": "جارٍ تحميل النقابات…",
+    "syndicatesFailed": "تعذّر تحميل النقابات.",
+    "retry": "حاول مجددًا",
+    "syndicatesEmpty": "لا توجد نقابات متاحة بعد. تواصل مع دعم نمو.",
+    "memberNumber": "رقم العضوية",
+    "memberNumberPlaceholder": "12345",
+    "memberNumberHint": "رقم عضويتك في هذه النقابة. نستخدمه للتحقق من شهاداتك.",
+    "submit": "إنهاء الإعداد",
+    "submitting": "جارٍ الحفظ…",
+    "errors": {
+      "usernameFormat": "استخدم الأحرف والأرقام والنقاط والشرطات والشرطات السفلية فقط",
+      "usernameTaken": "اسم المستخدم هذا مأخوذ. جرّب اسمًا آخر.",
+      "usernameUnavailable": "اسم المستخدم هذا غير متاح. جرّب اسمًا آخر.",
+      "memberNumberTaken": "رقم العضوية هذا مسجّل بالفعل لدى هذه النقابة."
+    }
   }
 }

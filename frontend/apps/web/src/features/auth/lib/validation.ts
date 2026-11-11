@@ -37,6 +37,9 @@ export function createFieldRules(t: AuthErrorsTranslator) {
         .max(EMAIL_MAX_LENGTH, t("tooLong", { max: EMAIL_MAX_LENGTH }))
         .regex(EMAIL_SHAPE, t("field.MUST_BE_EMAIL")),
 
+    /** A required pick from a list (its value, e.g. an id) */
+    choice: (label: string) => z.string().min(1, required(label)),
+
     /**
      * Required, sent exactly as typed: no trimming and no rules, e.g. the
      * password on the login form (an old password may predate today's rules)

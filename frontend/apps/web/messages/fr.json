@@ -184,5 +184,30 @@
       "invalidLink": "Ce lien a expiré ou a déjà été utilisé.",
       "requestNewLink": "Demander un nouveau lien"
     }
+  },
+  "Onboarding": {
+    "metaTitle": "Configurez votre profil",
+    "title": "Configurez votre profil",
+    "description": "Choisissez votre nom d'utilisateur public et confirmez votre adhésion à votre syndicat. Vous compléterez le reste de votre profil ensuite.",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "dr.rana-haddad",
+    "usernameHint": "3 à 30 lettres, chiffres, points, tirets ou tirets bas. Il devient le lien de votre profil public.",
+    "syndicate": "Syndicat",
+    "syndicatePlaceholder": "Choisissez votre syndicat",
+    "syndicatesLoading": "Chargement des syndicats…",
+    "syndicatesFailed": "Impossible de charger les syndicats.",
+    "retry": "Réessayer",
+    "syndicatesEmpty": "Aucun syndicat n'est encore disponible. Contactez le support Nemouw.",
+    "memberNumber": "Numéro d'adhérent",
+    "memberNumberPlaceholder": "12345",
+    "memberNumberHint": "Votre numéro d'adhérent dans ce syndicat. Il nous sert à vérifier vos diplômes.",
+    "submit": "Terminer",
+    "submitting": "Enregistrement…",
+    "errors": {
+      "usernameFormat": "Utilisez uniquement des lettres, chiffres, points, tirets et tirets bas",
+      "usernameTaken": "Ce nom d'utilisateur est déjà pris. Essayez-en un autre.",
+      "usernameUnavailable": "Ce nom d'utilisateur n'est pas disponible. Essayez-en un autre.",
+      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat."
+    }
   }
 }

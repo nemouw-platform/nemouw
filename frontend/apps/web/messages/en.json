@@ -184,5 +184,30 @@
       "invalidLink": "This link has expired or was already used.",
       "requestNewLink": "Request a new link"
     }
+  },
+  "Onboarding": {
+    "metaTitle": "Set up your profile",
+    "title": "Set up your profile",
+    "description": "Pick your public username and confirm your syndicate membership. You can fill in the rest of your profile next.",
+    "username": "Username",
+    "usernamePlaceholder": "dr.rana-haddad",
+    "usernameHint": "3 to 30 letters, numbers, dots, dashes or underscores. It becomes your public profile link.",
+    "syndicate": "Syndicate",
+    "syndicatePlaceholder": "Choose your syndicate",
+    "syndicatesLoading": "Loading syndicates…",
+    "syndicatesFailed": "We couldn't load the syndicates.",
+    "retry": "Try again",
+    "syndicatesEmpty": "No syndicates are available yet. Contact Nemouw support.",
+    "memberNumber": "Member number",
+    "memberNumberPlaceholder": "12345",
+    "memberNumberHint": "Your membership number in this syndicate. We use it to verify your credentials.",
+    "submit": "Finish setup",
+    "submitting": "Saving…",
+    "errors": {
+      "usernameFormat": "Use only letters, numbers, dots, dashes and underscores",
+      "usernameTaken": "This username is taken. Try another.",
+      "usernameUnavailable": "This username isn't available. Try another.",
+      "memberNumberTaken": "This member number is already registered with this syndicate."
+    }
   }
 }
