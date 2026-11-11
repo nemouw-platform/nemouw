@@ -1,0 +1,224 @@
+{
+  "Metadata": {
+    "title": "Nemouw",
+    "description": "Trouvez des spécialistes paramédicaux vérifiés au Liban."
+  },
+  "Common": {
+    "toggleTheme": "Changer de thème",
+    "language": "Langue"
+  },
+  "Navbar": {
+    "mainNav": "Principale",
+    "findSpecialist": "Trouver un spécialiste",
+    "howItWorks": "Comment ça marche",
+    "forSpecialists": "Pour les spécialistes",
+    "logIn": "Se connecter",
+    "join": "Inscription spécialiste",
+    "menu": "Menu",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "HomePage": {
+    "tagline": "Site public pour les patients et les spécialistes."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas.",
+    "backHome": "Retour à l'accueil"
+  },
+  "Auth": {
+    "brand": {
+      "headline": "Faites-vous <em>trouver par les patients</em> partout au Liban.",
+      "description": "Nemouw aide les patients à trouver des orthophonistes, ergothérapeutes, psychomotriciens, éducateurs spécialisés et autres spécialistes paramédicaux vérifiés."
+    },
+    "step": "Étape {current} sur {total}.",
+    "copyright": "© {year} Nemouw",
+    "errors": {
+      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
+      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
+      "tooManyRequests": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
+      "required": "{field} est obligatoire",
+      "tooShort": "{min} caractères minimum",
+      "tooLong": "{max} caractères maximum",
+      "incompleteCode": "Saisissez les {length} chiffres",
+      "field": {
+        "REQUIRED": "Ce champ est obligatoire",
+        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
+        "TOO_SHORT": "C'est trop court",
+        "TOO_LONG": "C'est trop long",
+        "TOO_COMMON": "Ce mot de passe est trop courant",
+        "CONTAINS_PERSONAL_INFO": "N'incluez ni « nemouw » ni la partie de votre e-mail avant @",
+        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
+        "INVALID_FORMAT": "Vérifiez le format et réessayez"
+      }
+    },
+    "phone": {
+      "search": "Orthophonie à Beyrouth",
+      "filterLanguage": "Arabe",
+      "filterWeek": "Cette semaine",
+      "results": "Orthophonistes près de chez vous",
+      "verified": "Vérifié",
+      "nextSlot": "Prochain : {slot}",
+      "viewProfile": "Voir le profil",
+      "people": {
+        "rana": {
+          "name": "Rana Haddad",
+          "initials": "RH",
+          "role": "Orthophoniste",
+          "place": "Achrafieh, Beyrouth",
+          "slot": "mar. 16h00"
+        },
+        "karim": {
+          "name": "Karim Nassar",
+          "initials": "KN",
+          "role": "Orthophoniste",
+          "place": "Hamra, Beyrouth",
+          "slot": "mer. 10h30"
+        },
+        "maya": {
+          "name": "Maya Khoury",
+          "initials": "MK",
+          "role": "Orthophoniste",
+          "place": "Verdun, Beyrouth",
+          "slot": "jeu. 14h00"
+        }
+      }
+    },
+    "password": {
+      "show": "Afficher le mot de passe",
+      "hide": "Masquer le mot de passe",
+      "requirements": "Exigences du mot de passe",
+      "length": "8 à 64 caractères",
+      "personal": "Ne contient ni « nemouw » ni la partie de votre e-mail avant @",
+      "common": "Pas un mot de passe courant comme « password123 »",
+      "met": "Fait",
+      "notMet": "Pas encore"
+    },
+    "fields": {
+      "email": "Adresse e-mail",
+      "emailPlaceholder": "jean.dupont@exemple.com",
+      "password": "Mot de passe"
+    },
+    "spamHint": "Vous ne le trouvez pas ? Vérifiez vos courriers indésirables."
+  },
+  "Signup": {
+    "metaTitle": "Créez votre compte spécialiste",
+    "metaDescription": "Créez votre compte spécialiste sur Nemouw pour que les patients de tout le Liban trouvent votre cabinet.",
+    "title": "Créez votre compte spécialiste",
+    "description": "Nous vous enverrons un code à 6 chiffres par e-mail pour confirmer votre adresse.",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "submit": "Recevoir mon code",
+    "submitting": "Envoi du code…",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "logIn": "Se connecter",
+    "errors": {
+      "emailTaken": "Un compte utilise déjà cette adresse e-mail.",
+      "logInInstead": "Se connecter",
+      "codeAlreadySent": "Nous avons envoyé un code à cette adresse il y a moins d'une minute. Consultez votre boîte de réception ou réessayez dans {seconds, plural, one {# seconde} other {# secondes}}."
+    }
+  },
+  "Verify": {
+    "metaTitle": "Vérifiez votre e-mail",
+    "title": "Consultez vos e-mails",
+    "description": "Saisissez le code à 6 chiffres envoyé à <strong>{email}</strong>. Il expire dans 10 minutes.",
+    "codeLabel": "Code de vérification",
+    "submit": "Vérifier l'e-mail",
+    "submitting": "Vérification…",
+    "resendPrompt": "Vous n'avez pas reçu le code ?",
+    "resend": "Renvoyer le code",
+    "resending": "Envoi…",
+    "resendIn": "Renvoyer le code dans {time}",
+    "resent": "Nous avons envoyé un nouveau code à <strong>{email}</strong>.",
+    "wrongEmail": "Mauvaise adresse ?",
+    "changeEmail": "La modifier",
+    "errors": {
+      "invalidCode": "Ce code est incorrect ou a expiré. Réessayez ou demandez un nouveau code."
+    }
+  },
+  "Password": {
+    "metaTitle": "Choisissez votre mot de passe",
+    "title": "Choisissez un mot de passe",
+    "description": "Vous l'utiliserez avec votre adresse e-mail pour vous connecter à Nemouw.",
+    "submit": "Créer mon compte",
+    "submitting": "Création de votre compte…",
+    "errors": {
+      "setupExpired": "Cette étape a expiré. Confirmez à nouveau votre adresse e-mail pour continuer.",
+      "getNewCode": "Recevoir un nouveau code"
+    }
+  },
+  "Login": {
+    "metaTitle": "Connexion",
+    "title": "Connectez-vous à Nemouw",
+    "description": "Bon retour. Utilisez l'adresse e-mail et le mot de passe de votre inscription.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submit": "Se connecter",
+    "submitting": "Connexion…",
+    "noAccount": "Nouveau sur Nemouw ?",
+    "createAccount": "Créer un compte spécialiste",
+    "errors": {
+      "invalidCredentials": "Adresse e-mail ou mot de passe incorrect.",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "suspended": "Ce compte a été suspendu. Si vous pensez qu'il s'agit d'une erreur, contactez le support Nemouw.",
+      "notVerified": "Confirmez votre adresse e-mail pour terminer la création de votre compte.",
+      "verifyEmail": "Recevoir un code"
+    }
+  },
+  "ForgotPassword": {
+    "metaTitle": "Réinitialisez votre mot de passe",
+    "title": "Réinitialisez votre mot de passe",
+    "description": "Saisissez l'adresse e-mail de votre inscription. Nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+    "submit": "Envoyer le lien",
+    "submitting": "Envoi du lien…",
+    "sentTitle": "Consultez vos e-mails",
+    "sentDescription": "Si un compte existe pour <strong>{email}</strong>, nous lui avons envoyé un lien pour réinitialiser votre mot de passe. Le lien expire dans 60 minutes.",
+    "resendPrompt": "Vous n'avez pas reçu l'e-mail ?",
+    "resend": "Le renvoyer",
+    "resending": "Envoi…",
+    "resendIn": "Le renvoyer dans {time}",
+    "resent": "Nous avons envoyé un nouveau lien à <strong>{email}</strong>.",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
+    "logIn": "Se connecter"
+  },
+  "ResetPassword": {
+    "metaTitle": "Choisissez un nouveau mot de passe",
+    "title": "Choisissez un nouveau mot de passe",
+    "description": "Vous l'utiliserez désormais pour vous connecter à Nemouw.",
+    "submit": "Enregistrer le mot de passe",
+    "submitting": "Enregistrement…",
+    "doneTitle": "Mot de passe modifié",
+    "doneDescription": "Votre nouveau mot de passe est enregistré. Connectez-vous pour continuer.",
+    "logIn": "Se connecter",
+    "errors": {
+      "invalidLink": "Ce lien a expiré ou a déjà été utilisé.",
+      "requestNewLink": "Demander un nouveau lien"
+    }
+  },
+  "Onboarding": {
+    "metaTitle": "Configurez votre profil",
+    "title": "Configurez votre profil",
+    "description": "Choisissez votre nom d'utilisateur public et confirmez votre adhésion à votre syndicat. Vous compléterez le reste de votre profil ensuite.",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "dr.rana-haddad",
+    "usernameHint": "3 à 30 lettres, chiffres, points, tirets ou tirets bas. Il devient le lien de votre profil public.",
+    "syndicate": "Syndicat",
+    "syndicatePlaceholder": "Choisissez votre syndicat",
+    "syndicatesLoading": "Chargement des syndicats…",
+    "syndicatesFailed": "Impossible de charger les syndicats.",
+    "retry": "Réessayer",
+    "syndicatesEmpty": "Aucun syndicat n'est encore disponible. Contactez le support Nemouw.",
+    "memberNumber": "Numéro d'adhérent",
+    "memberNumberPlaceholder": "12345",
+    "memberNumberHint": "Votre numéro d'adhérent dans ce syndicat. Il nous sert à vérifier vos diplômes.",
+    "submit": "Terminer",
+    "submitting": "Enregistrement…",
+    "errors": {
+      "usernameFormat": "Utilisez uniquement des lettres, chiffres, points, tirets et tirets bas",
+      "usernameTaken": "Ce nom d'utilisateur est déjà pris. Essayez-en un autre.",
+      "usernameUnavailable": "Ce nom d'utilisateur n'est pas disponible. Essayez-en un autre.",
+      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat."
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "Metadata": {
+    "title": "Administration Nemouw",
+    "description": "Tableau de bord du personnel pour la vérification des qualifications et la modération."
+  },
+  "Common": {
+    "toggleTheme": "Changer de thème",
+    "language": "Langue"
+  },
+  "Dashboard": {
+    "tagline": "Tableau de bord du personnel : vérification des qualifications et modération."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez n'existe pas.",
+    "backHome": "Retour à l'accueil"
+  }
+}

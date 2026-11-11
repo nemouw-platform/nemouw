@@ -1,0 +1,224 @@
+{
+  "Metadata": {
+    "title": "Nemouw",
+    "description": "Find verified allied health specialists in Lebanon."
+  },
+  "Common": {
+    "toggleTheme": "Toggle theme",
+    "language": "Language"
+  },
+  "Navbar": {
+    "mainNav": "Main",
+    "findSpecialist": "Find a specialist",
+    "howItWorks": "How it works",
+    "forSpecialists": "For specialists",
+    "logIn": "Log in",
+    "join": "Join as a specialist",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "HomePage": {
+    "tagline": "Public site for patients and specialists."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist.",
+    "backHome": "Back to home"
+  },
+  "Auth": {
+    "brand": {
+      "headline": "Let patients across Lebanon <em>find you</em>.",
+      "description": "Nemouw helps patients find verified speech, occupational and psychomotor therapists, special educators and other allied health specialists."
+    },
+    "step": "Step {current} of {total}.",
+    "copyright": "© {year} Nemouw",
+    "errors": {
+      "network": "We can't reach Nemouw right now. Check your connection and try again.",
+      "unexpected": "Something went wrong on our side. Please try again.",
+      "tooManyRequests": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
+      "required": "{field} is required",
+      "tooShort": "Use at least {min} characters",
+      "tooLong": "Use {max} characters or fewer",
+      "incompleteCode": "Enter all {length} digits",
+      "field": {
+        "REQUIRED": "This field is required",
+        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
+        "TOO_SHORT": "This is too short",
+        "TOO_LONG": "This is too long",
+        "TOO_COMMON": "This password is too common",
+        "CONTAINS_PERSONAL_INFO": "Don't include “nemouw” or the part of your email before @",
+        "INVALID_ROLE": "Only specialists can create an account",
+        "INVALID_FORMAT": "Check the format and try again"
+      }
+    },
+    "phone": {
+      "search": "Speech therapy in Beirut",
+      "filterLanguage": "Arabic",
+      "filterWeek": "This week",
+      "results": "Speech therapists near you",
+      "verified": "Verified",
+      "nextSlot": "Next: {slot}",
+      "viewProfile": "View profile",
+      "people": {
+        "rana": {
+          "name": "Rana Haddad",
+          "initials": "RH",
+          "role": "Speech therapist",
+          "place": "Achrafieh, Beirut",
+          "slot": "Tue, 4:00 PM"
+        },
+        "karim": {
+          "name": "Karim Nassar",
+          "initials": "KN",
+          "role": "Speech therapist",
+          "place": "Hamra, Beirut",
+          "slot": "Wed, 10:30 AM"
+        },
+        "maya": {
+          "name": "Maya Khoury",
+          "initials": "MK",
+          "role": "Speech therapist",
+          "place": "Verdun, Beirut",
+          "slot": "Thu, 2:00 PM"
+        }
+      }
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password",
+      "requirements": "Password requirements",
+      "length": "8 to 64 characters",
+      "personal": "Doesn't include “nemouw” or the part of your email before @",
+      "common": "Not a common password like “password123”",
+      "met": "Done",
+      "notMet": "Not yet"
+    },
+    "fields": {
+      "email": "Email address",
+      "emailPlaceholder": "john.doe@example.com",
+      "password": "Password"
+    },
+    "spamHint": "Can't find it? Check your spam folder."
+  },
+  "Signup": {
+    "metaTitle": "Create your specialist account",
+    "metaDescription": "Create your specialist account on Nemouw so patients across Lebanon can find your practice.",
+    "title": "Create your specialist account",
+    "description": "We'll email you a 6-digit code to confirm your email.",
+    "firstName": "First name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "submit": "Send my code",
+    "submitting": "Sending code…",
+    "haveAccount": "Already have an account?",
+    "logIn": "Log in",
+    "errors": {
+      "emailTaken": "An account already uses this email.",
+      "logInInstead": "Log in instead",
+      "codeAlreadySent": "We sent a code to this email less than a minute ago. Check your inbox, or try again in {seconds, plural, one {# second} other {# seconds}}."
+    }
+  },
+  "Verify": {
+    "metaTitle": "Verify your email",
+    "title": "Check your email",
+    "description": "Enter the 6-digit code we sent to <strong>{email}</strong>. It expires in 10 minutes.",
+    "codeLabel": "Verification code",
+    "submit": "Verify email",
+    "submitting": "Verifying…",
+    "resendPrompt": "Didn't get the code?",
+    "resend": "Resend code",
+    "resending": "Sending…",
+    "resendIn": "Resend code in {time}",
+    "resent": "We sent a new code to <strong>{email}</strong>.",
+    "wrongEmail": "Wrong email?",
+    "changeEmail": "Change it",
+    "errors": {
+      "invalidCode": "This code is wrong or has expired. Try again, or send a new code."
+    }
+  },
+  "Password": {
+    "metaTitle": "Choose your password",
+    "title": "Choose a password",
+    "description": "You'll use it with your email to log in to Nemouw.",
+    "submit": "Create my account",
+    "submitting": "Creating your account…",
+    "errors": {
+      "setupExpired": "This step has expired. Confirm your email again to continue.",
+      "getNewCode": "Get a new code"
+    }
+  },
+  "Login": {
+    "metaTitle": "Log in",
+    "title": "Log in to Nemouw",
+    "description": "Welcome back. Use the email and password you signed up with.",
+    "forgotPassword": "Forgot password?",
+    "submit": "Log in",
+    "submitting": "Logging in…",
+    "noAccount": "New to Nemouw?",
+    "createAccount": "Create a specialist account",
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "resetPassword": "Reset your password",
+      "suspended": "This account has been suspended. If you think this is a mistake, contact Nemouw support.",
+      "notVerified": "Confirm your email to finish creating your account.",
+      "verifyEmail": "Get a code"
+    }
+  },
+  "ForgotPassword": {
+    "metaTitle": "Reset your password",
+    "title": "Reset your password",
+    "description": "Enter the email you signed up with. We'll send you a link to choose a new password.",
+    "submit": "Send reset link",
+    "submitting": "Sending link…",
+    "sentTitle": "Check your email",
+    "sentDescription": "If an account exists for <strong>{email}</strong>, we sent it a link to reset your password. The link expires in 60 minutes.",
+    "resendPrompt": "Didn't get the email?",
+    "resend": "Send it again",
+    "resending": "Sending…",
+    "resendIn": "Send it again in {time}",
+    "resent": "We sent another link to <strong>{email}</strong>.",
+    "rememberPassword": "Remember your password?",
+    "logIn": "Log in"
+  },
+  "ResetPassword": {
+    "metaTitle": "Choose a new password",
+    "title": "Choose a new password",
+    "description": "You'll use it to log in to Nemouw from now on.",
+    "submit": "Save new password",
+    "submitting": "Saving…",
+    "doneTitle": "Password changed",
+    "doneDescription": "Your new password is set. Log in to continue.",
+    "logIn": "Log in",
+    "errors": {
+      "invalidLink": "This link has expired or was already used.",
+      "requestNewLink": "Request a new link"
+    }
+  },
+  "Onboarding": {
+    "metaTitle": "Set up your profile",
+    "title": "Set up your profile",
+    "description": "Pick your public username and confirm your syndicate membership. You can fill in the rest of your profile next.",
+    "username": "Username",
+    "usernamePlaceholder": "dr.rana-haddad",
+    "usernameHint": "3 to 30 letters, numbers, dots, dashes or underscores. It becomes your public profile link.",
+    "syndicate": "Syndicate",
+    "syndicatePlaceholder": "Choose your syndicate",
+    "syndicatesLoading": "Loading syndicates…",
+    "syndicatesFailed": "We couldn't load the syndicates.",
+    "retry": "Try again",
+    "syndicatesEmpty": "No syndicates are available yet. Contact Nemouw support.",
+    "memberNumber": "Member number",
+    "memberNumberPlaceholder": "12345",
+    "memberNumberHint": "Your membership number in this syndicate. We use it to verify your credentials.",
+    "submit": "Finish setup",
+    "submitting": "Saving…",
+    "errors": {
+      "usernameFormat": "Use only letters, numbers, dots, dashes and underscores",
+      "usernameTaken": "This username is taken. Try another.",
+      "usernameUnavailable": "This username isn't available. Try another.",
+      "memberNumberTaken": "This member number is already registered with this syndicate."
+    }
+  }
+}
