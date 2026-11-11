@@ -4,4676 +4,4661 @@
  */
 
 export interface paths {
-  "/auth/signup": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Sign up (step 1 of 3)
-     * @description Creates a pending account and emails a one-time code. Next: verifySignupOtp. Only SignupRole roles can self-register.
-     */
-    post: operations["signup"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/verify-otp": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Verify the signup code (step 2 of 3)
-     * @description Proves mailbox ownership and sets a short-lived setup cookie, accepted only by setInitialPassword. Every failure returns the same 400.
-     */
-    post: operations["verifySignupOtp"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/resend-otp": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Resend the signup code
-     * @description Always 202, so account existence is not revealed. Throttled per account.
-     */
-    post: operations["resendSignupOtp"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/password/setup": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Choose a password and start the session (step 3 of 3)
-     * @description Sets the first password, activates the account, and starts a session. Needs the setup cookie from verifySignupOtp.
-     */
-    post: operations["setInitialPassword"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/login": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Log in
-     * @description identifier is an email, phone, or username. Wrong credentials, unknown identifiers, and deleted accounts all return 401; only a correct password reveals a suspended or unverified account (403).
-     */
-    post: operations["login"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/refresh": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Rotate the session
-     * @description Rotates both cookies. Refresh tokens are single-use; reuse after a short grace window revokes the session.
-     */
-    post: operations["refreshToken"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/logout": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Log out
-     * @description Revokes the refresh token if present and clears both cookies. Always `204`.
-     */
-    post: operations["logout"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/password/forgot": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Request a password reset email
-     * @description Always `202`, so account existence is not revealed. Throttled per account; `429` carries `Retry-After`.
-     */
-    post: operations["forgotPassword"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/auth/password/reset": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Complete a password reset or invite
-     * @description Sets a new password from a single-use, expiring token. Also sets the first password for invited admins and syndicate staff, activating a pending account. Success revokes all sessions.
-     */
-    post: operations["resetPassword"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/users/me": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /**
-     * Delete the authenticated user's account
-     * @description Marks the account deleted, revokes all sessions, and removes a specialist profile from discovery. Data is purged at purge_scheduled_for. Not available to admin or syndicate staff.
-     */
-    delete: operations["deleteMyAccount"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admins": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List admins */
-    get: operations["listAdmins"]
-    put?: never
-    /**
-     * Invite an admin
-     * @description Creates a `pending` admin and emails a first-password link.
-     */
-    post: operations["inviteAdmin"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admins/{userId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get an admin */
-    get: operations["getAdmin"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admins/{userId}/suspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Suspend an admin
-     * @description Blocks login. Reversible with `unsuspendAdmin`.
-     */
-    post: operations["suspendAdmin"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admins/{userId}/unsuspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Lift an admin's suspension */
-    post: operations["unsuspendAdmin"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admin/users": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List users of any role
-     * @description Account-level view. Specialists who have not onboarded appear here but in no syndicate roster.
-     */
-    get: operations["listUsers"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admin/users/{userId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get a user of any role */
-    get: operations["getUser"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /**
-     * Update a user's account fields
-     * @description Account-level fields only. Role, status, and verification change through their own endpoints.
-     */
-    patch: operations["updateUser"]
-    trace?: never
-  }
-  "/admin/users/{userId}/suspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Suspend a non-admin user
-     * @description Sets `UserStatus` to `suspended`, blocking login. Specialist verification is unchanged. Suspended accounts are never purged.
-     *
-     *     `409` for admin targets (use `suspendAdmin`) and deleted accounts.
-     */
-    post: operations["suspendUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admin/users/{userId}/unsuspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Lift a non-admin user's suspension
-     * @description Sets `UserStatus` back to `active`. Specialist verification is unchanged.
-     *
-     *     `409` for admin targets (use `unsuspendAdmin`) and deleted accounts.
-     */
-    post: operations["unsuspendUser"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialties": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List specialties */
-    get: operations["listSpecialties"]
-    put?: never
-    /** Add a specialty */
-    post: operations["createSpecialty"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialties/{specialtyId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /** Update a specialty */
-    patch: operations["updateSpecialty"]
-    trace?: never
-  }
-  "/conditions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List conditions
-     * @description Global list, not scoped by specialty.
-     */
-    get: operations["listConditions"]
-    put?: never
-    /** Add a condition */
-    post: operations["createCondition"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/conditions/{conditionId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /**
-     * Delete a condition
-     * @description Admin only; syndicate staff can create and edit but not delete.
-     */
-    delete: operations["deleteCondition"]
-    options?: never
-    head?: never
-    /** Update a condition */
-    patch: operations["updateCondition"]
-    trace?: never
-  }
-  "/countries": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List countries */
-    get: operations["listCountries"]
-    put?: never
-    /** Add a country */
-    post: operations["createCountry"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/countries/{countryId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get a country */
-    get: operations["getCountry"]
-    put?: never
-    post?: never
-    /**
-     * Delete a country
-     * @description Fails with `409` while the country is in use.
-     */
-    delete: operations["deleteCountry"]
-    options?: never
-    head?: never
-    /** Update a country */
-    patch: operations["updateCountry"]
-    trace?: never
-  }
-  "/syndicates": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List syndicates
-     * @description Public. Used by specialists to pick a syndicate during onboarding.
-     */
-    get: operations["listSyndicates"]
-    put?: never
-    /**
-     * Create a syndicate with its owner
-     * @description Creates the syndicate and a pending owner, then emails the owner a first-password link. One syndicate per country and specialty.
-     */
-    post: operations["createSyndicate"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/syndicates/{syndicateId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get a syndicate */
-    get: operations["getSyndicate"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    /**
-     * Update a syndicate
-     * @description Specialty and country are fixed at creation.
-     */
-    patch: operations["updateSyndicate"]
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/staff": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List a syndicate's staff */
-    get: operations["listSyndicateStaff"]
-    put?: never
-    /**
-     * Invite staff to a syndicate
-     * @description Creates a `pending` non-owner staff account and emails a first-password link.
-     */
-    post: operations["inviteSyndicateStaff"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/staff/{staffId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get a staff member */
-    get: operations["getSyndicateStaff"]
-    put?: never
-    post?: never
-    /**
-     * Remove a staff member
-     * @description Deletes the staff association and the user account; access is revoked immediately. The owner cannot be removed; hand over ownership first with `changeSyndicateOwner`.
-     */
-    delete: operations["removeSyndicateStaff"]
-    options?: never
-    head?: never
-    /** Update a staff member's title */
-    patch: operations["updateSyndicateStaff"]
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/staff/{staffId}/email": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Fix a pending staff email and re-send the invite
-     * @description Fixes a mistyped or expired invite while the account is pending, and re-sends it. Bypasses the resend throttle.
-     */
-    put: operations["changePendingStaffEmail"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/owner": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Hand ownership to another staff member
-     * @description The new owner must already be staff of this syndicate. The previous owner stays as regular staff.
-     */
-    put: operations["changeSyndicateOwner"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/specialists": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List a syndicate's specialists
-     * @description Every specialist of the syndicate in any verification or account status, unlike public discovery.
-     */
-    get: operations["listSyndicateSpecialists"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/admin/specialists": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List all specialists
-     * @description Global counterpart of `listSyndicateSpecialists`.
-     */
-    get: operations["listAllSpecialists"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/syndicates/{syndicateId}/credentials": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List a syndicate's credential review queue */
-    get: operations["listSyndicateCredentialQueue"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/credentials/{credentialId}/verify": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Approve a credential
-     * @description Independent of the specialist's overall verification, which only changes through `verifySpecialist`.
-     */
-    post: operations["verifyCredential"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/credentials/{credentialId}/reject": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Reject a credential */
-    post: operations["rejectCredential"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/credentials/{credentialId}/document": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get a temporary link to a credential's document
-     * @description Returns a temporary link to the private document, for review.
-     */
-    get: operations["getCredentialDocumentLink"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/by-id/{specialistId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get a specialist for staff review
-     * @description Bypasses the discovery gate, so pending and rejected profiles are included.
-     */
-    get: operations["getSpecialistForReview"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/by-id/{specialistId}/verify": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Verify a specialist
-     * @description Makes the profile eligible for discovery. Does not affect login.
-     */
-    post: operations["verifySpecialist"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/by-id/{specialistId}/reject": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Reject a specialist
-     * @description Removes the profile from discovery. Does not affect login. A later `verifySpecialist` reinstates it.
-     */
-    post: operations["rejectSpecialist"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/by-id/{specialistId}/suspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Suspend a specialist
-     * @description Same effect as `suspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
-     */
-    post: operations["suspendSpecialist"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/by-id/{specialistId}/unsuspend": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Lift a specialist's suspension
-     * @description Same effect as `unsuspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
-     */
-    post: operations["unsuspendSpecialist"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get the authenticated specialist's profile
-     * @description Locale-specific content lives under `/specialists/me/profiles/{locale}`.
-     */
-    get: operations["getMySpecialistProfile"]
-    put?: never
-    /**
-     * Complete onboarding
-     * @description Creates the specialist profile with the required fields; everything else starts `null`. `specialty_id` is derived from `syndicate_id`; `verification_status` starts `pending`.
-     *
-     *     Until this succeeds, other `/specialists/me/**` endpoints, including image and credential-document uploads, return `403 ONBOARDING_REQUIRED`.
-     */
-    post: operations["createMySpecialistProfile"]
-    delete?: never
-    options?: never
-    head?: never
-    /**
-     * Update the authenticated specialist's profile
-     * @description Partial update. syndicate_id is locked after verification and needs syndicate_member_number in the same request. min_age_treated must not exceed max_age_treated.
-     */
-    patch: operations["updateMySpecialistProfile"]
-    trace?: never
-  }
-  "/specialists/me/profiles": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List profile content for all locales */
-    get: operations["listMyProfileContent"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/profiles/{locale}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get profile content for a locale */
-    get: operations["getMyProfileContent"]
-    /** Create or replace profile content for a locale */
-    put: operations["upsertMyProfileContent"]
-    post?: never
-    /**
-     * Remove profile content for a locale
-     * @description Public lookups for that locale then fall back to the default.
-     */
-    delete: operations["deleteMyProfileContent"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/locations": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List locations */
-    get: operations["listMyLocations"]
-    put?: never
-    /**
-     * Add a location
-     * @description The first location is always primary; a later one becomes primary only with is_primary: true. Duplicate coordinates return 409.
-     */
-    post: operations["addLocation"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/locations/{locationId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Replace a location
-     * @description Full replacement. Demoting the current primary is refused with 409.
-     */
-    put: operations["updateLocation"]
-    post?: never
-    /**
-     * Remove a location
-     * @description Also removes its availability windows. The primary can’t be removed while others exist.
-     */
-    delete: operations["deleteLocation"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/availabilities": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List availability windows
-     * @description Ordered by weekday starting Monday, then by `start_time`.
-     */
-    get: operations["listMyAvailabilities"]
-    put?: never
-    /** Add an availability window */
-    post: operations["addAvailability"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/availabilities/{availabilityId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** Replace an availability window */
-    put: operations["updateAvailability"]
-    post?: never
-    /** Remove an availability window */
-    delete: operations["deleteAvailability"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/conditions": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List treated condition ids */
-    get: operations["listMyTreatedConditions"]
-    /**
-     * Replace treated conditions
-     * @description Full replacement, not a diff.
-     */
-    put: operations["replaceMyTreatedConditions"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/template": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get the profile template */
-    get: operations["getMyTemplate"]
-    /**
-     * Update the profile template
-     * @description Partial update. An omitted field is unchanged; an explicit `null` clears it.
-     */
-    put: operations["updateMyTemplate"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/profile-picture": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Set or replace the profile picture
-     * @description Replaces the current picture and returns its public url. JPEG, PNG, or WebP.
-     */
-    put: operations["setMyProfilePicture"]
-    post?: never
-    /**
-     * Remove the profile picture
-     * @description Removes the picture. Succeeds even when none is set.
-     */
-    delete: operations["deleteMyProfilePicture"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/cover-image": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /**
-     * Set or replace the cover image
-     * @description Replaces the current cover image and returns its public url. JPEG, PNG, or WebP.
-     */
-    put: operations["setMyCoverImage"]
-    post?: never
-    /**
-     * Remove the cover image
-     * @description Removes the cover image. Succeeds even when none is set.
-     */
-    delete: operations["deleteMyCoverImage"]
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/credentials": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** List credentials */
-    get: operations["listMyCredentials"]
-    put?: never
-    /**
-     * Submit a credential
-     * @description Sent with its private document as multipart/form-data (JPEG, PNG, WebP, or PDF) and routed to the review queue of the specialist’s syndicate.
-     */
-    post: operations["submitCredential"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/credentials/{credentialId}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get a credential */
-    get: operations["getMyCredential"]
-    put?: never
-    post?: never
-    /**
-     * Withdraw a credential
-     * @description Allowed in any status. Also deletes the attached document.
-     */
-    delete: operations["withdrawCredential"]
-    options?: never
-    head?: never
-    /**
-     * Edit a credential
-     * @description Allowed while pending or rejected; a rejected credential returns to pending for review. A verified credential cannot be edited; withdraw it and submit a new one.
-     */
-    patch: operations["updateCredential"]
-    trace?: never
-  }
-  "/specialists/me/credentials/{credentialId}/document": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get a temporary link to the credential's document
-     * @description Returns a temporary link to the private document.
-     */
-    get: operations["getMyCredentialDocumentLink"]
-    /**
-     * Replace a pending credential's document
-     * @description Allowed while pending or rejected (a rejected credential returns to pending). Verified credentials can’t be changed.
-     */
-    put: operations["replaceCredentialDocument"]
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/analytics": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get daily analytics
-     * @description Daily rows for charts. For a summary, use `getMyDashboard`.
-     */
-    get: operations["getMyAnalytics"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/me/dashboard": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get the dashboard summary
-     * @description Totals, trailing-window figures, verification status, and display fields for the home screen. For daily figures, use `getMyAnalytics`.
-     */
-    get: operations["getMyDashboard"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Search specialists
-     * @description Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`).
-     */
-    get: operations["searchSpecialists"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/{username}": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get a public profile
-     * @description Public. `404` unless the specialist is discoverable. Hide the contact button when `whatsapp_number` is `null`. The response `locale` reports the locale actually used. `credentials` lists only verified credentials that have not expired.
-     */
-    get: operations["getPublicSpecialistProfile"]
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  "/specialists/{username}/events": {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Record a profile view or WhatsApp click
-     * @description Public. Events are deduplicated per specialist, visitor, and event type per day; duplicates still return `202`. Events without `visitor_id` count toward totals but not unique visitors. The username is resolved to the specialist id before storage.
-     */
-    post: operations["recordAnalyticsEvent"]
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
+    "/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign up (step 1 of 3)
+         * @description Creates a pending account and emails a one-time code. Next: verifySignupOtp. Only SignupRole roles can self-register.
+         */
+        post: operations["signup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/verify-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify the signup code (step 2 of 3)
+         * @description Proves mailbox ownership and sets a short-lived setup cookie, accepted only by setInitialPassword. Every failure returns the same 400.
+         */
+        post: operations["verifySignupOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/resend-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend the signup code
+         * @description Always 202, so account existence is not revealed. Throttled per account.
+         */
+        post: operations["resendSignupOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/password/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Choose a password and start the session (step 3 of 3)
+         * @description Sets the first password, activates the account, and starts a session. Needs the setup cookie from verifySignupOtp.
+         */
+        post: operations["setInitialPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log in
+         * @description identifier is an email, phone, or username. Wrong credentials, unknown identifiers, and deleted accounts all return 401; only a correct password reveals a suspended or unverified account (403).
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rotate the session
+         * @description Rotates both cookies. Refresh tokens are single-use; reuse after a short grace window revokes the session.
+         */
+        post: operations["refreshToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log out
+         * @description Revokes the refresh token if present and clears both cookies. Always `204`.
+         */
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/password/forgot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request a password reset email
+         * @description Always `202`, so account existence is not revealed. Throttled per account; `429` carries `Retry-After`.
+         */
+        post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/password/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a password reset or invite
+         * @description Sets a new password from a single-use, expiring token. Also sets the first password for invited admins and syndicate staff, activating a pending account. Success revokes all sessions.
+         */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete the authenticated user's account
+         * @description Marks the account deleted, revokes all sessions, and removes a specialist profile from discovery. Data is purged at purge_scheduled_for. Not available to admin or syndicate staff.
+         */
+        delete: operations["deleteMyAccount"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List admins */
+        get: operations["listAdmins"];
+        put?: never;
+        /**
+         * Invite an admin
+         * @description Creates a `pending` admin and emails a first-password link.
+         */
+        post: operations["inviteAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admins/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an admin */
+        get: operations["getAdmin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admins/{userId}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend an admin
+         * @description Blocks login. Reversible with `unsuspendAdmin`.
+         */
+        post: operations["suspendAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admins/{userId}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lift an admin's suspension */
+        post: operations["unsuspendAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List users of any role
+         * @description Account-level view. Specialists who have not onboarded appear here but in no syndicate roster.
+         */
+        get: operations["listUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a user of any role */
+        get: operations["getUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a user's account fields
+         * @description Account-level fields only. Role, status, and verification change through their own endpoints.
+         */
+        patch: operations["updateUser"];
+        trace?: never;
+    };
+    "/admin/users/{userId}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend a non-admin user
+         * @description Sets `UserStatus` to `suspended`, blocking login. Specialist verification is unchanged. Suspended accounts are never purged.
+         *
+         *     `409` for admin targets (use `suspendAdmin`) and deleted accounts.
+         */
+        post: operations["suspendUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/users/{userId}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lift a non-admin user's suspension
+         * @description Sets `UserStatus` back to `active`. Specialist verification is unchanged.
+         *
+         *     `409` for admin targets (use `unsuspendAdmin`) and deleted accounts.
+         */
+        post: operations["unsuspendUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List specialties */
+        get: operations["listSpecialties"];
+        put?: never;
+        /** Add a specialty */
+        post: operations["createSpecialty"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialties/{specialtyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a specialty */
+        patch: operations["updateSpecialty"];
+        trace?: never;
+    };
+    "/conditions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List conditions
+         * @description Global list, not scoped by specialty.
+         */
+        get: operations["listConditions"];
+        put?: never;
+        /** Add a condition */
+        post: operations["createCondition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/conditions/{conditionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a condition
+         * @description Admin only; syndicate staff can create and edit but not delete.
+         */
+        delete: operations["deleteCondition"];
+        options?: never;
+        head?: never;
+        /** Update a condition */
+        patch: operations["updateCondition"];
+        trace?: never;
+    };
+    "/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List countries */
+        get: operations["listCountries"];
+        put?: never;
+        /** Add a country */
+        post: operations["createCountry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/countries/{countryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a country */
+        get: operations["getCountry"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a country
+         * @description Fails with `409` while the country is in use.
+         */
+        delete: operations["deleteCountry"];
+        options?: never;
+        head?: never;
+        /** Update a country */
+        patch: operations["updateCountry"];
+        trace?: never;
+    };
+    "/syndicates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List syndicates
+         * @description Public. Used by specialists to pick a syndicate during onboarding.
+         */
+        get: operations["listSyndicates"];
+        put?: never;
+        /**
+         * Create a syndicate with its owner
+         * @description Creates the syndicate and a pending owner, then emails the owner a first-password link. One syndicate per country and specialty.
+         */
+        post: operations["createSyndicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a syndicate */
+        get: operations["getSyndicate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a syndicate
+         * @description Specialty and country are fixed at creation.
+         */
+        patch: operations["updateSyndicate"];
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a syndicate's staff */
+        get: operations["listSyndicateStaff"];
+        put?: never;
+        /**
+         * Invite staff to a syndicate
+         * @description Creates a `pending` non-owner staff account and emails a first-password link.
+         */
+        post: operations["inviteSyndicateStaff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/staff/{staffId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a staff member */
+        get: operations["getSyndicateStaff"];
+        put?: never;
+        post?: never;
+        /**
+         * Remove a staff member
+         * @description Deletes the staff association and the user account; access is revoked immediately. The owner cannot be removed; hand over ownership first with `changeSyndicateOwner`.
+         */
+        delete: operations["removeSyndicateStaff"];
+        options?: never;
+        head?: never;
+        /** Update a staff member's title */
+        patch: operations["updateSyndicateStaff"];
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/staff/{staffId}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Fix a pending staff email and re-send the invite
+         * @description Fixes a mistyped or expired invite while the account is pending, and re-sends it. Bypasses the resend throttle.
+         */
+        put: operations["changePendingStaffEmail"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/owner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Hand ownership to another staff member
+         * @description The new owner must already be staff of this syndicate. The previous owner stays as regular staff.
+         */
+        put: operations["changeSyndicateOwner"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/specialists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a syndicate's specialists
+         * @description Every specialist of the syndicate in any verification or account status, unlike public discovery.
+         */
+        get: operations["listSyndicateSpecialists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/specialists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all specialists
+         * @description Global counterpart of `listSyndicateSpecialists`.
+         */
+        get: operations["listAllSpecialists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/syndicates/{syndicateId}/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a syndicate's credential review queue */
+        get: operations["listSyndicateCredentialQueue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credentials/{credentialId}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve a credential
+         * @description Independent of the specialist's overall verification, which only changes through `verifySpecialist`.
+         */
+        post: operations["verifyCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credentials/{credentialId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject a credential */
+        post: operations["rejectCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/credentials/{credentialId}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a temporary link to a credential's document
+         * @description Returns a temporary link to the private document, for review.
+         */
+        get: operations["getCredentialDocumentLink"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/by-id/{specialistId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a specialist for staff review
+         * @description Bypasses the discovery gate, so pending and rejected profiles are included.
+         */
+        get: operations["getSpecialistForReview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/by-id/{specialistId}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify a specialist
+         * @description Makes the profile eligible for discovery. Does not affect login.
+         */
+        post: operations["verifySpecialist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/by-id/{specialistId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject a specialist
+         * @description Removes the profile from discovery. Does not affect login. A later `verifySpecialist` reinstates it.
+         */
+        post: operations["rejectSpecialist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/by-id/{specialistId}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Suspend a specialist
+         * @description Same effect as `suspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
+         */
+        post: operations["suspendSpecialist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/by-id/{specialistId}/unsuspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lift a specialist's suspension
+         * @description Same effect as `unsuspendUser`, scoped to syndicate staff for their own specialists. Verification status is unchanged. `409` if the account is deleted.
+         */
+        post: operations["unsuspendSpecialist"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the authenticated specialist's profile
+         * @description Locale-specific content lives under `/specialists/me/profiles/{locale}`.
+         */
+        get: operations["getMySpecialistProfile"];
+        put?: never;
+        /**
+         * Complete onboarding
+         * @description Creates the specialist profile with the required fields; everything else starts `null`. `specialty_id` is derived from `syndicate_id`; `verification_status` starts `pending`.
+         *
+         *     Until this succeeds, other `/specialists/me/**` endpoints, including image and credential-document uploads, return `403 ONBOARDING_REQUIRED`.
+         */
+        post: operations["createMySpecialistProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update the authenticated specialist's profile
+         * @description Partial update. syndicate_id is locked after verification and needs syndicate_member_number in the same request. min_age_treated must not exceed max_age_treated.
+         */
+        patch: operations["updateMySpecialistProfile"];
+        trace?: never;
+    };
+    "/specialists/me/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List profile content for all locales */
+        get: operations["listMyProfileContent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/profiles/{locale}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get profile content for a locale */
+        get: operations["getMyProfileContent"];
+        /** Create or replace profile content for a locale */
+        put: operations["upsertMyProfileContent"];
+        post?: never;
+        /**
+         * Remove profile content for a locale
+         * @description Public lookups for that locale then fall back to the default.
+         */
+        delete: operations["deleteMyProfileContent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List locations */
+        get: operations["listMyLocations"];
+        put?: never;
+        /**
+         * Add a location
+         * @description The first location is always primary; a later one becomes primary only with is_primary: true. Duplicate coordinates return 409.
+         */
+        post: operations["addLocation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/locations/{locationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace a location
+         * @description Full replacement. Demoting the current primary is refused with 409.
+         */
+        put: operations["updateLocation"];
+        post?: never;
+        /**
+         * Remove a location
+         * @description Also removes its availability windows. The primary can’t be removed while others exist.
+         */
+        delete: operations["deleteLocation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/availabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List availability windows
+         * @description Ordered by weekday starting Monday, then by `start_time`.
+         */
+        get: operations["listMyAvailabilities"];
+        put?: never;
+        /** Add an availability window */
+        post: operations["addAvailability"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/availabilities/{availabilityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace an availability window */
+        put: operations["updateAvailability"];
+        post?: never;
+        /** Remove an availability window */
+        delete: operations["deleteAvailability"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/conditions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List treated condition ids */
+        get: operations["listMyTreatedConditions"];
+        /**
+         * Replace treated conditions
+         * @description Full replacement, not a diff.
+         */
+        put: operations["replaceMyTreatedConditions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the profile template */
+        get: operations["getMyTemplate"];
+        /**
+         * Update the profile template
+         * @description Partial update. An omitted field is unchanged; an explicit `null` clears it.
+         */
+        put: operations["updateMyTemplate"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/profile-picture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set or replace the profile picture
+         * @description Replaces the current picture and returns its public url. JPEG, PNG, or WebP.
+         */
+        put: operations["setMyProfilePicture"];
+        post?: never;
+        /**
+         * Remove the profile picture
+         * @description Removes the picture. Succeeds even when none is set.
+         */
+        delete: operations["deleteMyProfilePicture"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/cover-image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set or replace the cover image
+         * @description Replaces the current cover image and returns its public url. JPEG, PNG, or WebP.
+         */
+        put: operations["setMyCoverImage"];
+        post?: never;
+        /**
+         * Remove the cover image
+         * @description Removes the cover image. Succeeds even when none is set.
+         */
+        delete: operations["deleteMyCoverImage"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List credentials */
+        get: operations["listMyCredentials"];
+        put?: never;
+        /**
+         * Submit a credential
+         * @description Sent with its private document as multipart/form-data (JPEG, PNG, WebP, or PDF) and routed to the review queue of the specialist’s syndicate.
+         */
+        post: operations["submitCredential"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/credentials/{credentialId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a credential */
+        get: operations["getMyCredential"];
+        put?: never;
+        post?: never;
+        /**
+         * Withdraw a credential
+         * @description Allowed in any status. Also deletes the attached document.
+         */
+        delete: operations["withdrawCredential"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit a credential
+         * @description Allowed while pending or rejected; a rejected credential returns to pending for review. A verified credential cannot be edited; withdraw it and submit a new one.
+         */
+        patch: operations["updateCredential"];
+        trace?: never;
+    };
+    "/specialists/me/credentials/{credentialId}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a temporary link to the credential's document
+         * @description Returns a temporary link to the private document.
+         */
+        get: operations["getMyCredentialDocumentLink"];
+        /**
+         * Replace a pending credential's document
+         * @description Allowed while pending or rejected (a rejected credential returns to pending). Verified credentials can’t be changed.
+         */
+        put: operations["replaceCredentialDocument"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get daily analytics
+         * @description Daily rows for charts. For a summary, use `getMyDashboard`.
+         */
+        get: operations["getMyAnalytics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/me/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the dashboard summary
+         * @description Totals, trailing-window figures, verification status, and display fields for the home screen. For daily figures, use `getMyAnalytics`.
+         */
+        get: operations["getMyDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search specialists
+         * @description Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`).
+         */
+        get: operations["searchSpecialists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/{username}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a public profile
+         * @description Public. `404` unless the specialist is discoverable. Hide the contact button when `whatsapp_number` is `null`. The response `locale` reports the locale actually used. `credentials` lists only verified credentials that have not expired.
+         */
+        get: operations["getPublicSpecialistProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/{username}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a profile view or WhatsApp click
+         * @description Public. Events are deduplicated per specialist, visitor, and event type per day; duplicates still return `202`. Events without `visitor_id` count toward totals but not unique visitors. The username is resolved to the specialist id before storage.
+         */
+        post: operations["recordAnalyticsEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-export type webhooks = Record<string, never>
+export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /** @enum {string} */
-    Role: "admin" | "syndicate_staff" | "specialist" | "patient"
-    /**
-     * @description Roles that can self-register.
-     * @enum {string}
-     */
-    SignupRole: "specialist"
-    /**
-     * @description Account login status.
-     *     - `pending`: signed up or invited, not yet activated.
-     *     - `active`: can log in.
-     *     - `suspended`: blocked by moderation; never purged.
-     *     - `deleted`: blocked; purged after a retention period.
-     * @enum {string}
-     */
-    UserStatus: "pending" | "active" | "suspended" | "deleted"
-    /**
-     * @description Verification status of a specialist profile, independent of `UserStatus`. Suspend and unsuspend change only `UserStatus`; verify and reject change only this field.
-     *     Login requires `UserStatus = active`. Discovery requires `UserStatus = active` and verification `active`.
-     * @default pending
-     * @enum {string}
-     */
-    SpecialistVerificationStatus: "pending" | "active" | "rejected"
-    /**
-     * @default en
-     * @enum {string}
-     */
-    Locale: "en" | "ar" | "fr"
-    UserSummary: {
-      /** Format: uuid */
-      id?: string
-      first_name?: string
-      last_name?: string
-      /** Format: email */
-      email?: string
-      role?: components["schemas"]["Role"]
-      user_status?: components["schemas"]["UserStatus"]
-      /** Format: date-time */
-      created_at?: string
-    }
-    UserDetail: components["schemas"]["UserSummary"] & {
-      /** Format: uuid */
-      country_id?: string | null
-      preferred_language?: string | null
-      /** Format: date-time */
-      last_login_at?: string | null
-      /** Format: date-time */
-      deleted_at?: string | null
-    }
-    UserUpdateRequest: {
-      first_name?: string
-      last_name?: string
-      /** Format: uuid */
-      country_id?: string | null
-      preferred_language?: string | null
-    }
-    UserPage: {
-      data?: components["schemas"]["UserDetail"][]
-      page?: number
-      page_size?: number
-      total?: number
-    }
-    SignupRequest: {
-      role: components["schemas"]["SignupRole"]
-      first_name: string
-      last_name: string
-      /** Format: email */
-      email: string
-      locale?: components["schemas"]["Locale"]
-    }
-    SignupResponse: {
-      /** Format: email */
-      email?: string
-      /** Format: date-time */
-      otp_expires_at?: string
-    }
-    VerifyOtpRequest: {
-      /** Format: email */
-      email: string
-      /** @example 482913 */
-      code: string
-    }
-    ResendOtpRequest: {
-      /** Format: email */
-      email: string
-      locale?: components["schemas"]["Locale"]
-    }
-    PasswordSetupResponse: {
-      /**
-       * @description Setup cookie lifetime in seconds.
-       * @example 900
-       */
-      expires_in: number
-    }
-    SetPasswordRequest: {
-      /** Format: password */
-      password: string
-    }
-    LoginRequest: {
-      /** @description Email, phone, or username. */
-      identifier: string
-      /** Format: password */
-      password: string
-    }
-    SessionResponse: {
-      /** Format: uuid */
-      user_id: string
-      role: components["schemas"]["Role"]
-      /**
-       * @description Access token lifetime in seconds.
-       * @example 900
-       */
-      expires_in: number
-    }
-    ForgotPasswordRequest: {
-      /** Format: email */
-      email: string
-      locale?: components["schemas"]["Locale"]
-    }
-    ResetPasswordRequest: {
-      token: string
-      /** Format: password */
-      new_password: string
-    }
-    AdminInviteRequest: {
-      first_name: string
-      last_name: string
-      /** Format: email */
-      email: string
-    }
-    /** @description Public-safe shape with no contact or staff detail. */
-    SyndicateSummary: {
-      /** Format: uuid */
-      id?: string
-      name?: string
-      /** Format: uuid */
-      specialty_id?: string
-      /** Format: uuid */
-      country_id?: string
-    }
-    SyndicateCreateRequest: {
-      name: string
-      /** Format: uuid */
-      specialty_id: string
-      /** Format: uuid */
-      country_id: string
-      /** Format: email */
-      contact_email: string
-      contact_phone?: string
-      owner_first_name: string
-      owner_last_name: string
-      /** Format: email */
-      owner_email: string
-    }
-    SyndicateUpdateRequest: {
-      name?: string
-      /** Format: email */
-      contact_email?: string
-      contact_phone?: string
-    }
-    SyndicateResponse: {
-      /** Format: uuid */
-      id?: string
-      name?: string
-      /** Format: uuid */
-      specialty_id?: string
-      /** Format: uuid */
-      country_id?: string
-      /** Format: email */
-      contact_email?: string
-      contact_phone?: string
-      status?: string
-      owner?: components["schemas"]["SyndicateStaffResponse"]
-      /** Format: date-time */
-      created_at?: string
-    }
-    SyndicateStaffInviteRequest: {
-      first_name: string
-      last_name: string
-      /** Format: email */
-      email: string
-      /** @example Registrar */
-      title: string
-    }
-    SyndicateStaffUpdateRequest: {
-      title: string
-    }
-    SyndicateStaffResponse: {
-      /** Format: uuid */
-      id?: string
-      /** Format: uuid */
-      syndicate_id?: string
-      user?: components["schemas"]["UserSummary"]
-      title?: string | null
-      /** @description Exactly one staff member per syndicate is the owner. */
-      is_owner?: boolean
-      /** Format: date-time */
-      created_at?: string
-    }
-    SyndicateStaffEmailRequest: {
-      /** Format: email */
-      email: string
-    }
-    SyndicateOwnerChangeRequest: {
-      /** Format: uuid */
-      staff_id: string
-    }
-    /** @description Management-table row; includes status fields the public search result omits. */
-    SpecialistManagementRow: {
-      /** Format: uuid */
-      id?: string
-      username?: string
-      /** Format: uuid */
-      syndicate_id?: string
-      syndicate_member_number?: string
-      /** Format: uuid */
-      specialty_id?: string
-      verification_status?: components["schemas"]["SpecialistVerificationStatus"]
-      user_status?: components["schemas"]["UserStatus"]
-      pending_credentials_count?: number
-      /** Format: date-time */
-      created_at?: string
-    }
-    SpecialistManagementPage: {
-      data?: components["schemas"]["SpecialistManagementRow"][]
-      page?: number
-      page_size?: number
-      total?: number
-    }
-    /**
-     * @description Stored lowercase. Reserved words are rejected. Used as the public URL slug, never as an internal key.
-     * @example dr.jane-doe
-     */
-    Username: string
-    SpecialistOnboardingRequest: {
-      username: components["schemas"]["Username"]
-      /** Format: uuid */
-      syndicate_id: string
-      syndicate_member_number: string
-    }
-    SpecialistUpdateRequest: {
-      /** Format: uuid */
-      syndicate_id?: string
-      syndicate_member_number?: string
-      username?: components["schemas"]["Username"]
-      gender?: string | null
-      whatsapp_number?: string | null
-      primary_language?: string | null
-      years_of_experience?: number | null
-      min_age_treated?: number | null
-      max_age_treated?: number | null
-    }
-    SpecialistResponse: {
-      /** Format: uuid */
-      id?: string
-      /** Format: uuid */
-      user_id?: string
-      /** Format: uuid */
-      readonly specialty_id?: string
-      /** Format: uuid */
-      syndicate_id?: string
-      syndicate_member_number?: string
-      username?: string
-      gender?: string | null
-      whatsapp_number?: string | null
-      primary_language?: string | null
-      years_of_experience?: number | null
-      profile_picture_url?: string | null
-      cover_image_url?: string | null
-      min_age_treated?: number | null
-      max_age_treated?: number | null
-      verification_status?: components["schemas"]["SpecialistVerificationStatus"]
-      /** Format: date-time */
-      verified_at?: string | null
-      /** Format: date-time */
-      created_at?: string
-      /** Format: date-time */
-      updated_at?: string
-    }
-    AccountDeletionResponse: {
-      /** Format: date-time */
-      deleted_at?: string
-      /** Format: date-time */
-      purge_scheduled_for?: string
-    }
-    SpecialistProfileResponse: {
-      /** Format: uuid */
-      specialist_id?: string
-      locale_code?: components["schemas"]["Locale"]
-      title?: string | null
-      headline?: string | null
-      bio?: string | null
-      /** Format: date-time */
-      created_at?: string
-      /** Format: date-time */
-      updated_at?: string
-    }
-    SpecialistProfileWriteRequest: {
-      title?: string
-      headline?: string
-      bio?: string
-    }
-    SpecialistLocation: {
-      /** Format: uuid */
-      id?: string
-      /** Format: uuid */
-      country_id?: string
-      label?: string | null
-      city?: string
-      address_line1?: string | null
-      address_line2?: string | null
-      latitude?: number | null
-      longitude?: number | null
-      phone?: string | null
-      is_primary?: boolean
-    }
-    SpecialistLocationWriteRequest: {
-      /** Format: uuid */
-      country_id: string
-      label?: string
-      address_line1?: string
-      address_line2?: string
-      city: string
-      latitude?: number
-      longitude?: number
-      phone?: string
-      /** @description See `addLocation` and `updateLocation` for how this is applied. */
-      is_primary?: boolean
-    }
-    /** @enum {string} */
-    WeekDay:
-      | "monday"
-      | "tuesday"
-      | "wednesday"
-      | "thursday"
-      | "friday"
-      | "saturday"
-      | "sunday"
-    /**
-     * @description 24-hour `HH:mm`.
-     * @example 09:00
-     */
-    ClockTime: string
-    SpecialistAvailability: {
-      /** Format: uuid */
-      id?: string
-      /** Format: uuid */
-      location_id?: string | null
-      day_of_week?: components["schemas"]["WeekDay"]
-      start_time?: components["schemas"]["ClockTime"]
-      end_time?: components["schemas"]["ClockTime"]
-    }
-    SpecialistAvailabilityWriteRequest: {
-      /**
-       * Format: uuid
-       * @description Omit for a window not tied to a location.
-       */
-      location_id?: string | null
-      day_of_week: components["schemas"]["WeekDay"]
-      start_time: components["schemas"]["ClockTime"]
-      /** @description Must be after `start_time`. */
-      end_time: components["schemas"]["ClockTime"]
-    }
-    TreatedConditionsWriteRequest: {
-      condition_ids: string[]
-    }
-    SpecialistTemplateResponse: {
-      /** Format: uuid */
-      specialist_id?: string
-      /** @description Free-form, template-defined JSON. */
-      content?: Record<string, never>
-      primary_color?: string | null
-      /** Format: date-time */
-      created_at?: string
-      /** Format: date-time */
-      updated_at?: string
-    }
-    SpecialistTemplateWriteRequest: {
-      content?: Record<string, never>
-      primary_color?: string | null
-    }
-    ImageUploadRequest: {
-      /**
-       * Format: binary
-       * @description The image file.
-       */
-      file: string
-    }
-    ImageResponse: {
-      /** @description Public URL. Changes on every upload. */
-      url?: string
-      /** @example image/webp */
-      mime_type?: string
-    }
-    CredentialDocumentUploadRequest: {
-      /**
-       * Format: binary
-       * @description The document file.
-       */
-      document: string
-    }
-    /** @description File metadata. The file itself is private. */
-    CredentialDocument: {
-      /** @example application/pdf */
-      mime_type?: string
-      /** Format: date-time */
-      uploaded_at?: string
-    }
-    DocumentAccessResponse: {
-      /** @description Temporary link. Do not store or share it. */
-      url?: string
-      /** Format: date-time */
-      expires_at?: string
-    }
-    /** @enum {string} */
-    CredentialType: "degree" | "license" | "certification" | "membership"
-    /** @enum {string} */
-    CredentialsVerificationStatus: "pending" | "verified" | "rejected"
-    CredentialUpdateRequest: {
-      credential_type: components["schemas"]["CredentialType"]
-      title: string
-      issuing_organization: string
-      credential_number?: string
-      /** Format: date */
-      issue_date?: string
-      /** Format: date */
-      expiry_date?: string | null
-    }
-    CredentialCreateRequest: components["schemas"]["CredentialUpdateRequest"] & {
-      /**
-       * Format: binary
-       * @description The document file.
-       */
-      document: string
-    }
-    RejectionRequest: {
-      rejection_reason: string
-    }
-    CredentialResponse: {
-      /** Format: uuid */
-      id?: string
-      /** Format: uuid */
-      specialist_id?: string
-      credential_type?: components["schemas"]["CredentialType"]
-      title?: string
-      issuing_organization?: string
-      credential_number?: string | null
-      /** Format: date */
-      issue_date?: string | null
-      /** Format: date */
-      expiry_date?: string | null
-      document?: components["schemas"]["CredentialDocument"]
-      verification_status?: components["schemas"]["CredentialsVerificationStatus"]
-      /** Format: uuid */
-      reviewed_by?: string | null
-      /** Format: date-time */
-      reviewed_at?: string | null
-      rejection_reason?: string | null
-      /** Format: date-time */
-      created_at?: string
-      /** Format: date-time */
-      updated_at?: string
-    }
-    Specialty: {
-      /** Format: uuid */
-      id?: string
-      code?: string
-      name?: string
-      label?: string
-      label_fr?: string
-      label_ar?: string
-      description?: string | null
-      is_active?: boolean
-    }
-    /** @description `code`, `name`, and `label` are required on create. */
-    SpecialtyWriteRequest: {
-      code?: string
-      name?: string
-      label?: string
-      label_fr?: string
-      label_ar?: string
-      description?: string
-      /** @default true */
-      is_active: boolean
-    }
-    Condition: {
-      /** Format: uuid */
-      id?: string
-      code?: string
-      name?: string
-      label?: string
-      label_fr?: string
-      label_ar?: string
-      description?: string | null
-      is_active?: boolean
-    }
-    /** @description `code`, `name`, and `label` are required on create. */
-    ConditionWriteRequest: {
-      code?: string
-      name?: string
-      label?: string
-      label_fr?: string
-      label_ar?: string
-      description?: string
-      /** @default true */
-      is_active: boolean
-    }
-    Country: {
-      /** Format: uuid */
-      id?: string
-      name?: string
-      /** @example LB */
-      iso_code?: string
-      /** @example LBP */
-      currency_code?: string
-      /** @example +961 */
-      phone_code?: string
-      region?: string | null
-      is_active?: boolean
-      /** Format: date-time */
-      created_at?: string
-      /** Format: date-time */
-      updated_at?: string
-    }
-    /** @description `iso_code`, `name`, `currency_code`, and `phone_code` are required on create. */
-    CountryWriteRequest: {
-      name?: string
-      iso_code?: string
-      currency_code?: string
-      phone_code?: string
-      region?: string
-      /** @default true */
-      is_active: boolean
-    }
-    SpecialistSearchResult: {
-      /** Format: uuid */
-      id?: string
-      username?: string
-      title?: string | null
-      headline?: string | null
-      /** Format: uuid */
-      specialty_id?: string
-      city?: string | null
-      /** Format: uuid */
-      country_id?: string | null
-      profile_picture_url?: string | null
-      years_of_experience?: number | null
-      primary_language?: string | null
-    }
-    SpecialistSearchPage: {
-      data?: components["schemas"]["SpecialistSearchResult"][]
-      page?: number
-      page_size?: number
-      total?: number
-    }
-    SpecialistPublicProfile: {
-      /** Format: uuid */
-      id?: string
-      username?: string
-      /** @description Locale actually used for `title`, `headline`, and `bio`. */
-      locale?: components["schemas"]["Locale"]
-      title?: string | null
-      headline?: string | null
-      bio?: string | null
-      /** Format: uuid */
-      specialty_id?: string
-      gender?: string | null
-      years_of_experience?: number | null
-      primary_language?: string | null
-      whatsapp_number?: string | null
-      min_age_treated?: number | null
-      max_age_treated?: number | null
-      profile_picture_url?: string | null
-      cover_image_url?: string | null
-      treated_condition_ids?: string[]
-      locations?: components["schemas"]["SpecialistLocation"][]
-      availabilities?: components["schemas"]["SpecialistAvailability"][]
-      credentials?: components["schemas"]["PublicCredential"][]
-    }
-    /** @description Verified, unexpired credentials only. */
-    PublicCredential: {
-      credential_type?: components["schemas"]["CredentialType"]
-      title?: string
-      issuing_organization?: string
-      /** Format: date */
-      issue_date?: string | null
-      /** Format: date */
-      expiry_date?: string | null
-      /** Format: date-time */
-      verified_at?: string
-      verified_by_syndicate?: {
-        /** Format: uuid */
-        id?: string
-        name?: string
-      }
-    }
-    /** @enum {string} */
-    AnalyticsEventType: "profile_view" | "whatsapp_click"
-    AnalyticsEventRequest: {
-      event_type: components["schemas"]["AnalyticsEventType"]
-      /** @description Client-generated id used for deduplication and unique-visitor counts. */
-      visitor_id?: string
-    }
-    AnalyticsDailyRow: {
-      /** Format: date */
-      date?: string
-      profile_views?: number
-      unique_visitors?: number
-      whatsapp_clicks?: number
-    }
-    AnalyticsSummaryResponse: {
-      data?: components["schemas"]["AnalyticsDailyRow"][]
-    }
-    DashboardResponse: {
-      first_name?: string
-      last_name?: string
-      profile_picture_url?: string | null
-      verification_status?: components["schemas"]["SpecialistVerificationStatus"]
-      pending_credentials_count?: number
-      total_profile_views?: number
-      total_unique_visitors?: number
-      total_whatsapp_clicks?: number
-      profile_views_last_7_days?: number
-      profile_views_last_30_days?: number
-      whatsapp_clicks_last_7_days?: number
-      whatsapp_clicks_last_30_days?: number
-    }
-    Error: {
-      /** @description HTTP status code. */
-      status: number
-      /** @description Stable, machine-readable error code. */
-      code: string
-      /** @description Human-readable summary. */
-      message: string
-      /**
-       * @description Correlation id to quote to support.
-       * @example 01J8Z3F8N6K9X2Q4R7T1V5W8YB
-       */
-      trace_id?: string | null
-    }
-    /** @description Returned only for `422`. */
-    ValidationErrorBody: components["schemas"]["Error"] & {
-      errors: components["schemas"]["FieldError"][]
-    }
-    FieldError: {
-      /** @description Dot-notation for nested fields. */
-      field: string
-      /** @enum {string} */
-      code:
-        | "REQUIRED"
-        | "MUST_BE_EMAIL"
-        | "TOO_SHORT"
-        | "TOO_LONG"
-        | "TOO_COMMON"
-        | "CONTAINS_PERSONAL_INFO"
-        | "INVALID_ROLE"
-        | "INVALID_FORMAT"
-      message: string
-    }
-  }
-  responses: {
-    /** @description Request failed validation */
-    ValidationError: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+    schemas: {
+        /** @enum {string} */
+        Role: "admin" | "syndicate_staff" | "specialist" | "patient";
         /**
-         * @example {
-         *       "status": 422,
-         *       "code": "VALIDATION_ERROR",
-         *       "message": "Validation failed",
-         *       "errors": [
-         *         {
-         *           "field": "email",
-         *           "code": "MUST_BE_EMAIL",
-         *           "message": "must be a valid email address"
-         *         }
-         *       ]
-         *     }
+         * @description Roles that can self-register.
+         * @enum {string}
          */
-        "application/json": components["schemas"]["ValidationErrorBody"]
-      }
-    }
-    /** @description The resource already exists or the state does not allow the change */
-    Conflict: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        SignupRole: "specialist";
         /**
-         * @example {
-         *       "status": 409,
-         *       "code": "USERNAME_TAKEN",
-         *       "message": "Username is already taken"
-         *     }
+         * @description Account login status.
+         *     - `pending`: signed up or invited, not yet activated.
+         *     - `active`: can log in.
+         *     - `suspended`: blocked by moderation; never purged.
+         *     - `deleted`: blocked; purged after a retention period.
+         * @enum {string}
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The account is deleted and awaiting purge */
-    AccountDeleted: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        UserStatus: "pending" | "active" | "suspended" | "deleted";
         /**
-         * @example {
-         *       "status": 409,
-         *       "code": "ACCOUNT_DELETED",
-         *       "message": "The account is deleted and awaiting purge"
-         *     }
+         * @description Verification status of a specialist profile, independent of `UserStatus`. Suspend and unsuspend change only `UserStatus`; verify and reject change only this field.
+         *     Login requires `UserStatus = active`. Discovery requires `UserStatus = active` and verification `active`.
+         * @default pending
+         * @enum {string}
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The credential is already verified */
-    CredentialVerified: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        SpecialistVerificationStatus: "pending" | "active" | "rejected";
         /**
-         * @example {
-         *       "status": 409,
-         *       "code": "CREDENTIAL_VERIFIED",
-         *       "message": "A verified credential cannot be changed, withdraw it and submit a new one"
-         *     }
+         * @default en
+         * @enum {string}
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description Resource not found */
-    NotFound: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        Locale: "en" | "ar" | "fr";
+        UserSummary: {
+            /** Format: uuid */
+            id?: string;
+            first_name?: string;
+            last_name?: string;
+            /** Format: email */
+            email?: string;
+            role?: components["schemas"]["Role"];
+            user_status?: components["schemas"]["UserStatus"];
+            /** Format: date-time */
+            created_at?: string;
+        };
+        UserDetail: components["schemas"]["UserSummary"] & {
+            /** Format: uuid */
+            country_id?: string | null;
+            preferred_language?: string | null;
+            /** Format: date-time */
+            last_login_at?: string | null;
+            /** Format: date-time */
+            deleted_at?: string | null;
+        };
+        UserUpdateRequest: {
+            first_name?: string;
+            last_name?: string;
+            /** Format: uuid */
+            country_id?: string | null;
+            preferred_language?: string | null;
+        };
+        UserPage: {
+            data?: components["schemas"]["UserDetail"][];
+            page?: number;
+            page_size?: number;
+            total?: number;
+        };
+        SignupRequest: {
+            role: components["schemas"]["SignupRole"];
+            first_name: string;
+            last_name: string;
+            /** Format: email */
+            email: string;
+            locale?: components["schemas"]["Locale"];
+        };
+        SignupResponse: {
+            /** Format: email */
+            email?: string;
+            /** Format: date-time */
+            otp_expires_at?: string;
+        };
+        VerifyOtpRequest: {
+            /** Format: email */
+            email: string;
+            /** @example 482913 */
+            code: string;
+        };
+        ResendOtpRequest: {
+            /** Format: email */
+            email: string;
+            locale?: components["schemas"]["Locale"];
+        };
+        PasswordSetupResponse: {
+            /**
+             * @description Setup cookie lifetime in seconds.
+             * @example 900
+             */
+            expires_in: number;
+        };
+        SetPasswordRequest: {
+            /** Format: password */
+            password: string;
+        };
+        LoginRequest: {
+            /** @description Email, phone, or username. */
+            identifier: string;
+            /** Format: password */
+            password: string;
+        };
+        SessionResponse: {
+            /** Format: uuid */
+            user_id: string;
+            role: components["schemas"]["Role"];
+            /**
+             * @description Access token lifetime in seconds.
+             * @example 900
+             */
+            expires_in: number;
+        };
+        ForgotPasswordRequest: {
+            /** Format: email */
+            email: string;
+            locale?: components["schemas"]["Locale"];
+        };
+        ResetPasswordRequest: {
+            token: string;
+            /** Format: password */
+            new_password: string;
+        };
+        AdminInviteRequest: {
+            first_name: string;
+            last_name: string;
+            /** Format: email */
+            email: string;
+        };
+        /** @description Public-safe shape with no contact or staff detail. */
+        SyndicateSummary: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            /** Format: uuid */
+            specialty_id?: string;
+            /** Format: uuid */
+            country_id?: string;
+        };
+        SyndicateCreateRequest: {
+            name: string;
+            /** Format: uuid */
+            specialty_id: string;
+            /** Format: uuid */
+            country_id: string;
+            /** Format: email */
+            contact_email: string;
+            contact_phone?: string;
+            owner_first_name: string;
+            owner_last_name: string;
+            /** Format: email */
+            owner_email: string;
+        };
+        SyndicateUpdateRequest: {
+            name?: string;
+            /** Format: email */
+            contact_email?: string;
+            contact_phone?: string;
+        };
+        SyndicateResponse: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            /** Format: uuid */
+            specialty_id?: string;
+            /** Format: uuid */
+            country_id?: string;
+            /** Format: email */
+            contact_email?: string;
+            contact_phone?: string;
+            status?: string;
+            owner?: components["schemas"]["SyndicateStaffResponse"];
+            /** Format: date-time */
+            created_at?: string;
+        };
+        SyndicateStaffInviteRequest: {
+            first_name: string;
+            last_name: string;
+            /** Format: email */
+            email: string;
+            /** @example Registrar */
+            title: string;
+        };
+        SyndicateStaffUpdateRequest: {
+            title: string;
+        };
+        SyndicateStaffResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            syndicate_id?: string;
+            user?: components["schemas"]["UserSummary"];
+            title?: string | null;
+            /** @description Exactly one staff member per syndicate is the owner. */
+            is_owner?: boolean;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        SyndicateStaffEmailRequest: {
+            /** Format: email */
+            email: string;
+        };
+        SyndicateOwnerChangeRequest: {
+            /** Format: uuid */
+            staff_id: string;
+        };
+        /** @description Management-table row; includes status fields the public search result omits. */
+        SpecialistManagementRow: {
+            /** Format: uuid */
+            id?: string;
+            username?: string;
+            /** Format: uuid */
+            syndicate_id?: string;
+            syndicate_member_number?: string;
+            /** Format: uuid */
+            specialty_id?: string;
+            verification_status?: components["schemas"]["SpecialistVerificationStatus"];
+            user_status?: components["schemas"]["UserStatus"];
+            pending_credentials_count?: number;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        SpecialistManagementPage: {
+            data?: components["schemas"]["SpecialistManagementRow"][];
+            page?: number;
+            page_size?: number;
+            total?: number;
+        };
         /**
-         * @example {
-         *       "status": 404,
-         *       "code": "NOT_FOUND",
-         *       "message": "Resource not found"
-         *     }
+         * @description Stored lowercase. Reserved words are rejected. Used as the public URL slug, never as an internal key.
+         * @example dr.jane-doe
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description Authenticated but not allowed */
-    Forbidden: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        Username: string;
+        SpecialistOnboardingRequest: {
+            username: components["schemas"]["Username"];
+            /** Format: uuid */
+            syndicate_id: string;
+            syndicate_member_number: string;
+        };
+        SpecialistUpdateRequest: {
+            /** Format: uuid */
+            syndicate_id?: string;
+            syndicate_member_number?: string;
+            username?: components["schemas"]["Username"];
+            gender?: string | null;
+            whatsapp_number?: string | null;
+            primary_language?: string | null;
+            years_of_experience?: number | null;
+            min_age_treated?: number | null;
+            max_age_treated?: number | null;
+        };
+        SpecialistResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            user_id?: string;
+            /** Format: uuid */
+            readonly specialty_id?: string;
+            /** Format: uuid */
+            syndicate_id?: string;
+            syndicate_member_number?: string;
+            username?: string;
+            gender?: string | null;
+            whatsapp_number?: string | null;
+            primary_language?: string | null;
+            years_of_experience?: number | null;
+            profile_picture_url?: string | null;
+            cover_image_url?: string | null;
+            min_age_treated?: number | null;
+            max_age_treated?: number | null;
+            verification_status?: components["schemas"]["SpecialistVerificationStatus"];
+            /** Format: date-time */
+            verified_at?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        AccountDeletionResponse: {
+            /** Format: date-time */
+            deleted_at?: string;
+            /** Format: date-time */
+            purge_scheduled_for?: string;
+        };
+        SpecialistProfileResponse: {
+            /** Format: uuid */
+            specialist_id?: string;
+            locale_code?: components["schemas"]["Locale"];
+            title?: string | null;
+            headline?: string | null;
+            bio?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        SpecialistProfileWriteRequest: {
+            title?: string;
+            headline?: string;
+            bio?: string;
+        };
+        SpecialistLocation: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            country_id?: string;
+            label?: string | null;
+            city?: string;
+            address_line1?: string | null;
+            address_line2?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            phone?: string | null;
+            is_primary?: boolean;
+        };
+        SpecialistLocationWriteRequest: {
+            /** Format: uuid */
+            country_id: string;
+            label?: string;
+            address_line1?: string;
+            address_line2?: string;
+            city: string;
+            latitude?: number;
+            longitude?: number;
+            phone?: string;
+            /** @description See `addLocation` and `updateLocation` for how this is applied. */
+            is_primary?: boolean;
+        };
+        /** @enum {string} */
+        WeekDay: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
         /**
-         * @example {
-         *       "status": 403,
-         *       "code": "FORBIDDEN",
-         *       "message": "You do not have permission to perform this action"
-         *     }
+         * @description 24-hour `HH:mm`.
+         * @example 09:00
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The specialist has not completed onboarding */
-    OnboardingRequired: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
+        ClockTime: string;
+        SpecialistAvailability: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            day_of_week?: components["schemas"]["WeekDay"];
+            start_time?: components["schemas"]["ClockTime"];
+            end_time?: components["schemas"]["ClockTime"];
+        };
+        SpecialistAvailabilityWriteRequest: {
+            /**
+             * Format: uuid
+             * @description Omit for a window not tied to a location.
+             */
+            location_id?: string | null;
+            day_of_week: components["schemas"]["WeekDay"];
+            start_time: components["schemas"]["ClockTime"];
+            /** @description Must be after `start_time`. */
+            end_time: components["schemas"]["ClockTime"];
+        };
+        TreatedConditionsWriteRequest: {
+            condition_ids: string[];
+        };
+        SpecialistTemplateResponse: {
+            /** Format: uuid */
+            specialist_id?: string;
+            /** @description Free-form, template-defined JSON. */
+            content?: Record<string, never>;
+            primary_color?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        SpecialistTemplateWriteRequest: {
+            content?: Record<string, never>;
+            primary_color?: string | null;
+        };
+        ImageUploadRequest: {
+            /**
+             * Format: binary
+             * @description The image file.
+             */
+            file: string;
+        };
+        ImageResponse: {
+            /** @description Public URL. Changes on every upload. */
+            url?: string;
+            /** @example image/webp */
+            mime_type?: string;
+        };
+        CredentialDocumentUploadRequest: {
+            /**
+             * Format: binary
+             * @description The document file.
+             */
+            document: string;
+        };
+        /** @description File metadata. The file itself is private. */
+        CredentialDocument: {
+            /** @example application/pdf */
+            mime_type?: string;
+            /** Format: date-time */
+            uploaded_at?: string;
+        };
+        DocumentAccessResponse: {
+            /** @description Temporary link. Do not store or share it. */
+            url?: string;
+            /** Format: date-time */
+            expires_at?: string;
+        };
+        /** @enum {string} */
+        CredentialType: "degree" | "license" | "certification" | "membership";
+        /** @enum {string} */
+        CredentialsVerificationStatus: "pending" | "verified" | "rejected";
+        CredentialUpdateRequest: {
+            credential_type: components["schemas"]["CredentialType"];
+            title: string;
+            issuing_organization: string;
+            credential_number?: string;
+            /** Format: date */
+            issue_date?: string;
+            /** Format: date */
+            expiry_date?: string | null;
+        };
+        CredentialCreateRequest: components["schemas"]["CredentialUpdateRequest"] & {
+            /**
+             * Format: binary
+             * @description The document file.
+             */
+            document: string;
+        };
+        RejectionRequest: {
+            rejection_reason: string;
+        };
+        CredentialResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            specialist_id?: string;
+            credential_type?: components["schemas"]["CredentialType"];
+            title?: string;
+            issuing_organization?: string;
+            credential_number?: string | null;
+            /** Format: date */
+            issue_date?: string | null;
+            /** Format: date */
+            expiry_date?: string | null;
+            document?: components["schemas"]["CredentialDocument"];
+            verification_status?: components["schemas"]["CredentialsVerificationStatus"];
+            /** Format: uuid */
+            reviewed_by?: string | null;
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            rejection_reason?: string | null;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        Specialty: {
+            /** Format: uuid */
+            id?: string;
+            code?: string;
+            name?: string;
+            label?: string;
+            label_fr?: string;
+            label_ar?: string;
+            description?: string | null;
+            is_active?: boolean;
+        };
+        /** @description `code`, `name`, and `label` are required on create. */
+        SpecialtyWriteRequest: {
+            code?: string;
+            name?: string;
+            label?: string;
+            label_fr?: string;
+            label_ar?: string;
+            description?: string;
+            /** @default true */
+            is_active: boolean;
+        };
+        Condition: {
+            /** Format: uuid */
+            id?: string;
+            code?: string;
+            name?: string;
+            label?: string;
+            label_fr?: string;
+            label_ar?: string;
+            description?: string | null;
+            is_active?: boolean;
+        };
+        /** @description `code`, `name`, and `label` are required on create. */
+        ConditionWriteRequest: {
+            code?: string;
+            name?: string;
+            label?: string;
+            label_fr?: string;
+            label_ar?: string;
+            description?: string;
+            /** @default true */
+            is_active: boolean;
+        };
+        Country: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            /** @example LB */
+            iso_code?: string;
+            /** @example LBP */
+            currency_code?: string;
+            /** @example +961 */
+            phone_code?: string;
+            region?: string | null;
+            is_active?: boolean;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        /** @description `iso_code`, `name`, `currency_code`, and `phone_code` are required on create. */
+        CountryWriteRequest: {
+            name?: string;
+            iso_code?: string;
+            currency_code?: string;
+            phone_code?: string;
+            region?: string;
+            /** @default true */
+            is_active: boolean;
+        };
+        SpecialistSearchResult: {
+            /** Format: uuid */
+            id?: string;
+            username?: string;
+            title?: string | null;
+            headline?: string | null;
+            /** Format: uuid */
+            specialty_id?: string;
+            city?: string | null;
+            /** Format: uuid */
+            country_id?: string | null;
+            profile_picture_url?: string | null;
+            years_of_experience?: number | null;
+            primary_language?: string | null;
+        };
+        SpecialistSearchPage: {
+            data?: components["schemas"]["SpecialistSearchResult"][];
+            page?: number;
+            page_size?: number;
+            total?: number;
+        };
+        SpecialistPublicProfile: {
+            /** Format: uuid */
+            id?: string;
+            username?: string;
+            /** @description Locale actually used for `title`, `headline`, and `bio`. */
+            locale?: components["schemas"]["Locale"];
+            title?: string | null;
+            headline?: string | null;
+            bio?: string | null;
+            /** Format: uuid */
+            specialty_id?: string;
+            gender?: string | null;
+            years_of_experience?: number | null;
+            primary_language?: string | null;
+            whatsapp_number?: string | null;
+            min_age_treated?: number | null;
+            max_age_treated?: number | null;
+            profile_picture_url?: string | null;
+            cover_image_url?: string | null;
+            treated_condition_ids?: string[];
+            locations?: components["schemas"]["SpecialistLocation"][];
+            availabilities?: components["schemas"]["SpecialistAvailability"][];
+            credentials?: components["schemas"]["PublicCredential"][];
+        };
+        /** @description Verified, unexpired credentials only. */
+        PublicCredential: {
+            credential_type?: components["schemas"]["CredentialType"];
+            title?: string;
+            issuing_organization?: string;
+            /** Format: date */
+            issue_date?: string | null;
+            /** Format: date */
+            expiry_date?: string | null;
+            /** Format: date-time */
+            verified_at?: string;
+            verified_by_syndicate?: {
+                /** Format: uuid */
+                id?: string;
+                name?: string;
+            };
+        };
+        /** @enum {string} */
+        AnalyticsEventType: "profile_view" | "whatsapp_click";
+        AnalyticsEventRequest: {
+            event_type: components["schemas"]["AnalyticsEventType"];
+            /** @description Client-generated id used for deduplication and unique-visitor counts. */
+            visitor_id?: string;
+        };
+        AnalyticsDailyRow: {
+            /** Format: date */
+            date?: string;
+            profile_views?: number;
+            unique_visitors?: number;
+            whatsapp_clicks?: number;
+        };
+        AnalyticsSummaryResponse: {
+            data?: components["schemas"]["AnalyticsDailyRow"][];
+        };
+        DashboardResponse: {
+            first_name?: string;
+            last_name?: string;
+            profile_picture_url?: string | null;
+            verification_status?: components["schemas"]["SpecialistVerificationStatus"];
+            pending_credentials_count?: number;
+            total_profile_views?: number;
+            total_unique_visitors?: number;
+            total_whatsapp_clicks?: number;
+            profile_views_last_7_days?: number;
+            profile_views_last_30_days?: number;
+            whatsapp_clicks_last_7_days?: number;
+            whatsapp_clicks_last_30_days?: number;
+        };
+        Error: {
+            /** @description HTTP status code. */
+            status: number;
+            /** @description Stable, machine-readable error code. */
+            code: string;
+            /** @description Human-readable summary. */
+            message: string;
+            /**
+             * @description Correlation id to quote to support.
+             * @example 01J8Z3F8N6K9X2Q4R7T1V5W8YB
+             */
+            trace_id?: string | null;
+        };
+        /** @description Returned only for `422`. */
+        ValidationErrorBody: components["schemas"]["Error"] & {
+            errors: components["schemas"]["FieldError"][];
+        };
+        FieldError: {
+            /** @description Dot-notation for nested fields. */
+            field: string;
+            /** @enum {string} */
+            code: "REQUIRED" | "MUST_BE_EMAIL" | "TOO_SHORT" | "TOO_LONG" | "TOO_COMMON" | "CONTAINS_PERSONAL_INFO" | "INVALID_ROLE" | "INVALID_FORMAT";
+            message: string;
+        };
+    };
+    responses: {
+        /** @description Request failed validation */
+        ValidationError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 422,
+                 *       "code": "VALIDATION_ERROR",
+                 *       "message": "Validation failed",
+                 *       "errors": [
+                 *         {
+                 *           "field": "email",
+                 *           "code": "MUST_BE_EMAIL",
+                 *           "message": "must be a valid email address"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                "application/json": components["schemas"]["ValidationErrorBody"];
+            };
+        };
+        /** @description The resource already exists or the state does not allow the change */
+        Conflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 409,
+                 *       "code": "USERNAME_TAKEN",
+                 *       "message": "Username is already taken"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The account is deleted and awaiting purge */
+        AccountDeleted: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 409,
+                 *       "code": "ACCOUNT_DELETED",
+                 *       "message": "The account is deleted and awaiting purge"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The credential is already verified */
+        CredentialVerified: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 409,
+                 *       "code": "CREDENTIAL_VERIFIED",
+                 *       "message": "A verified credential cannot be changed, withdraw it and submit a new one"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Resource not found */
+        NotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 404,
+                 *       "code": "NOT_FOUND",
+                 *       "message": "Resource not found"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Authenticated but not allowed */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 403,
+                 *       "code": "FORBIDDEN",
+                 *       "message": "You do not have permission to perform this action"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The specialist has not completed onboarding */
+        OnboardingRequired: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 403,
+                 *       "code": "ONBOARDING_REQUIRED",
+                 *       "message": "Complete onboarding first"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Request body is missing or not valid JSON */
+        MalformedJson: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 400,
+                 *       "code": "MALFORMED_JSON",
+                 *       "message": "Request body is not valid JSON"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description No session cookie, or the cookie is invalid, expired, or revoked */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Wrong password, unknown identifier, or an account with no password */
+        InvalidCredentials: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 401,
+                 *       "code": "INVALID_CREDENTIALS",
+                 *       "message": "Invalid email or password"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The refresh cookie is missing, invalid, expired, or already rotated */
+        InvalidRefreshToken: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 401,
+                 *       "code": "INVALID_TOKEN",
+                 *       "message": "Invalid or expired refresh token"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The token or code is invalid, expired, or already used */
+        InvalidOrExpiredToken: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 400,
+                 *       "code": "INVALID_OR_EXPIRED_TOKEN",
+                 *       "message": "The code is invalid or has expired"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Rate limit exceeded */
+        TooManyRequests: {
+            headers: {
+                /** @description Seconds until the caller may retry */
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 429,
+                 *       "code": "TOO_MANY_REQUESTS",
+                 *       "message": "Too many requests"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The file exceeds the limit for this upload */
+        FileTooLarge: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 413,
+                 *       "code": "FILE_TOO_LARGE",
+                 *       "message": "The file exceeds the allowed size"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The file type is not allowed for this upload */
+        UnsupportedFileType: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 415,
+                 *       "code": "UNSUPPORTED_FILE_TYPE",
+                 *       "message": "File type not allowed"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description The file is missing or unreadable */
+        InvalidFile: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 422,
+                 *       "code": "VALIDATION_ERROR",
+                 *       "message": "Validation failed",
+                 *       "errors": [
+                 *         {
+                 *           "field": "file",
+                 *           "code": "INVALID_FORMAT",
+                 *           "message": "the file could not be read"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                "application/json": components["schemas"]["ValidationErrorBody"];
+            };
+        };
+        /** @description Processing is at capacity; retry shortly */
+        MediaBusy: {
+            headers: {
+                /** @description Seconds until the caller may retry */
+                "Retry-After"?: number;
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "status": 503,
+                 *       "code": "MEDIA_BUSY",
+                 *       "message": "Try again shortly"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+    };
+    parameters: {
+        RefreshTokenCookie: string;
+        Page: number;
+        PageSize: number;
+        IsActive: boolean;
+        /** @description Locale for localized fields; falls back to the default. */
+        LocaleQuery: components["schemas"]["Locale"];
+        LocalePath: components["schemas"]["Locale"];
+        UserId: string;
+        SyndicateId: string;
+        StaffId: string;
+        ConditionId: string;
+        CredentialId: string;
+        SpecialistId: string;
+        LocationId: string;
+        AvailabilityId: string;
+        SpecialtyId: string;
+        CountryId: string;
+        Username: string;
+    };
+    requestBodies: never;
+    headers: {
         /**
-         * @example {
-         *       "status": 403,
-         *       "code": "ONBOARDING_REQUIRED",
-         *       "message": "Complete onboarding first"
-         *     }
+         * @description Sets two cookies:
+         *     - `access_token`: `HttpOnly; Secure; SameSite=Lax; Path=/`
+         *     - `refresh_token`: `HttpOnly; Secure; SameSite=Strict`, scoped to the auth endpoints
          */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description Request body is missing or not valid JSON */
-    MalformedJson: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 400,
-         *       "code": "MALFORMED_JSON",
-         *       "message": "Request body is not valid JSON"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description No session cookie, or the cookie is invalid, expired, or revoked */
-    Unauthorized: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description Wrong password, unknown identifier, or an account with no password */
-    InvalidCredentials: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 401,
-         *       "code": "INVALID_CREDENTIALS",
-         *       "message": "Invalid email or password"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The refresh cookie is missing, invalid, expired, or already rotated */
-    InvalidRefreshToken: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 401,
-         *       "code": "INVALID_TOKEN",
-         *       "message": "Invalid or expired refresh token"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The token or code is invalid, expired, or already used */
-    InvalidOrExpiredToken: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 400,
-         *       "code": "INVALID_OR_EXPIRED_TOKEN",
-         *       "message": "The code is invalid or has expired"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description Rate limit exceeded */
-    TooManyRequests: {
-      headers: {
-        /** @description Seconds until the caller may retry */
-        "Retry-After"?: number
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 429,
-         *       "code": "TOO_MANY_REQUESTS",
-         *       "message": "Too many requests"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The file exceeds the limit for this upload */
-    FileTooLarge: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 413,
-         *       "code": "FILE_TOO_LARGE",
-         *       "message": "The file exceeds the allowed size"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The file type is not allowed for this upload */
-    UnsupportedFileType: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 415,
-         *       "code": "UNSUPPORTED_FILE_TYPE",
-         *       "message": "File type not allowed"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-    /** @description The file is missing or unreadable */
-    InvalidFile: {
-      headers: {
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 422,
-         *       "code": "VALIDATION_ERROR",
-         *       "message": "Validation failed",
-         *       "errors": [
-         *         {
-         *           "field": "file",
-         *           "code": "INVALID_FORMAT",
-         *           "message": "the file could not be read"
-         *         }
-         *       ]
-         *     }
-         */
-        "application/json": components["schemas"]["ValidationErrorBody"]
-      }
-    }
-    /** @description Processing is at capacity; retry shortly */
-    MediaBusy: {
-      headers: {
-        /** @description Seconds until the caller may retry */
-        "Retry-After"?: number
-        [name: string]: unknown
-      }
-      content: {
-        /**
-         * @example {
-         *       "status": 503,
-         *       "code": "MEDIA_BUSY",
-         *       "message": "Try again shortly"
-         *     }
-         */
-        "application/json": components["schemas"]["Error"]
-      }
-    }
-  }
-  parameters: {
-    RefreshTokenCookie: string
-    Page: number
-    PageSize: number
-    IsActive: boolean
-    /** @description Locale for localized fields; falls back to the default. */
-    LocaleQuery: components["schemas"]["Locale"]
-    LocalePath: components["schemas"]["Locale"]
-    UserId: string
-    SyndicateId: string
-    StaffId: string
-    ConditionId: string
-    CredentialId: string
-    SpecialistId: string
-    LocationId: string
-    AvailabilityId: string
-    SpecialtyId: string
-    CountryId: string
-    Username: string
-  }
-  requestBodies: never
-  headers: {
-    /**
-     * @description Sets two cookies:
-     *     - `access_token`: `HttpOnly; Secure; SameSite=Lax; Path=/`
-     *     - `refresh_token`: `HttpOnly; Secure; SameSite=Strict`, scoped to the auth endpoints
-     */
-    SetAuthCookies: string
-    /** @description Sets `access_token` (`HttpOnly; Secure; SameSite=Lax; Path=/`) with no `refresh_token`, so it cannot become a session. */
-    SetSetupCookie: string
-    /** @description Expires `access_token` and `refresh_token` with the same attributes they were set with. */
-    ClearAuthCookies: string
-  }
-  pathItems: never
+        SetAuthCookies: string;
+        /** @description Sets `access_token` (`HttpOnly; Secure; SameSite=Lax; Path=/`) with no `refresh_token`, so it cannot become a session. */
+        SetSetupCookie: string;
+        /** @description Expires `access_token` and `refresh_token` with the same attributes they were set with. */
+        ClearAuthCookies: string;
+    };
+    pathItems: never;
 }
-export type $defs = Record<string, never>
+export type $defs = Record<string, never>;
 export interface operations {
-  signup: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SignupRequest"]
-      }
-    }
-    responses: {
-      /** @description Account created, code sent */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SignupResponse"]
-        }
-      }
-      400: components["responses"]["MalformedJson"]
-      /** @description The email belongs to a non-pending account */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "EMAIL_TAKEN",
-           *       "message": "Email is already registered"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  verifySignupOtp: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VerifyOtpRequest"]
-      }
-    }
-    responses: {
-      /** @description Mailbox verified, setup cookie set */
-      200: {
-        headers: {
-          "Set-Cookie": components["headers"]["SetSetupCookie"]
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["PasswordSetupResponse"]
-        }
-      }
-      400: components["responses"]["InvalidOrExpiredToken"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  resendSignupOtp: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ResendOtpRequest"]
-      }
-    }
-    responses: {
-      /** @description Code re-sent if the account is eligible */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      400: components["responses"]["MalformedJson"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  setInitialPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SetPasswordRequest"]
-      }
-    }
-    responses: {
-      /** @description Password set, session started */
-      200: {
-        headers: {
-          "Set-Cookie": components["headers"]["SetAuthCookies"]
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SessionResponse"]
-        }
-      }
-      400: components["responses"]["MalformedJson"]
-      401: components["responses"]["Unauthorized"]
-      403: components["responses"]["Forbidden"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  login: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LoginRequest"]
-      }
-    }
-    responses: {
-      /** @description Authenticated, session cookies set */
-      200: {
-        headers: {
-          "Set-Cookie": components["headers"]["SetAuthCookies"]
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SessionResponse"]
-        }
-      }
-      400: components["responses"]["MalformedJson"]
-      401: components["responses"]["InvalidCredentials"]
-      /** @description The password was correct but the account cannot log in */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  refreshToken: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: {
-        refresh_token?: components["parameters"]["RefreshTokenCookie"]
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Session rotated */
-      200: {
-        headers: {
-          "Set-Cookie": components["headers"]["SetAuthCookies"]
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SessionResponse"]
-        }
-      }
-      401: components["responses"]["InvalidRefreshToken"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  logout: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: {
-        refresh_token?: components["parameters"]["RefreshTokenCookie"]
-      }
-    }
-    requestBody?: never
-    responses: {
-      /** @description Session ended, cookies cleared */
-      204: {
-        headers: {
-          "Set-Cookie": components["headers"]["ClearAuthCookies"]
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  forgotPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ForgotPasswordRequest"]
-      }
-    }
-    responses: {
-      /** @description Email sent if the account exists */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      400: components["responses"]["MalformedJson"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  resetPassword: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ResetPasswordRequest"]
-      }
-    }
-    responses: {
-      /** @description Password set */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      400: components["responses"]["InvalidOrExpiredToken"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
-  deleteMyAccount: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Account deleted, purge scheduled */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AccountDeletionResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-    }
-  }
-  listAdmins: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Admin list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserSummary"][]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-    }
-  }
-  inviteAdmin: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdminInviteRequest"]
-      }
-    }
-    responses: {
-      /** @description Admin invited */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserSummary"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getAdmin: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Admin */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserSummary"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  suspendAdmin: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Admin suspended */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserSummary"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  unsuspendAdmin: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Suspension lifted */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserSummary"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  listUsers: {
-    parameters: {
-      query?: {
-        role?: components["schemas"]["Role"]
-        user_status?: components["schemas"]["UserStatus"]
-        /** @description Matches first name, last name, or email. */
-        search?: string
-        page?: components["parameters"]["Page"]
-        page_size?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description User page */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserPage"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-    }
-  }
-  getUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description User */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserDetail"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  updateUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UserUpdateRequest"]
-      }
-    }
-    responses: {
-      /** @description User updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserDetail"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  suspendUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description User suspended */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserDetail"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      /** @description The target is an admin or a deleted account */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "INVALID_TARGET",
-           *       "message": "Target account cannot be suspended through this endpoint"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-    }
-  }
-  unsuspendUser: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        userId: components["parameters"]["UserId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Suspension lifted */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["UserDetail"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      /** @description The target is an admin or a deleted account */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "INVALID_TARGET",
-           *       "message": "Target account cannot be unsuspended through this endpoint"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-    }
-  }
-  listSpecialties: {
-    parameters: {
-      query?: {
-        is_active?: components["parameters"]["IsActive"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialty list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Specialty"][]
-        }
-      }
-    }
-  }
-  createSpecialty: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialtyWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Specialty created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Specialty"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  updateSpecialty: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialtyId: components["parameters"]["SpecialtyId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialtyWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Specialty updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Specialty"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listConditions: {
-    parameters: {
-      query?: {
-        is_active?: components["parameters"]["IsActive"]
-        /** @description Matches name or label. */
-        search?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Condition list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Condition"][]
-        }
-      }
-    }
-  }
-  createCondition: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ConditionWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Condition created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Condition"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  deleteCondition: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        conditionId: components["parameters"]["ConditionId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Condition deleted */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["Conflict"]
-    }
-  }
-  updateCondition: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        conditionId: components["parameters"]["ConditionId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ConditionWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Condition updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Condition"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listCountries: {
-    parameters: {
-      query?: {
-        is_active?: components["parameters"]["IsActive"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Country list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Country"][]
-        }
-      }
-    }
-  }
-  createCountry: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CountryWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Country created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Country"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getCountry: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        countryId: components["parameters"]["CountryId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Country */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Country"]
-        }
-      }
-      404: components["responses"]["NotFound"]
-    }
-  }
-  deleteCountry: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        countryId: components["parameters"]["CountryId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Country deleted */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["Conflict"]
-    }
-  }
-  updateCountry: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        countryId: components["parameters"]["CountryId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CountryWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Country updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Country"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listSyndicates: {
-    parameters: {
-      query?: {
-        specialty_id?: string
-        country_id?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Syndicate list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateSummary"][]
-        }
-      }
-    }
-  }
-  createSyndicate: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateCreateRequest"]
-      }
-    }
-    responses: {
-      /** @description Syndicate created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      /** @description The country and specialty already have a syndicate, or the owner email is taken */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getSyndicate: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Syndicate */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateSummary"]
-        }
-      }
-      404: components["responses"]["NotFound"]
-    }
-  }
-  updateSyndicate: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateUpdateRequest"]
-      }
-    }
-    responses: {
-      /** @description Syndicate updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listSyndicateStaff: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Staff list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"][]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  inviteSyndicateStaff: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateStaffInviteRequest"]
-      }
-    }
-    responses: {
-      /** @description Staff invited */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getSyndicateStaff: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-        staffId: components["parameters"]["StaffId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Staff member */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  removeSyndicateStaff: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-        staffId: components["parameters"]["StaffId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Staff removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      /** @description The target is the syndicate owner */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "OWNER_CANNOT_BE_REMOVED",
-           *       "message": "The syndicate owner cannot be removed"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-    }
-  }
-  updateSyndicateStaff: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-        staffId: components["parameters"]["StaffId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateStaffUpdateRequest"]
-      }
-    }
-    responses: {
-      /** @description Staff member updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  changePendingStaffEmail: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-        staffId: components["parameters"]["StaffId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateStaffEmailRequest"]
-      }
-    }
-    responses: {
-      /** @description Email updated, invite re-sent */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      /** @description The account is already active, or the email is taken */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  changeSyndicateOwner: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyndicateOwnerChangeRequest"]
-      }
-    }
-    responses: {
-      /** @description Ownership changed */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SyndicateStaffResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      /** @description The staff member is already the owner */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "ALREADY_OWNER",
-           *       "message": "This staff member is already the owner"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listSyndicateSpecialists: {
-    parameters: {
-      query?: {
-        verification_status?: components["schemas"]["SpecialistVerificationStatus"]
-        user_status?: components["schemas"]["UserStatus"]
-        /** @description Matches username. */
-        search?: string
-        page?: components["parameters"]["Page"]
-        page_size?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist page */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistManagementPage"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  listAllSpecialists: {
-    parameters: {
-      query?: {
-        verification_status?: components["schemas"]["SpecialistVerificationStatus"]
-        user_status?: components["schemas"]["UserStatus"]
-        syndicate_id?: string
-        specialty_id?: string
-        country_id?: string
-        /** @description Matches username. */
-        search?: string
-        page?: components["parameters"]["Page"]
-        page_size?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist page */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistManagementPage"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-    }
-  }
-  listSyndicateCredentialQueue: {
-    parameters: {
-      query?: {
-        verification_status?: components["schemas"]["CredentialsVerificationStatus"]
-      }
-      header?: never
-      path: {
-        syndicateId: components["parameters"]["SyndicateId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Credential queue */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"][]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-    }
-  }
-  verifyCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Credential verified */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  rejectCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RejectionRequest"]
-      }
-    }
-    responses: {
-      /** @description Credential rejected */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getCredentialDocumentLink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Temporary link */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DocumentAccessResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  getSpecialistForReview: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialistId: components["parameters"]["SpecialistId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  verifySpecialist: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialistId: components["parameters"]["SpecialistId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist verified */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  rejectSpecialist: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialistId: components["parameters"]["SpecialistId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RejectionRequest"]
-      }
-    }
-    responses: {
-      /** @description Specialist rejected */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  suspendSpecialist: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialistId: components["parameters"]["SpecialistId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist suspended */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["AccountDeleted"]
-    }
-  }
-  unsuspendSpecialist: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        specialistId: components["parameters"]["SpecialistId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Suspension lifted */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["AccountDeleted"]
-    }
-  }
-  getMySpecialistProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Specialist */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      /** @description Onboarding is not complete */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 404,
-           *       "code": "SPECIALIST_NOT_FOUND",
-           *       "message": "Specialist not found, complete onboarding first"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-    }
-  }
-  createMySpecialistProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistOnboardingRequest"]
-      }
-    }
-    responses: {
-      /** @description Profile created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["Forbidden"]
-      409: components["responses"]["Conflict"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  updateMySpecialistProfile: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistUpdateRequest"]
-      }
-    }
-    responses: {
-      /** @description Profile updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      /** @description Username or member number taken, or syndicate locked after verification */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "SYNDICATE_LOCKED",
-           *       "message": "The syndicate cannot be changed after verification"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  listMyProfileContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description One row per existing locale */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistProfileResponse"][]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  getMyProfileContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        locale: components["parameters"]["LocalePath"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Profile content */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistProfileResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  upsertMyProfileContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        locale: components["parameters"]["LocalePath"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistProfileWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Profile content saved */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistProfileResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  deleteMyProfileContent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        locale: components["parameters"]["LocalePath"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Profile content removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  listMyLocations: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Location list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistLocation"][]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  addLocation: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistLocationWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Location created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistLocation"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      /** @description A location with these coordinates already exists */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "LOCATION_ALREADY_EXISTS",
-           *       "message": "This location is already saved"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  updateLocation: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        locationId: components["parameters"]["LocationId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistLocationWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Location updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistLocation"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-      /** @description Duplicate coordinates, or the current primary was demoted */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "PRIMARY_LOCATION_REQUIRED",
-           *       "message": "A primary location is required, make another location primary first"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  deleteLocation: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        locationId: components["parameters"]["LocationId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Location removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-      /** @description The primary location cannot be removed while others exist */
-      409: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          /**
-           * @example {
-           *       "status": 409,
-           *       "code": "PRIMARY_LOCATION_REQUIRED",
-           *       "message": "A primary location is required, make another location primary first"
-           *     }
-           */
-          "application/json": components["schemas"]["Error"]
-        }
-      }
-    }
-  }
-  listMyAvailabilities: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Availability list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistAvailability"][]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  addAvailability: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistAvailabilityWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Availability created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistAvailability"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  updateAvailability: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        availabilityId: components["parameters"]["AvailabilityId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistAvailabilityWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Availability updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistAvailability"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  deleteAvailability: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        availabilityId: components["parameters"]["AvailabilityId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Availability removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  listMyTreatedConditions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Condition ids */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": string[]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  replaceMyTreatedConditions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["TreatedConditionsWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Updated condition ids */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": string[]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getMyTemplate: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Template */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistTemplateResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  updateMyTemplate: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SpecialistTemplateWriteRequest"]
-      }
-    }
-    responses: {
-      /** @description Template saved */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistTemplateResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  setMyProfilePicture: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["ImageUploadRequest"]
-      }
-    }
-    responses: {
-      /** @description Picture saved */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImageResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      413: components["responses"]["FileTooLarge"]
-      415: components["responses"]["UnsupportedFileType"]
-      422: components["responses"]["InvalidFile"]
-      429: components["responses"]["TooManyRequests"]
-      503: components["responses"]["MediaBusy"]
-    }
-  }
-  deleteMyProfilePicture: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Picture removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  setMyCoverImage: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["ImageUploadRequest"]
-      }
-    }
-    responses: {
-      /** @description Cover image saved */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["ImageResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      413: components["responses"]["FileTooLarge"]
-      415: components["responses"]["UnsupportedFileType"]
-      422: components["responses"]["InvalidFile"]
-      429: components["responses"]["TooManyRequests"]
-      503: components["responses"]["MediaBusy"]
-    }
-  }
-  deleteMyCoverImage: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Cover image removed */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  listMyCredentials: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Credential list */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"][]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  submitCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["CredentialCreateRequest"]
-      }
-    }
-    responses: {
-      /** @description Credential submitted as `pending` */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      413: components["responses"]["FileTooLarge"]
-      415: components["responses"]["UnsupportedFileType"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-      503: components["responses"]["MediaBusy"]
-    }
-  }
-  getMyCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Credential */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  withdrawCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Credential withdrawn */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  updateCredential: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CredentialUpdateRequest"]
-      }
-    }
-    responses: {
-      /** @description Credential updated */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["CredentialVerified"]
-      422: components["responses"]["ValidationError"]
-    }
-  }
-  getMyCredentialDocumentLink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Temporary link */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DocumentAccessResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-    }
-  }
-  replaceCredentialDocument: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        credentialId: components["parameters"]["CredentialId"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "multipart/form-data": components["schemas"]["CredentialDocumentUploadRequest"]
-      }
-    }
-    responses: {
-      /** @description Document replaced */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["CredentialResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-      404: components["responses"]["NotFound"]
-      409: components["responses"]["CredentialVerified"]
-      413: components["responses"]["FileTooLarge"]
-      415: components["responses"]["UnsupportedFileType"]
-      422: components["responses"]["InvalidFile"]
-      429: components["responses"]["TooManyRequests"]
-      503: components["responses"]["MediaBusy"]
-    }
-  }
-  getMyAnalytics: {
-    parameters: {
-      query?: {
-        start_date?: string
-        end_date?: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Daily rows */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["AnalyticsSummaryResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  getMyDashboard: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Dashboard summary */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["DashboardResponse"]
-        }
-      }
-      403: components["responses"]["OnboardingRequired"]
-    }
-  }
-  searchSpecialists: {
-    parameters: {
-      query?: {
-        /** @description Matches username and the resolved title. */
-        search?: string
-        specialty_id?: string
-        country_id?: string
-        city?: string
-        condition_id?: string
-        language?: string
-        gender?: string
-        /** @description Locale for localized fields; falls back to the default. */
-        locale?: components["parameters"]["LocaleQuery"]
-        page?: components["parameters"]["Page"]
-        page_size?: components["parameters"]["PageSize"]
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Search results */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistSearchPage"]
-        }
-      }
-    }
-  }
-  getPublicSpecialistProfile: {
-    parameters: {
-      query?: {
-        /** @description Locale for localized fields; falls back to the default. */
-        locale?: components["parameters"]["LocaleQuery"]
-      }
-      header?: never
-      path: {
-        username: components["parameters"]["Username"]
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Public profile */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          "application/json": components["schemas"]["SpecialistPublicProfile"]
-        }
-      }
-      404: components["responses"]["NotFound"]
-    }
-  }
-  recordAnalyticsEvent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        username: components["parameters"]["Username"]
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AnalyticsEventRequest"]
-      }
-    }
-    responses: {
-      /** @description Event accepted */
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      404: components["responses"]["NotFound"]
-      422: components["responses"]["ValidationError"]
-      429: components["responses"]["TooManyRequests"]
-    }
-  }
+    signup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description Account created, code sent */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignupResponse"];
+                };
+            };
+            400: components["responses"]["MalformedJson"];
+            /** @description The email belongs to a non-pending account */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "EMAIL_TAKEN",
+                     *       "message": "Email is already registered"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    verifySignupOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyOtpRequest"];
+            };
+        };
+        responses: {
+            /** @description Mailbox verified, setup cookie set */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["SetSetupCookie"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasswordSetupResponse"];
+                };
+            };
+            400: components["responses"]["InvalidOrExpiredToken"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    resendSignupOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendOtpRequest"];
+            };
+        };
+        responses: {
+            /** @description Code re-sent if the account is eligible */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["MalformedJson"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    setInitialPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Password set, session started */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["SetAuthCookies"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            400: components["responses"]["MalformedJson"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Authenticated, session cookies set */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["SetAuthCookies"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            400: components["responses"]["MalformedJson"];
+            401: components["responses"]["InvalidCredentials"];
+            /** @description The password was correct but the account cannot log in */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    refreshToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refresh_token?: components["parameters"]["RefreshTokenCookie"];
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session rotated */
+            200: {
+                headers: {
+                    "Set-Cookie": components["headers"]["SetAuthCookies"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            401: components["responses"]["InvalidRefreshToken"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                refresh_token?: components["parameters"]["RefreshTokenCookie"];
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session ended, cookies cleared */
+            204: {
+                headers: {
+                    "Set-Cookie": components["headers"]["ClearAuthCookies"];
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Email sent if the account exists */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["MalformedJson"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Password set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["InvalidOrExpiredToken"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
+    deleteMyAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account deleted, purge scheduled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDeletionResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listAdmins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Admin list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"][];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    inviteAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminInviteRequest"];
+            };
+        };
+        responses: {
+            /** @description Admin invited */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Admin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    suspendAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Admin suspended */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    unsuspendAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suspension lifted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listUsers: {
+        parameters: {
+            query?: {
+                role?: components["schemas"]["Role"];
+                user_status?: components["schemas"]["UserStatus"];
+                /** @description Matches first name, last name, or email. */
+                search?: string;
+                page?: components["parameters"]["Page"];
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPage"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetail"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description User updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetail"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    suspendUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User suspended */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetail"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The target is an admin or a deleted account */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "INVALID_TARGET",
+                     *       "message": "Target account cannot be suspended through this endpoint"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    unsuspendUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suspension lifted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDetail"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The target is an admin or a deleted account */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "INVALID_TARGET",
+                     *       "message": "Target account cannot be unsuspended through this endpoint"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listSpecialties: {
+        parameters: {
+            query?: {
+                is_active?: components["parameters"]["IsActive"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialty list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Specialty"][];
+                };
+            };
+        };
+    };
+    createSpecialty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialtyWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Specialty created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Specialty"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    updateSpecialty: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialtyId: components["parameters"]["SpecialtyId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialtyWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Specialty updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Specialty"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listConditions: {
+        parameters: {
+            query?: {
+                is_active?: components["parameters"]["IsActive"];
+                /** @description Matches name or label. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Condition list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Condition"][];
+                };
+            };
+        };
+    };
+    createCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConditionWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Condition created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Condition"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    deleteCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conditionId: components["parameters"]["ConditionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Condition deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    updateCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conditionId: components["parameters"]["ConditionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConditionWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Condition updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Condition"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listCountries: {
+        parameters: {
+            query?: {
+                is_active?: components["parameters"]["IsActive"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Country list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Country"][];
+                };
+            };
+        };
+    };
+    createCountry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CountryWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Country created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Country"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getCountry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                countryId: components["parameters"]["CountryId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Country */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Country"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteCountry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                countryId: components["parameters"]["CountryId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Country deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    updateCountry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                countryId: components["parameters"]["CountryId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CountryWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Country updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Country"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listSyndicates: {
+        parameters: {
+            query?: {
+                specialty_id?: string;
+                country_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Syndicate list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateSummary"][];
+                };
+            };
+        };
+    };
+    createSyndicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Syndicate created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            /** @description The country and specialty already have a syndicate, or the owner email is taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getSyndicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Syndicate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateSummary"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateSyndicate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Syndicate updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listSyndicateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"][];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    inviteSyndicateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateStaffInviteRequest"];
+            };
+        };
+        responses: {
+            /** @description Staff invited */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getSyndicateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+                staffId: components["parameters"]["StaffId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff member */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    removeSyndicateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+                staffId: components["parameters"]["StaffId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The target is the syndicate owner */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "OWNER_CANNOT_BE_REMOVED",
+                     *       "message": "The syndicate owner cannot be removed"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateSyndicateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+                staffId: components["parameters"]["StaffId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateStaffUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Staff member updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    changePendingStaffEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+                staffId: components["parameters"]["StaffId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateStaffEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Email updated, invite re-sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The account is already active, or the email is taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    changeSyndicateOwner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyndicateOwnerChangeRequest"];
+            };
+        };
+        responses: {
+            /** @description Ownership changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyndicateStaffResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description The staff member is already the owner */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "ALREADY_OWNER",
+                     *       "message": "This staff member is already the owner"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listSyndicateSpecialists: {
+        parameters: {
+            query?: {
+                verification_status?: components["schemas"]["SpecialistVerificationStatus"];
+                user_status?: components["schemas"]["UserStatus"];
+                /** @description Matches username. */
+                search?: string;
+                page?: components["parameters"]["Page"];
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistManagementPage"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listAllSpecialists: {
+        parameters: {
+            query?: {
+                verification_status?: components["schemas"]["SpecialistVerificationStatus"];
+                user_status?: components["schemas"]["UserStatus"];
+                syndicate_id?: string;
+                specialty_id?: string;
+                country_id?: string;
+                /** @description Matches username. */
+                search?: string;
+                page?: components["parameters"]["Page"];
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistManagementPage"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    listSyndicateCredentialQueue: {
+        parameters: {
+            query?: {
+                verification_status?: components["schemas"]["CredentialsVerificationStatus"];
+            };
+            header?: never;
+            path: {
+                syndicateId: components["parameters"]["SyndicateId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Credential queue */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"][];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    verifyCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Credential verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    rejectCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Credential rejected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getCredentialDocumentLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentAccessResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getSpecialistForReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialistId: components["parameters"]["SpecialistId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    verifySpecialist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialistId: components["parameters"]["SpecialistId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    rejectSpecialist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialistId: components["parameters"]["SpecialistId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Specialist rejected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    suspendSpecialist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialistId: components["parameters"]["SpecialistId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist suspended */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["AccountDeleted"];
+        };
+    };
+    unsuspendSpecialist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                specialistId: components["parameters"]["SpecialistId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suspension lifted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["AccountDeleted"];
+        };
+    };
+    getMySpecialistProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Specialist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            /** @description Onboarding is not complete */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 404,
+                     *       "code": "SPECIALIST_NOT_FOUND",
+                     *       "message": "Specialist not found, complete onboarding first"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createMySpecialistProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistOnboardingRequest"];
+            };
+        };
+        responses: {
+            /** @description Profile created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    updateMySpecialistProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Profile updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            /** @description Username or member number taken, or syndicate locked after verification */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "SYNDICATE_LOCKED",
+                     *       "message": "The syndicate cannot be changed after verification"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    listMyProfileContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One row per existing locale */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistProfileResponse"][];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    getMyProfileContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                locale: components["parameters"]["LocalePath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile content */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistProfileResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    upsertMyProfileContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                locale: components["parameters"]["LocalePath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistProfileWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Profile content saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistProfileResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    deleteMyProfileContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                locale: components["parameters"]["LocalePath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile content removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listMyLocations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Location list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistLocation"][];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    addLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistLocationWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Location created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistLocation"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            /** @description A location with these coordinates already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "LOCATION_ALREADY_EXISTS",
+                     *       "message": "This location is already saved"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    updateLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                locationId: components["parameters"]["LocationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistLocationWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Location updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistLocation"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+            /** @description Duplicate coordinates, or the current primary was demoted */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "PRIMARY_LOCATION_REQUIRED",
+                     *       "message": "A primary location is required, make another location primary first"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    deleteLocation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                locationId: components["parameters"]["LocationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Location removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+            /** @description The primary location cannot be removed while others exist */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": 409,
+                     *       "code": "PRIMARY_LOCATION_REQUIRED",
+                     *       "message": "A primary location is required, make another location primary first"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listMyAvailabilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistAvailability"][];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    addAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistAvailabilityWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Availability created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistAvailability"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    updateAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                availabilityId: components["parameters"]["AvailabilityId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistAvailabilityWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Availability updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistAvailability"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    deleteAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                availabilityId: components["parameters"]["AvailabilityId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listMyTreatedConditions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Condition ids */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    replaceMyTreatedConditions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreatedConditionsWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated condition ids */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getMyTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Template */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistTemplateResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateMyTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpecialistTemplateWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description Template saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistTemplateResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    setMyProfilePicture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["ImageUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Picture saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            413: components["responses"]["FileTooLarge"];
+            415: components["responses"]["UnsupportedFileType"];
+            422: components["responses"]["InvalidFile"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["MediaBusy"];
+        };
+    };
+    deleteMyProfilePicture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Picture removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    setMyCoverImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["ImageUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Cover image saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            413: components["responses"]["FileTooLarge"];
+            415: components["responses"]["UnsupportedFileType"];
+            422: components["responses"]["InvalidFile"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["MediaBusy"];
+        };
+    };
+    deleteMyCoverImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cover image removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    listMyCredentials: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Credential list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"][];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    submitCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CredentialCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Credential submitted as `pending` */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            413: components["responses"]["FileTooLarge"];
+            415: components["responses"]["UnsupportedFileType"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["MediaBusy"];
+        };
+    };
+    getMyCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Credential */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    withdrawCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Credential withdrawn */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateCredential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Credential updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["CredentialVerified"];
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getMyCredentialDocumentLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Temporary link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentAccessResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    replaceCredentialDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credentialId: components["parameters"]["CredentialId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["CredentialDocumentUploadRequest"];
+            };
+        };
+        responses: {
+            /** @description Document replaced */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["CredentialVerified"];
+            413: components["responses"]["FileTooLarge"];
+            415: components["responses"]["UnsupportedFileType"];
+            422: components["responses"]["InvalidFile"];
+            429: components["responses"]["TooManyRequests"];
+            503: components["responses"]["MediaBusy"];
+        };
+    };
+    getMyAnalytics: {
+        parameters: {
+            query?: {
+                start_date?: string;
+                end_date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daily rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsSummaryResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    getMyDashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dashboard summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardResponse"];
+                };
+            };
+            403: components["responses"]["OnboardingRequired"];
+        };
+    };
+    searchSpecialists: {
+        parameters: {
+            query?: {
+                /** @description Matches username and the resolved title. */
+                search?: string;
+                specialty_id?: string;
+                country_id?: string;
+                city?: string;
+                condition_id?: string;
+                language?: string;
+                gender?: string;
+                /** @description Locale for localized fields; falls back to the default. */
+                locale?: components["parameters"]["LocaleQuery"];
+                page?: components["parameters"]["Page"];
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Search results */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistSearchPage"];
+                };
+            };
+        };
+    };
+    getPublicSpecialistProfile: {
+        parameters: {
+            query?: {
+                /** @description Locale for localized fields; falls back to the default. */
+                locale?: components["parameters"]["LocaleQuery"];
+            };
+            header?: never;
+            path: {
+                username: components["parameters"]["Username"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistPublicProfile"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    recordAnalyticsEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                username: components["parameters"]["Username"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnalyticsEventRequest"];
+            };
+        };
+        responses: {
+            /** @description Event accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            429: components["responses"]["TooManyRequests"];
+        };
+    };
 }
