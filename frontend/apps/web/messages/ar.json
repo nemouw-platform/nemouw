@@ -7,6 +7,17 @@
     "toggleTheme": "تبديل المظهر",
     "language": "اللغة"
   },
+  "Navbar": {
+    "mainNav": "الرئيسية",
+    "findSpecialist": "ابحث عن أخصائي",
+    "howItWorks": "كيف يعمل",
+    "forSpecialists": "للأخصائيين",
+    "logIn": "تسجيل الدخول",
+    "join": "انضم كأخصائي",
+    "menu": "القائمة",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
+  },
   "HomePage": {
     "tagline": "الموقع العام للمرضى والأخصائيين."
   },

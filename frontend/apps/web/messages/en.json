@@ -7,6 +7,17 @@
     "toggleTheme": "Toggle theme",
     "language": "Language"
   },
+  "Navbar": {
+    "mainNav": "Main",
+    "findSpecialist": "Find a specialist",
+    "howItWorks": "How it works",
+    "forSpecialists": "For specialists",
+    "logIn": "Log in",
+    "join": "Join as a specialist",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
   "HomePage": {
     "tagline": "Public site for patients and specialists."
   },

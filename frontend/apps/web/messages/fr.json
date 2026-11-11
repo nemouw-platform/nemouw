@@ -7,6 +7,17 @@
     "toggleTheme": "Changer de thème",
     "language": "Langue"
   },
+  "Navbar": {
+    "mainNav": "Principale",
+    "findSpecialist": "Trouver un spécialiste",
+    "howItWorks": "Comment ça marche",
+    "forSpecialists": "Pour les spécialistes",
+    "logIn": "Se connecter",
+    "join": "Inscription spécialiste",
+    "menu": "Menu",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
   "HomePage": {
     "tagline": "Site public pour les patients et les spécialistes."
   },
