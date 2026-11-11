@@ -42,7 +42,7 @@ public class InviteService {
         String normalized = TextNormalizer.normalizeEmail(email);
         if (users.findByEmail(normalized).isPresent()) throw Errors.emailTaken();
         try {
-            UUID userId = users.insertUser(role, firstName.trim(), lastName.trim());
+            UUID userId = users.insertUser(role, TextNormalizer.strip(firstName), TextNormalizer.strip(lastName));
             UUID identifierId = users.insertEmailIdentifier(userId, normalized);
             IssuedResetToken token = tokens.issueInviteToken(userId, identifierId).orElseThrow();
             return new Invite(userId, normalized, token);

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 @Service
@@ -49,7 +50,7 @@ class SpecialistService {
         if (!specialists.syndicateExists(req.syndicateId())) throw Errors.invalidField("syndicate_id", "unknown syndicate");
 
         String username = normalizeUsername(Objects.requireNonNull(req.username()));
-        String memberNumber = req.syndicateMemberNumber().trim();
+        String memberNumber = strip(req.syndicateMemberNumber());
         if (specialists.usernameTaken(username, null)) throw new ApiException(ErrorCode.USERNAME_TAKEN);
         if (specialists.memberNumberTaken(req.syndicateId(), memberNumber, null)) {
             throw new ApiException(ErrorCode.MEMBER_NUMBER_TAKEN);
@@ -200,7 +201,7 @@ class SpecialistService {
             return null;
         }
         v.required(key, s);
-        return s.isBlank() ? null : s.trim();
+        return blankToNull(s);
     }
 
     /** Nullable text: null or blank clears the field. */

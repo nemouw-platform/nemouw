@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.DESCRIPTION_MAX;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
@@ -76,7 +77,7 @@ class SpecialtyService {
      */
     private static void apply(Specialty s, SpecialtyWriteRequest r) {
         if (r.code() != null) s.setCode(normalizeCode(r.code()));
-        if (r.name() != null) s.setName(r.name().trim());
+        if (r.name() != null) s.setName(strip(r.name()));
         if (r.label() != null) s.setLabel(r.label().trim());
         if (r.labelFr() != null) s.setLabelFr(blankToNull(r.labelFr()));
         if (r.labelAr() != null) s.setLabelAr(blankToNull(r.labelAr()));

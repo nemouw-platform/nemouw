@@ -1,6 +1,7 @@
 package com.nemouw.common.util;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public final class UserAgentParser {
     private UserAgentParser() {}
@@ -8,6 +9,9 @@ public final class UserAgentParser {
     public record Result(String deviceType, String osName, String browser) {}
 
     private static final Result UNKNOWN = new Result("unknown", "Unknown", "Unknown");
+
+    /** "bot" as a word, a name ending in bot before / ; ) or -, or crawler, spider, slurp. */
+    private static final Pattern BOT = Pattern.compile("\\bbot\\b|[a-z]bot[/;)-]|crawler|spider|slurp");
 
     public static Result parse(String ua) {
         if (ua == null || ua.isBlank()) return UNKNOWN;
@@ -43,7 +47,7 @@ public final class UserAgentParser {
 
     private static String deviceType(String s) {
         String lower = s.toLowerCase(Locale.ROOT);
-        if (has(lower, "bot", "crawler", "spider", "slurp")) return "bot";
+        if (BOT.matcher(lower).find()) return "bot";
         if (s.contains("iPad") || lower.contains("tablet")) return "tablet";
         if (s.contains("Android")) return s.contains("Mobile") ? "mobile" : "tablet";
         if (has(s, "iPhone", "iPod", "Mobile")) return "mobile";

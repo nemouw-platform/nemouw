@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.DESCRIPTION_MAX;
 
 /** Staff actions on a specialist. Authorization is on the controller; these methods assume it has passed. */
@@ -53,7 +54,7 @@ class SpecialistReviewService {
                 .maxLength("rejection_reason", req.rejectionReason(), DESCRIPTION_MAX)
                 .throwIfInvalid();
         lock(specialistId);
-        specialists.markRejected(specialistId, reviewerId, req.rejectionReason().trim());
+        specialists.markRejected(specialistId, reviewerId, strip(req.rejectionReason()));
         log.info("SPECIALIST_REJECTED specialist={} reviewer={}", specialistId, reviewerId);
         return respond(find(specialistId));
     }

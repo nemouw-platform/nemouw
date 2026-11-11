@@ -75,7 +75,7 @@ class SyndicateService {
 
         Syndicate syndicate;
         try {
-            syndicate = syndicates.insert(r.name().trim(), r.specialtyId(), r.countryId(),
+            syndicate = syndicates.insert(TextNormalizer.strip(r.name()), r.specialtyId(), r.countryId(),
                     TextNormalizer.normalizeEmail(r.contactEmail()), blankToNull(r.contactPhone()));
         } catch (DuplicateKeyException e) {
             throw new ApiException(ErrorCode.SYNDICATE_EXISTS);   // lost a race with another create
@@ -90,7 +90,7 @@ class SyndicateService {
         validate(req);
         Syndicate current = find(id);
 
-        String name = req.name() != null ? req.name().trim() : current.name();
+        String name = req.name() != null ? TextNormalizer.strip(req.name()) : current.name();
         String email = req.contactEmail() != null
                 ? TextNormalizer.normalizeEmail(req.contactEmail()) : current.contactEmail();
         String phone = req.contactPhone() != null ? blankToNull(req.contactPhone()) : current.contactPhone();

@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.DESCRIPTION_MAX;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
@@ -100,8 +101,8 @@ class ConditionService {
     /** Copies only the fields that were sent. Validation has already run. */
     private static void apply(Condition c, ConditionWriteRequest r) {
         if (r.code() != null) c.setCode(normalizeCode(r.code()));
-        if (r.name() != null) c.setName(r.name().trim());
-        if (r.label() != null) c.setLabel(r.label().trim());
+        if (r.name() != null) c.setName(strip(r.name()));
+        if (r.label() != null) c.setLabel(strip(r.label()));
         if (r.labelFr() != null) c.setLabelFr(blankToNull(r.labelFr()));
         if (r.labelAr() != null) c.setLabelAr(blankToNull(r.labelAr()));
         if (r.description() != null) c.setDescription(blankToNull(r.description()));
