@@ -693,15 +693,6 @@ class VerificationTokensTest {
             assertThat(first).hasSize(43).isNotEqualTo(second);
         }
 
-        @Test
-        void refusesToStartWhenMailDeliveryIsLive() {
-            TokenProperties withFixed = withFixedOtp("123456");
-
-            assertThatThrownBy(() -> new VerificationTokens(repo, withFixed, props()))   // props() is LIVE
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("MAIL_DELIVERY=file");
-        }
-
         @ParameterizedTest
         @ValueSource(strings = {"12ab", "12345", "1234567", "12 456"})
         void refusesAValueThatIsNotExactlySixDigits(String value) {

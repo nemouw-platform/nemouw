@@ -1,5 +1,6 @@
 package com.nemouw.user.session;
 
+import com.nemouw.common.enums.UserRole;
 import com.nemouw.user.session.SessionDtos.SessionResponse;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class IssuedSessionTest {
         );
 
         assertThat(response.userId()).isEqualTo(USER_ID);
-        assertThat(response.role()).isEqualTo("specialist");
+        assertThat(response.role()).isEqualTo(UserRole.SPECIALIST);
         assertThat(response.expiresIn()).isEqualTo(ACCESS_TTL_SECONDS);
 
         assertThat(response.toString())

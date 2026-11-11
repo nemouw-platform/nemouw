@@ -20,6 +20,7 @@ class ErrorsTest {
                 Arguments.of(Errors.invalidCredentials(), "INVALID_CREDENTIALS", 401),
                 Arguments.of(Errors.invalidOrExpiredCode(), "INVALID_OR_EXPIRED_TOKEN", 400),
                 Arguments.of(Errors.emailTaken(), "EMAIL_TAKEN", 409),
+                Arguments.of(Errors.accountDeleted(), "ACCOUNT_DELETED", 409),
                 Arguments.of(Errors.accountNotVerified(), "ACCOUNT_NOT_VERIFIED", 403),
                 Arguments.of(Errors.accountSuspended(), "ACCOUNT_SUSPENDED", 403),
                 Arguments.of(Errors.invalidRefreshToken(), "INVALID_TOKEN", 401),

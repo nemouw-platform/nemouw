@@ -17,8 +17,10 @@ class SpecialistRepository {
                    s.profile_picture_id, pm.s3_key AS profile_picture_key,
                    s.cover_image_id, cm.s3_key AS cover_image_key,
                    s.min_age_treated, s.max_age_treated,
-                   s.verification_status AS verification_status_code, s.verified_at, s.created_at, s.updated_at
+                   s.verification_status AS verification_status_code, s.reviewed_at, s.rejection_reason,
+                   u.status AS user_status_code, s.created_at, s.updated_at
             FROM specialists s
+            JOIN users u ON u.id = s.user_id
             LEFT JOIN media pm ON pm.id = s.profile_picture_id
             LEFT JOIN media cm ON cm.id = s.cover_image_id
             """;
@@ -53,6 +55,13 @@ class SpecialistRepository {
                 .optional();
     }
 
+    Optional<SpecialistRow> lockById(UUID id) {
+        return jdbc.sql(SELECT + "WHERE s.id = :id FOR UPDATE OF s")
+                .param("id", id)
+                .query(SpecialistRow.class)
+                .optional();
+    }
+
     boolean syndicateExists(UUID syndicateId) {
         return jdbc.sql("SELECT EXISTS (SELECT 1 FROM syndicates WHERE id = :id)")
                 .param("id", syndicateId)
@@ -60,7 +69,9 @@ class SpecialistRepository {
                 .single();
     }
 
-    /** excludeId may be null (onboarding) or the caller's own id (PATCH). */
+    /**
+     * excludeId may be null (onboarding) or the caller's own id (PATCH).
+     */
     boolean usernameTaken(String username, UUID excludeId) {
         return jdbc.sql("""
                         SELECT EXISTS (SELECT 1 FROM specialists
@@ -115,5 +126,42 @@ class SpecialistRepository {
                 .params(changes)
                 .param("id", id)
                 .update();
+    }
+
+    void markVerified(UUID id, UUID reviewerId) {
+        jdbc.sql("""
+                        UPDATE specialists
+                        SET verification_status = :status, reviewed_by = :reviewer, reviewed_at = now(),
+                            rejection_reason = NULL
+                        WHERE id = :id""")
+                .param("status", SpecialistVerificationStatus.ACTIVE.code())
+                .param("reviewer", reviewerId)
+                .param("id", id)
+                .update();
+    }
+
+    void markRejected(UUID id, UUID reviewerId, String reason) {
+        jdbc.sql("""
+                        UPDATE specialists
+                        SET verification_status = :status, reviewed_by = :reviewer, reviewed_at = now(),
+                            rejection_reason = :reason
+                        WHERE id = :id""")
+                .param("status", SpecialistVerificationStatus.REJECTED.code())
+                .param("reviewer", reviewerId)
+                .param("reason", reason)
+                .param("id", id)
+                .update();
+    }
+
+    boolean isStaffOfSyndicateOf(UUID specialistId, UUID userId) {
+        return jdbc.sql("""
+                        SELECT EXISTS (
+                            SELECT 1 FROM specialists s
+                            JOIN syndicate_staff ss ON ss.syndicate_id = s.syndicate_id
+                            WHERE s.id = :specialistId AND ss.user_id = :userId)""")
+                .param("specialistId", specialistId)
+                .param("userId", userId)
+                .query(Boolean.class)
+                .single();
     }
 }

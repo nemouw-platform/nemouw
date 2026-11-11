@@ -1458,7 +1458,7 @@ paths:
       tags:
         - Verification
       summary: Get a specialist for staff review
-      description: Bypasses the discovery gate, so pending and rejected profiles are included.
+      description: Bypasses the discovery gate, so pending, rejected and suspended profiles are included.
       x-required-roles:
         - admin
         - "syndicate_staff:same_syndicate_as_specialist"
@@ -3121,10 +3121,17 @@ components:
           nullable: true
         verification_status:
           $ref: "#/components/schemas/SpecialistVerificationStatus"
-        verified_at:
+        reviewed_at:
           type: string
           format: date-time
           nullable: true
+          description: When the last verify or reject decision was made. `null` while pending.
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Why the specialist was rejected. `null` unless `verification_status` is `rejected`.
+        user_status:
+          $ref: "#/components/schemas/UserStatus"
         created_at:
           type: string
           format: date-time
@@ -3414,11 +3421,14 @@ components:
               description: The document file.
     RejectionRequest:
       type: object
+      description: Removes the profile from discovery and stores the reason, which the specialist sees in `rejection_reason`. Does not affect login. A later `verifySpecialist` reinstates it.
       required:
         - rejection_reason
       properties:
         rejection_reason:
           type: string
+          minLength: 1
+          maxLength: 1000
     CredentialResponse:
       type: object
       properties:

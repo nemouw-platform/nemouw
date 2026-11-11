@@ -121,6 +121,7 @@ public class SecurityConfig {
                         .requestMatchers(API + "/countries/**", API + "/specialties/**").hasRole(ADMIN)
                         .requestMatchers(API + "/syndicates/**").hasAnyRole(ADMIN, STAFF)
                         .requestMatchers(API + "/credentials/**").hasAnyRole(ADMIN, STAFF)
+                        .requestMatchers(API + "/specialists/by-id/**").hasAnyRole(ADMIN, STAFF)
                         .anyRequest().denyAll())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(errors)
