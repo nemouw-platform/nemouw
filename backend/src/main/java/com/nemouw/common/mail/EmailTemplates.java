@@ -31,7 +31,7 @@ public class EmailTemplates {
 
     EmailTemplates() {
         var bundle = new ResourceBundleMessageSource();
-        bundle.setBasename("mail/properties/messages");
+        bundle.setBasename("messages");
         bundle.setDefaultEncoding("UTF-8");
         bundle.setFallbackToSystemLocale(false);   // missing locale -> messages.properties, not the server's locale
         bundle.setAlwaysUseMessageFormat(true);    // one rule everywhere: write '' for a literal apostrophe
@@ -45,7 +45,7 @@ public class EmailTemplates {
 
     private static ClassLoaderTemplateResolver resolver(TemplateMode mode, String pattern, int order) {
         var r = new ClassLoaderTemplateResolver();
-        r.setPrefix("mail/");
+        r.setPrefix("templates/mail/");
         r.setTemplateMode(mode);
         r.setCharacterEncoding("UTF-8");
         r.setResolvablePatterns(Set.of(pattern));
