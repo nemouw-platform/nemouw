@@ -26,6 +26,7 @@ public enum FileKind {
     }
 
     public static Optional<FileKind> detect(byte[] h) {
+        if (h == null) return Optional.empty();
         if (at(h, 0, 0xFF, 0xD8, 0xFF)) return Optional.of(JPEG);
         if (at(h, 0, 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A)) return Optional.of(PNG);
         if (at(h, 0, '%', 'P', 'D', 'F', '-')) return Optional.of(PDF);

@@ -127,6 +127,14 @@ class GlobalExceptionHandlerTest {
 
             assertError(response, 500, "INTERNAL_ERROR", "Storage is down");
         }
+
+        @Test
+        void answersABusyMediaPipelineWith503AndTheRetryAfterHeader() {
+            ResponseEntity<ErrorBody> response = handler.handleApi(Errors.mediaBusy(3));
+
+            assertError(response, 503, "MEDIA_BUSY", "Try again shortly");
+            assertThat(response.getHeaders().getFirst(HttpHeaders.RETRY_AFTER)).isEqualTo("3");
+        }
     }
 
     @Nested

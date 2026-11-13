@@ -131,6 +131,6 @@ class SpecialistReviewServiceTest {
         OffsetDateTime now = NOW.atOffset(ZoneOffset.UTC);
         return new SpecialistRow(SPECIALIST_ID, USER_ID, null, null, "M-1001", "dr.amira",
                 null, null, null, null, null, null, null, null, null, null,
-                status.code(), null, null, userStatus.code(), now, now);
+                status.code(), null, null, userStatus.code(), null, null, "USD", now, now);
     }
 }
