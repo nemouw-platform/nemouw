@@ -55,9 +55,18 @@ class PriceRangeUpdateTest {
     }
 
     @Test
-    void currencyIsThreeUppercaseLetters() {
-        assertThat(parse(Map.of("price_currency", "LBP"), row(null, null))).containsEntry("price_currency", "LBP");
+    void currencyMustBeASupportedCode() {
+        assertThat(parse(Map.of("price_currency", "USD"), row(null, null))).containsEntry("price_currency", "USD");
         assertInvalid(Map.of("price_currency", "usd"), row(null, null));
+        assertInvalid(Map.of("price_currency", "LBP"), row(null, null));
+    }
+
+    @Test
+    void currencyCannotBeCleared() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("price_currency", null);
+
+        assertInvalid(body, row(null, null));
     }
 
     private static Map<String, Object> parse(Map<String, Object> body, SpecialistRow cur) {

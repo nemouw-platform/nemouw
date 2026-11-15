@@ -23,6 +23,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -63,7 +65,10 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_READS = {
             API + "/countries/**", API + "/specialties/**", API + "/conditions/**",
-            API + "/syndicates", API + "/syndicates/*"};
+            API + "/syndicates", API + "/syndicates/*", API + "/specialists", API + "/specialists/search/fields"};
+
+    private static final String SPECIALIST_PROFILE = API + "/specialists/*";
+    private static final String OWN_PROFILE = API + "/specialists/me";
 
     /** Only exists when app.docs.enabled=true (local development). */
     @Bean
@@ -98,9 +103,12 @@ public class SecurityConfig {
         RequestMatcher[] reads = Arrays.stream(PUBLIC_READS)
                 .map(p -> path.matcher(HttpMethod.GET, p))
                 .toArray(RequestMatcher[]::new);
+        RequestMatcher publicProfile = new AndRequestMatcher(
+                path.matcher(HttpMethod.GET, SPECIALIST_PROFILE),
+                new NegatedRequestMatcher(path.matcher(OWN_PROFILE)));
 
         return http
-                .securityMatcher(new OrRequestMatcher(reads))
+                .securityMatcher(new OrRequestMatcher(new OrRequestMatcher(reads), publicProfile))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }

@@ -2,12 +2,9 @@ package com.nemouw.specialist.profile;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import com.nemouw.common.enums.Currency;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 class SpecialistRepository {
@@ -18,7 +15,8 @@ class SpecialistRepository {
                    s.cover_image_id, cm.s3_key AS cover_image_key,
                    s.min_age_treated, s.max_age_treated,
                    s.verification_status AS verification_status_code, s.reviewed_at, s.rejection_reason,
-                   u.status AS user_status_code, s.created_at, s.updated_at
+                   u.status AS user_status_code, s.session_price_min, s.session_price_max, s.price_currencyو
+                   s.created_at, s.updated_at
             FROM specialists s
             JOIN users u ON u.id = s.user_id
             LEFT JOIN media pm ON pm.id = s.profile_picture_id
@@ -26,7 +24,8 @@ class SpecialistRepository {
             """;
 
     private static final Set<String> UPDATABLE = Set.of("username", "syndicate_id", "syndicate_member_number",
-            "gender", "whatsapp_number", "primary_language", "years_of_experience", "min_age_treated", "max_age_treated");
+            "gender", "whatsapp_number", "primary_language", "years_of_experience", "min_age_treated", "max_age_treated",
+            "session_price_min", "session_price_max", "price_currency");
 
     private final JdbcClient jdbc;
 
@@ -98,15 +97,29 @@ class SpecialistRepository {
     }
 
     /**
+     * The currency code of the user's country, when the user has one.
+     */
+    Optional<String> countryCurrencyCode(UUID userId) {
+        return jdbc.sql("""
+                        SELECT c.currency_code FROM users u JOIN countries c ON c.id = u.country_id
+                        WHERE u.id = :userId
+                        """)
+                .param("userId", userId)
+                .query(String.class)
+                .optional();
+    }
+
+    /**
      * specialty_id is not inserted: the trg_specialists_derive_specialty trigger fills it from the syndicate.
      * verification_status takes its 'pending' default.
      */
-    UUID insert(UUID userId, String username, UUID syndicateId, String memberNumber) {
+    UUID insert(UUID userId, String username, UUID syndicateId, String memberNumber, Currency currency) {
         return jdbc.sql("""
-                        INSERT INTO specialists (user_id, syndicate_id, syndicate_member_number, username)
-                        VALUES (:userId, :syndicateId, :number, :username)
+                        INSERT INTO specialists (user_id, syndicate_id, syndicate_member_number, username, price_currency)
+                        VALUES (:userId, :syndicateId, :number, :username, :currency)
                         RETURNING id
                         """)
+                .param("currency", currency.code())
                 .param("userId", userId)
                 .param("syndicateId", syndicateId)
                 .param("number", memberNumber)

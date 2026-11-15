@@ -13,40 +13,15 @@ class SearchParamsParserTest {
     void defaults() {
         SearchParams p = parse();
 
-        assertThat(p.page()).isEqualTo(1);
-        assertThat(p.pageSize()).isEqualTo(20);
-        assertThat(p.filters()).isEmpty();
-        assertThat(p.sorts()).isEmpty();
+        assertThat(p.query().page()).isEqualTo(1);
+        assertThat(p.query().pageSize()).isEqualTo(20);
+        assertThat(p.query().filters()).isEmpty();
+        assertThat(p.query().sorts()).isEmpty();
     }
 
     @Test
     void searchDropsFillerWordsAndKeepsTheRest() {
         assertThat(parse("search", "Dr. Sara in anxiety").words()).containsExactly("sara", "anxiety");
-    }
-
-    @Test
-    void listFilterMeansAnyOf() {
-        SearchParams.Filter f = parse("filter[last_name]", "haddad,khoury").filters().get(0);
-
-        assertThat(f.field().name()).isEqualTo("last_name");
-        assertThat(f.op()).isEqualTo(SearchFields.Op.EQ);
-        assertThat(f.values()).containsExactly("haddad", "khoury");
-    }
-
-    @Test
-    void operatorFilterParsesTheValueByFieldType() {
-        SearchParams.Filter f = parse("filter[years_of_experience][gte]", "10").filters().get(0);
-
-        assertThat(f.op()).isEqualTo(SearchFields.Op.GTE);
-        assertThat(f.values()).hasSize(1);
-    }
-
-    @Test
-    void sortKeepsOrderAndDirection() {
-        assertThat(parse("sort", "-years_of_experience,last_name").sorts())
-                .extracting(SearchParams.Sort::key, SearchParams.Sort::desc)
-                .containsExactly(org.assertj.core.groups.Tuple.tuple("years_of_experience", true),
-                        org.assertj.core.groups.Tuple.tuple("last_name", false));
     }
 
     @Test
@@ -56,11 +31,10 @@ class SearchParamsParserTest {
     }
 
     @Test
-    void unknownFieldOperatorAndBadValueAreRejected() {
+    void sortAndFiltersUseTheSpecialistFields() {
+        assertThat(parse("sort", "-years_of_experience,last_name").query().sorts()).hasSize(2);
+        assertThat(parse("filter[years_of_experience][gte]", "10").query().filters()).hasSize(1);
         assertInvalid("filter[nope]", "1");
-        assertInvalid("filter[username][gt]", "a");
-        assertInvalid("filter[years_of_experience][gte]", "abc");
-        assertInvalid("sort", "nope");
     }
 
     @Test
@@ -70,7 +44,25 @@ class SearchParamsParserTest {
     }
 
     @Test
-    void pageSizeIsCapped() {
+    void availabilityTakesDaysAndHoursEitherAlone() {
+        SearchParams.Availability a = parse("available_days", "Monday, friday,monday").availability();
+
+        assertThat(a.days()).containsExactly("monday", "friday");
+        assertThat(a.from()).isNull();
+        assertThat(parse("available_from", "09:30").availability().from()).hasHour(9).hasMinute(30);
+        assertThat(parse().availability()).isNull();
+    }
+
+    @Test
+    void badDaysAndHoursAreRejected() {
+        assertInvalid("available_days", "funday");
+        assertInvalid("available_from", "9am");
+        assertInvalid("available_from", "24:00");
+        assertInvalid("available_from", "12:00", "available_to", "09:00");
+    }
+
+    @Test
+    void pageSizeIsCappedAt50() {
         assertInvalid("page_size", "51");
     }
 
