@@ -48,7 +48,7 @@ Details:
 ### 2.3 Refresh and logout
 
 - `POST /refresh` has no body. The browser sends the `refresh_token` cookie. The token is rotated atomically: the old one stops working and a new pair of cookies is set.
-- If a rotated-out token is replayed **after** a 10 second grace window, the whole session is revoked and `refresh_token_reuse` is logged (likely theft). Inside the window the call just fails with `401`, because it is probably two tabs racing.
+- If a rotated-out token is replayed **after** a 10-second grace window, the whole session is revoked and `refresh_token_reuse` is logged (likely theft). Inside the window the call just fails with `401`, because it is probably two tabs racing.
 - `POST /logout` has no body. It revokes the session in the database and clears both cookies. It always answers `204`, even with a missing or unknown token.
 
 ### 2.4 Password reset
@@ -195,7 +195,7 @@ Created by `V2__identity_auth.sql`. `V5__onboarding.sql` adds the `deleted` stat
 ## 11. Operations notes
 
 - **Logging.** One `http_request` line per request (method, path, status, duration; no query string) and `trace_id` on every line (plus `user_id` once the caller is authenticated). Emails log the recipient address and provider id, never the code or link.
-- **Email failures.** Delivery runs on a 4-thread executor with a queue of 100 and 3 attempts (1 s and 4 s backoff). When it gives up it logs `EMAIL_UNDELIVERED`; the user can request a new code. If the queue is full the email is dropped and logged, not queued forever.
+- **Email failures.** Emails are sent synchronously, inside the request, with no queue and no retry. If sending fails, the error is logged as `EMAIL_UNDELIVERED` and the request still succeeds; the user can request a new code.
 - **Cleanup.** Expired sessions and verification tokens are not deleted yet. Plan a scheduled purge.
 - **Rotating `JWT_SECRET`** logs everyone out (all access tokens become invalid; refresh tokens still work and mint new ones).
 - **Rotating `OTP_HASH_SECRET`** invalidates all outstanding codes and reset links.
