@@ -1,5 +1,10 @@
 package com.nemouw.specialist.profile;
 
+import com.nemouw.common.enums.Coded;
+import com.nemouw.common.enums.Codes;
+import com.nemouw.common.enums.Gender;
+import com.nemouw.common.enums.LocaleCode;
+import com.nemouw.common.enums.Currency;
 import com.nemouw.common.exception.ApiException;
 import com.nemouw.common.exception.ErrorCode;
 import com.nemouw.common.exception.Errors;
@@ -16,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 @Service
@@ -46,10 +52,11 @@ class SpecialistService {
                 .throwIfInvalid();
 
         if (specialists.findByUserId(userId).isPresent()) throw new ApiException(ErrorCode.PROFILE_ALREADY_EXISTS);
-        if (!specialists.syndicateExists(req.syndicateId())) throw Errors.invalidField("syndicate_id", "unknown syndicate");
+        if (!specialists.syndicateExists(req.syndicateId()))
+            throw Errors.invalidField("syndicate_id", "unknown syndicate");
 
         String username = normalizeUsername(Objects.requireNonNull(req.username()));
-        String memberNumber = req.syndicateMemberNumber().trim();
+        String memberNumber = strip(req.syndicateMemberNumber());
         if (specialists.usernameTaken(username, null)) throw new ApiException(ErrorCode.USERNAME_TAKEN);
         if (specialists.memberNumberTaken(req.syndicateId(), memberNumber, null)) {
             throw new ApiException(ErrorCode.MEMBER_NUMBER_TAKEN);
@@ -57,7 +64,8 @@ class SpecialistService {
 
         UUID id;
         try {
-            id = specialists.insert(userId, username, req.syndicateId(), memberNumber);
+            Currency currency = Currency.forCountry(specialists.countryCurrencyCode(userId).orElse(null));
+            id = specialists.insert(userId, username, req.syndicateId(), memberNumber, currency);
         } catch (DuplicateKeyException e) {
             throw conflict(e);
         }
@@ -110,9 +118,11 @@ class SpecialistService {
             v.required("syndicate_member_number", null);
         }
 
-        for (String key : List.of("gender", "whatsapp_number", "primary_language")) {
-            if (body.containsKey(key)) changes.put(key, optionalText(body, key, v));
+        if (body.containsKey("whatsapp_number")) {
+            changes.put("whatsapp_number", optionalText(body, "whatsapp_number", v));
         }
+        putCode(body, "gender", Gender.class, v, changes);
+        putCode(body, "primary_language", LocaleCode.class, v, changes);
 
         if (body.containsKey("years_of_experience")) {
             changes.put("years_of_experience", optionalInt(body, "years_of_experience", v));
@@ -132,6 +142,9 @@ class SpecialistService {
                     "min_age_treated must be less than or equal to max_age_treated"));
         }
 
+        changes.putAll(PriceRangeUpdate.parse(body, cur, v));
+        v.throwIfInvalid();
+
         if (!username.equals(cur.username())) {
             if (specialists.usernameTaken(username, cur.id())) throw new ApiException(ErrorCode.USERNAME_TAKEN);
             changes.put("username", username);
@@ -140,7 +153,8 @@ class SpecialistService {
             if (cur.verificationStatus() == SpecialistVerificationStatus.ACTIVE) {
                 throw new ApiException(ErrorCode.SYNDICATE_LOCKED);
             }
-            if (!specialists.syndicateExists(syndicateId)) throw Errors.invalidField("syndicate_id", "unknown syndicate");
+            if (!specialists.syndicateExists(syndicateId))
+                throw Errors.invalidField("syndicate_id", "unknown syndicate");
             changes.put("syndicate_id", syndicateId);
         }
         if (syndicateChanged || !memberNumber.equals(cur.syndicateMemberNumber())) {
@@ -168,7 +182,9 @@ class SpecialistService {
         return raw.trim().toLowerCase(Locale.ROOT);
     }
 
-    /** Maps the unique index that fired to the contract's error. Anything else is a real bug: rethrow. */
+    /**
+     * Maps the unique index that fired to the contract's error. Anything else is a real bug: rethrow.
+     */
     private static RuntimeException conflict(DuplicateKeyException e) {
         String m = String.valueOf(e.getMostSpecificCause().getMessage());
         if (m.contains("uq_specialists_syndicate_member")) return new ApiException(ErrorCode.MEMBER_NUMBER_TAKEN);
@@ -181,14 +197,20 @@ class SpecialistService {
 
     private static RuntimeException integrity(DataIntegrityViolationException e) {
         String m = String.valueOf(e.getMostSpecificCause().getMessage());
-        if (m.contains("syndicate_id cannot change")) return new ApiException(ErrorCode.SYNDICATE_LOCKED);   // verified between our read and write
+        if (m.contains("syndicate_id cannot change"))
+            return new ApiException(ErrorCode.SYNDICATE_LOCKED);   // verified between our read and write
         if (m.contains("ck_specialists_age_range")) {
             return Errors.invalidField("min_age_treated", "min_age_treated must be less than or equal to max_age_treated");
+        }
+        if (m.contains("ck_specialists_price_range")) {
+            return Errors.invalidField("session_price_max", "must be greater than or equal to session_price_min");
         }
         return e;
     }
 
-    /** Mandatory when present: null, blank and non-string are all errors. Returns the trimmed text or null. */
+    /**
+     * Mandatory when present: null, blank and non-string are all errors. Returns the trimmed text or null.
+     */
     private static String requiredText(Map<String, Object> b, String key, Validator v) {
         Object o = b.get(key);
         if (o == null) {
@@ -200,10 +222,21 @@ class SpecialistService {
             return null;
         }
         v.required(key, s);
-        return s.isBlank() ? null : s.trim();
+        return blankToNull(s);
     }
 
-    /** Nullable text: null or blank clears the field. */
+    /** Nullable enum column: null clears it, anything outside the enum's codes is an error. */
+    private static <E extends Enum<E> & Coded> void putCode(Map<String, Object> body, String key, Class<E> type,
+                                                            Validator v, Map<String, Object> changes) {
+        if (!body.containsKey(key)) return;
+        E value = Codes.fromBody(body, key, type, v);
+        changes.put(key, value == null ? null : value.code());
+    }
+
+
+    /**
+     * Nullable text: null or blank clears the field.
+     */
     private static String optionalText(Map<String, Object> b, String key, Validator v) {
         Object o = b.get(key);
         if (o == null) return null;

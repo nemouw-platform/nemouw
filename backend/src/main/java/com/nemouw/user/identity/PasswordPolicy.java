@@ -71,22 +71,22 @@ public final class PasswordPolicy {
         if (!errors.isEmpty()) return errors; // fail early
 
         String normalizedPw = TextNormalizer.nfc(password);
-        String[] forms = normalizedForms(normalizedPw);
 
-        if (isCommon(forms)) errors.add(FieldErrors.tooCommon(field));
-        if (containsContextWord(forms, personalInfo)) errors.add(FieldErrors.containsPersonalInfo(field));
+        if (isCommon(commonForms(normalizedPw))) errors.add(FieldErrors.tooCommon(field));
+        if (containsContextWord(contextForms(normalizedPw), personalInfo)) {
+            errors.add(FieldErrors.containsPersonalInfo(field));
+        }
 
         return errors;
     }
 
     /**
-     * lowercase, letters only ("Password1!" -> "password"), and leet-decoded
-     * ("P@ssw0rd" -> "password").
+     * For the common-password check: lowercase, letters only ("Password1!" -> "password"), and leet-decoded.
      */
-    private static String[] normalizedForms(String password) {
+    private static String[] commonForms(String password) {
         String lower = password.toLowerCase(Locale.ROOT);
         String lettersOnly = lower.replaceAll("[^\\p{L}]", "");
-        String leetDecoded = lower.replace('@', 'a').replace('0', 'o').replace('3', 'e').replace('$', 's').replace('5', 's').replace('7', 't').replace('1', 'i').replaceAll("[^\\p{L}]", "");
+        String leetDecoded = decodeLeet(lower).replaceAll("[^\\p{L}]", "");
 
         // Prevent validation anomalies with strings that strip out entirely into empty
         // values
@@ -96,6 +96,19 @@ public final class PasswordPolicy {
         if (!leetDecoded.isEmpty() && !leetDecoded.equals(lettersOnly)) list.add(leetDecoded);
 
         return list.toArray(new String[0]);
+    }
+
+    /**
+     * The password as typed and leet-decoded. Nothing is stripped, so separators, digits and symbols all count.
+     */
+    private static String[] contextForms(String password) {
+        String lower = password.toLowerCase(Locale.ROOT);
+        return new String[]{lower, decodeLeet(lower)};
+    }
+
+    private static String decodeLeet(String s) {
+        return s.replace('@', 'a').replace('0', 'o').replace('3', 'e').replace('$', 's')
+                .replace('5', 's').replace('7', 't').replace('1', 'i');
     }
 
     private static boolean isCommon(String[] forms) {

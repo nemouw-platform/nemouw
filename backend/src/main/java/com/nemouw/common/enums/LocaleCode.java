@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Optional;
 
-public enum LocaleCode {
+public enum LocaleCode implements Coded {
     EN("en"),
     AR("ar"),
     FR("fr");

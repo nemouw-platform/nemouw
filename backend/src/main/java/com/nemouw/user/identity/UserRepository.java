@@ -102,6 +102,14 @@ public class UserRepository {
                 .map(UserStatus::fromCode);
     }
 
+    /** Returns false and changes nothing if the user is not currently in {@code from}. */
+    @Transactional(propagation = Propagation.MANDATORY)
+    public boolean changeStatus(UUID userId, UserStatus from, UserStatus to) {
+        return jdbc.sql("UPDATE users SET status = :newStatus WHERE id = :id AND status = :oldStatus")
+                .param("newStatus", to.code()).param("oldStatus", from.code()).param("id", userId)
+                .update() > 0;
+    }
+
     /**
      * Activates only a still-pending user. Returns false (and changes nothing) otherwise.
      * Used by signup once the password is set, when the email was already marked verified.

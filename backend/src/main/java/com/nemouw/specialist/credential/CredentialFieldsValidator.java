@@ -7,7 +7,7 @@ import com.nemouw.specialist.credential.CredentialDtos.CredentialWriteRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.*;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 final class CredentialFieldsValidator {
@@ -24,7 +24,7 @@ final class CredentialFieldsValidator {
                 .maxLength("credential_number", r.credentialNumber(), TEXT_MAX);
 
         CredentialType type = CredentialType.tryFrom(r.credentialType()).orElse(null);
-        boolean typeGiven = r.credentialType() != null && !r.credentialType().isBlank();
+        boolean typeGiven = !isBlank(r.credentialType());
         v.check(type != null || !typeGiven,
                 FieldErrors.invalidFormat("credential_type", "must be one of " + CredentialType.allCodes()));
 
@@ -34,7 +34,7 @@ final class CredentialFieldsValidator {
                 FieldErrors.invalidFormat("expiry_date", "must not be before issue_date"));
         v.throwIfInvalid();
 
-        return new CredentialFields(type, r.title().trim(), r.issuingOrganization().trim(),
+        return new CredentialFields(type, strip(r.title()), strip(r.issuingOrganization()),
                 blankToNull(r.credentialNumber()), issued, expires);
     }
 

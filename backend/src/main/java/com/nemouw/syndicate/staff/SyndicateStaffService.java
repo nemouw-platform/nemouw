@@ -19,6 +19,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.List;
 import java.util.UUID;
 
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 @Service
@@ -67,7 +68,7 @@ class SyndicateStaffService {
             requireSyndicate(syndicateId);
             Invite invite = invites.createPendingAccount(
                     UserRole.SYNDICATE_STAFF, req.firstName(), req.lastName(), req.email());
-            UUID memberId = staff.insertMember(syndicateId, invite.userId(), req.title().trim());
+            UUID memberId = staff.insertMember(syndicateId, invite.userId(), strip(req.title()));
             return new Created(assembler.toResponse(findRow(syndicateId, memberId)), invite);
         });
         invites.sendInvite(created.invite(), LocaleCode.EN);   // only after the commit
@@ -80,7 +81,7 @@ class SyndicateStaffService {
                 .required("title", req.title())
                 .maxLength("title", req.title(), TEXT_MAX)
                 .throwIfInvalid();
-        if (!staff.updateTitle(staffId, syndicateId, req.title().trim())) {
+        if (!staff.updateTitle(staffId, syndicateId, strip(req.title()))) {
             throw new ApiException(ErrorCode.NOT_FOUND);
         }
         return assembler.toResponse(findRow(syndicateId, staffId));
