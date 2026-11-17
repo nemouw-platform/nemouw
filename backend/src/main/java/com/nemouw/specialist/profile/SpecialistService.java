@@ -1,9 +1,6 @@
 package com.nemouw.specialist.profile;
 
-import com.nemouw.common.enums.Coded;
-import com.nemouw.common.enums.Codes;
-import com.nemouw.common.enums.Gender;
-import com.nemouw.common.enums.LocaleCode;
+import com.nemouw.common.enums.*;
 import com.nemouw.common.enums.Currency;
 import com.nemouw.common.exception.ApiException;
 import com.nemouw.common.exception.ErrorCode;
@@ -28,6 +25,8 @@ import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 class SpecialistService {
     private final SpecialistRepository specialists;
     private final PublicMediaUrls publicMediaUrls;
+    private static final int MAX_YEARS_OF_EXPERIENCE = 100;
+    private static final int MAX_AGE = 100;
 
     SpecialistService(SpecialistRepository specialists, PublicMediaUrls publicMediaUrls) {
         this.specialists = specialists;
@@ -125,16 +124,16 @@ class SpecialistService {
         putCode(body, "primary_language", LocaleCode.class, v, changes);
 
         if (body.containsKey("years_of_experience")) {
-            changes.put("years_of_experience", optionalInt(body, "years_of_experience", v));
+            changes.put("years_of_experience", optionalInt(body, "years_of_experience", MAX_YEARS_OF_EXPERIENCE, v));
         }
         Integer min = cur.minAgeTreated();
         Integer max = cur.maxAgeTreated();
         if (body.containsKey("min_age_treated")) {
-            min = optionalInt(body, "min_age_treated", v);
+            min = optionalInt(body, "min_age_treated", MAX_AGE, v);
             changes.put("min_age_treated", min);
         }
         if (body.containsKey("max_age_treated")) {
-            max = optionalInt(body, "max_age_treated", v);
+            max = optionalInt(body, "max_age_treated", MAX_AGE, v);
             changes.put("max_age_treated", max);
         }
         if (min != null && max != null && min > max) {
@@ -149,14 +148,13 @@ class SpecialistService {
             changes.put("username", username);
         }
         if (syndicateChanged) {
-            if (cur.verificationStatus() == SpecialistVerificationStatus.ACTIVE) {
-                throw new ApiException(ErrorCode.SYNDICATE_LOCKED);
-            }
+            requireUnverified(cur, ErrorCode.SYNDICATE_LOCKED);
             if (!specialists.syndicateExists(syndicateId))
                 throw Errors.invalidField("syndicate_id", "unknown syndicate");
             changes.put("syndicate_id", syndicateId);
         }
         if (syndicateChanged || !memberNumber.equals(cur.syndicateMemberNumber())) {
+            requireUnverified(cur, ErrorCode.MEMBER_NUMBER_LOCKED);
             if (specialists.memberNumberTaken(syndicateId, memberNumber, cur.id())) {
                 throw new ApiException(ErrorCode.MEMBER_NUMBER_TAKEN);
             }
@@ -181,6 +179,11 @@ class SpecialistService {
         return raw.trim().toLowerCase(Locale.ROOT);
     }
 
+    /** What staff verified, the syndicate and the member number, cannot change afterward. */
+    private static void requireUnverified(SpecialistRow cur, ErrorCode lockedError) {
+        if (cur.verificationStatus() == SpecialistVerificationStatus.ACTIVE) throw new ApiException(lockedError);
+    }
+
     /**
      * Maps the unique index that fired to the contract's error. Anything else is a real bug: rethrow.
      */
@@ -198,6 +201,8 @@ class SpecialistService {
         String m = String.valueOf(e.getMostSpecificCause().getMessage());
         if (m.contains("syndicate_id cannot change"))
             return new ApiException(ErrorCode.SYNDICATE_LOCKED);   // verified between our read and write
+        if (m.contains("syndicate_member_number cannot change"))
+            return new ApiException(ErrorCode.MEMBER_NUMBER_LOCKED);
         if (m.contains("ck_specialists_age_range")) {
             return Errors.invalidField("min_age_treated", "min_age_treated must be less than or equal to max_age_treated");
         }
@@ -247,11 +252,11 @@ class SpecialistService {
         return blankToNull(s);
     }
 
-    private static Integer optionalInt(Map<String, Object> b, String key, Validator v) {
+    private static Integer optionalInt(Map<String, Object> b, String key, int max, Validator v) {
         Object o = b.get(key);
         if (o == null) return null;
         if (o instanceof Integer i) {
-            v.check(i >= 0, FieldErrors.invalidFormat(key, "must be 0 or greater"));
+            v.check(i >= 0 && i <= max, FieldErrors.invalidFormat(key, "must be between 0 and " + max));
             return i;
         }
         v.check(false, FieldErrors.invalidFormat(key, "must be an integer"));
