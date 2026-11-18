@@ -1,5 +1,7 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -7,9 +9,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPromptLink } from "@/features/auth/components/auth-prompt"
-import { FormAlert } from "@/features/auth/components/form-alert"
 import { NewPasswordField } from "@/features/auth/components/new-password-field"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createPasswordSchema,
   type PasswordValues,
@@ -18,16 +18,16 @@ import { useSetupPassword } from "@/features/auth/password/use-setup-password"
 
 export function PasswordForm({ email }: { email?: string }) {
   const t = useTranslations("Password")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const tFields = useTranslations("Auth.fields")
   const schema = React.useMemo(
     () =>
       createPasswordSchema(
         { password: tFields("password") },
-        tAuthErrors,
+        tFormErrors,
         email
       ),
-    [tFields, tAuthErrors, email]
+    [tFields, tFormErrors, email]
   )
 
   const form = useForm<PasswordValues>({

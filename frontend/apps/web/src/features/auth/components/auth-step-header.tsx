@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl"
 
+import { PageHeader } from "@/components/page-header"
+
 interface AuthStepHeaderProps {
   title: React.ReactNode
   description?: React.ReactNode
@@ -16,16 +18,16 @@ export function AuthStepHeader({
   const t = useTranslations("Auth")
 
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-2xl font-semibold tracking-tight text-balance">
-        {title}
-      </h1>
-      {(step || description) && (
-        <p className="text-sm text-pretty text-muted-foreground">
-          {step && <>{t("step", step)} </>}
-          {description}
-        </p>
-      )}
-    </div>
+    <PageHeader
+      title={title}
+      description={
+        (step || description) && (
+          <>
+            {step && <>{t("step", step)} </>}
+            {description}
+          </>
+        )
+      }
+    />
   )
 }

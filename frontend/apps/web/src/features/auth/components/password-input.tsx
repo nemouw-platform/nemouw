@@ -11,7 +11,8 @@ import {
   FormField,
   splitFieldProps,
   type FieldOwnProps,
-} from "@/features/auth/components/form-field"
+  type PlaceholderProps,
+} from "@/components/form/form-field"
 
 type InputProps = Omit<React.ComponentProps<typeof Input>, "type">
 
@@ -71,7 +72,9 @@ function FadeIcon({
 
 /** FormField with a PasswordInput; `className` styles the input */
 export function FormPasswordField(
-  props: FieldOwnProps & Omit<InputProps, "id">
+  props: FieldOwnProps &
+    PlaceholderProps &
+    Omit<InputProps, "id" | "placeholder">
 ) {
   const [field, inputProps] = splitFieldProps(props)
   return (

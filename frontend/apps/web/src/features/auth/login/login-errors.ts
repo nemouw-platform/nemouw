@@ -1,10 +1,10 @@
-import { isApiError, type FieldErrorCode } from "@workspace/api"
-
-import { pickFieldErrors } from "@/features/auth/lib/api-errors"
 import {
   LOGIN_FIELDS,
   type LoginValues,
 } from "@/features/auth/login/login-schema"
+import { isApiError, type FieldErrorCode } from "@workspace/api"
+
+import { pickFieldErrors } from "@/lib/forms/api-errors"
 
 export type LoginFailure =
   | {

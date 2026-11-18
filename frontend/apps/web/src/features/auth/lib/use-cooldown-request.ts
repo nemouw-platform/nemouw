@@ -1,14 +1,11 @@
 "use client"
 
+import { RESEND_COOLDOWN_SECONDS } from "@/features/auth/lib/constants"
 import { useCountdown } from "@workspace/ui/hooks/use-countdown"
 import type { RequestFn } from "@workspace/ui/hooks/use-request"
 
-import {
-  isTooManyRequests,
-  retryAfterSeconds,
-} from "@/features/auth/lib/api-errors"
-import { RESEND_COOLDOWN_SECONDS } from "@/features/auth/lib/constants"
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
+import { isTooManyRequests, retryAfterSeconds } from "@/lib/forms/api-errors"
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 interface CooldownOptions<TData> {
   /** Seconds to wait before the first send, e.g. when the previous step just sent one */
@@ -29,7 +26,7 @@ export function useCooldownRequest<TArgs extends unknown[], TData>(
 ) {
   const countdown = useCountdown(initialCooldown)
 
-  const { run, isPending, formError } = useAuthRequest(request, {
+  const { run, isPending, formError } = useFormRequest(request, {
     onSuccess: (data) => {
       countdown.start(RESEND_COOLDOWN_SECONDS)
       onSuccess?.(data)

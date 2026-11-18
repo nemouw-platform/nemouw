@@ -5,7 +5,37 @@
   },
   "Common": {
     "toggleTheme": "تبديل المظهر",
-    "language": "اللغة"
+    "language": "اللغة",
+    "retry": "حاول مجددًا",
+    "signOut": "تسجيل الخروج"
+  },
+  "Form": {
+    "errors": {
+      "network": "تعذّر الاتصال بنمو حاليًا. تحقّق من اتصالك بالإنترنت وحاول مجددًا.",
+      "unexpected": "حدث خطأ من جهتنا. يُرجى المحاولة مجددًا.",
+      "tooManyRequests": "محاولات كثيرة. حاول مجددًا بعد {seconds, plural, one {ثانية واحدة} two {ثانيتين} few {# ثوانٍ} many {# ثانية} other {# ثانية}}.",
+      "required": "{field} مطلوب",
+      "tooShort": "{min} أحرف على الأقل",
+      "tooLong": "{max} حرفًا كحد أقصى",
+      "incompleteCode": "أدخل الأرقام الـ{length} كاملة",
+      "field": {
+        "REQUIRED": "هذا الحقل مطلوب",
+        "MUST_BE_EMAIL": "أدخل بريدًا إلكترونيًا صحيحًا، مثل name@example.com",
+        "TOO_SHORT": "النص قصير جدًا",
+        "TOO_LONG": "النص طويل جدًا",
+        "TOO_COMMON": "كلمة المرور هذه شائعة جدًا",
+        "CONTAINS_PERSONAL_INFO": "لا تستخدم «nemouw» أو الجزء الذي يسبق @ في بريدك الإلكتروني",
+        "INVALID_ROLE": "إنشاء الحساب متاح للأخصائيين فقط",
+        "INVALID_FORMAT": "تحقّق من الصيغة وحاول مجددًا"
+      },
+      "wholeNumber": "أدخل عددًا صحيحًا، مثل 5",
+      "tooLarge": "أدخل {max} أو أقل"
+    }
+  },
+  "PhoneInput": {
+    "country": "البلد: {country} (‎+{code}‎)",
+    "search": "ابحث عن بلد",
+    "noResults": "لم يُعثر على أي بلد"
   },
   "Navbar": {
     "mainNav": "الرئيسية",
@@ -14,6 +44,7 @@
     "forSpecialists": "للأخصائيين",
     "logIn": "تسجيل الدخول",
     "join": "انضم كأخصائي",
+    "dashboard": "لوحة التحكم",
     "menu": "القائمة",
     "openMenu": "فتح القائمة",
     "closeMenu": "إغلاق القائمة"
@@ -33,25 +64,6 @@
     },
     "step": "الخطوة {current} من {total}.",
     "copyright": "© {year} نمو",
-    "errors": {
-      "network": "تعذّر الاتصال بنمو حاليًا. تحقّق من اتصالك بالإنترنت وحاول مجددًا.",
-      "unexpected": "حدث خطأ من جهتنا. يُرجى المحاولة مجددًا.",
-      "tooManyRequests": "محاولات كثيرة. حاول مجددًا بعد {seconds, plural, one {ثانية واحدة} two {ثانيتين} few {# ثوانٍ} many {# ثانية} other {# ثانية}}.",
-      "required": "{field} مطلوب",
-      "tooShort": "{min} أحرف على الأقل",
-      "tooLong": "{max} حرفًا كحد أقصى",
-      "incompleteCode": "أدخل الأرقام الـ{length} كاملة",
-      "field": {
-        "REQUIRED": "هذا الحقل مطلوب",
-        "MUST_BE_EMAIL": "أدخل بريدًا إلكترونيًا صحيحًا، مثل name@example.com",
-        "TOO_SHORT": "النص قصير جدًا",
-        "TOO_LONG": "النص طويل جدًا",
-        "TOO_COMMON": "كلمة المرور هذه شائعة جدًا",
-        "CONTAINS_PERSONAL_INFO": "لا تستخدم «nemouw» أو الجزء الذي يسبق @ في بريدك الإلكتروني",
-        "INVALID_ROLE": "إنشاء الحساب متاح للأخصائيين فقط",
-        "INVALID_FORMAT": "تحقّق من الصيغة وحاول مجددًا"
-      }
-    },
     "phone": {
       "search": "علاج النطق في بيروت",
       "filterLanguage": "العربية",
@@ -97,7 +109,9 @@
     "fields": {
       "email": "البريد الإلكتروني",
       "emailPlaceholder": "mohamad.khalil@example.com",
-      "password": "كلمة المرور"
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "newPasswordPlaceholder": "أنشئ كلمة مرور"
     },
     "spamHint": "لم تجده؟ تحقّق من مجلد الرسائل غير المرغوب فيها."
   },
@@ -219,6 +233,107 @@
       "usernameTaken": "اسم المستخدم هذا مأخوذ. جرّب اسمًا آخر.",
       "usernameUnavailable": "اسم المستخدم هذا غير متاح. جرّب اسمًا آخر.",
       "memberNumberTaken": "رقم العضوية هذا مسجّل بالفعل لدى هذه النقابة."
+    }
+  },
+  "Dashboard": {
+    "nav": {
+      "label": "لوحة التحكم",
+      "overview": "نظرة عامة",
+      "profile": "الملف الشخصي"
+    },
+    "overview": {
+      "metaTitle": "لوحة التحكم",
+      "title": "أهلًا بعودتك",
+      "description": "سجّلت الدخول باسم ‎@{username}‎. إليك وضع ملفك الشخصي."
+    },
+    "verification": {
+      "title": "التحقق",
+      "pending": {
+        "label": "قيد المراجعة",
+        "description": "لم تتحقق نقابتك من ملفك بعد. سيتمكن المرضى من إيجادك بعد التحقق منه."
+      },
+      "active": {
+        "label": "موثّق",
+        "description": "تحققت نقابتك من ملفك في {date}. يمكن للمرضى إيجادك."
+      },
+      "rejected": {
+        "label": "غير موثّق",
+        "description": "لم تتمكن نقابتك من التحقق من ملفك، لذا لا يمكن للمرضى إيجادك بعد. راجع معلوماتك وتواصل مع نقابتك."
+      }
+    },
+    "setup": {
+      "title": "أكمل ملفك الشخصي",
+      "completeTitle": "ملفك الشخصي مكتمل",
+      "progress": "أُنجز {done} من {total}",
+      "done": "منجز",
+      "toDo": "غير منجز",
+      "steps": {
+        "details": {
+          "title": "أضف تفاصيل عملك",
+          "description": "سنوات الخبرة ولغتك الأساسية ورقم واتساب يتواصل معك المرضى عليه."
+        },
+        "about": {
+          "title": "عرّف بنفسك",
+          "description": "نبذة قصيرة بلغة واحدة على الأقل ليعرف المرضى من أنت."
+        }
+      }
+    }
+  },
+  "Profile": {
+    "metaTitle": "الملف الشخصي",
+    "title": "ملفك الشخصي",
+    "description": "ما يراه المرضى في صفحتك العامة. تظهر التغييرات فور حفظها.",
+    "languages": {
+      "ar": "العربية",
+      "en": "الإنجليزية",
+      "fr": "الفرنسية"
+    },
+    "details": {
+      "title": "تفاصيل العمل",
+      "description": "يعتمد عليها المرضى لاختيار الأخصائي والتواصل معه.",
+      "experience": "سنوات الخبرة",
+      "experiencePlaceholder": "8",
+      "experienceHint": "منذ بدأت ممارسة المهنة",
+      "whatsapp": "رقم واتساب",
+      "whatsappHint": "يتواصل معك المرضى على هذا الرقم",
+      "phoneFormat": "أدخل رقم هاتف صالحًا لهذا البلد",
+      "gender": "الجنس",
+      "genders": {
+        "female": "أنثى",
+        "male": "ذكر"
+      },
+      "language": "اللغة الأساسية",
+      "languageHint": "اللغة التي تعمل بها أكثر من غيرها",
+      "notSpecified": "غير محدد",
+      "minAge": "أصغر عمر تستقبله",
+      "minAgePlaceholder": "3",
+      "maxAge": "أكبر عمر تستقبله",
+      "maxAgePlaceholder": "18",
+      "ageHint": "بالسنوات. اتركه فارغًا إن لم يكن هناك حد.",
+      "ageRange": "يجب ألا يقل عن أصغر عمر",
+      "save": "حفظ التفاصيل",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ"
+    },
+    "about": {
+      "title": "نبذة عنك",
+      "description": "اكتب لقبك وعنوانك التعريفي ونبذتك بكل لغة تريد أن يقرأها بها المرضى. يرى المرضى النسخة المكتوبة بلغتهم، أو نسخة أخرى إن لم تتوفر.",
+      "languages": "اللغات",
+      "written": "تحتوي على نبذة",
+      "formTitle": "باللغة {language}",
+      "formDescription": "تظهر للمرضى الذين يتصفحون نمو باللغة {language}.",
+      "titleLabel": "اللقب المهني",
+      "titlePlaceholder": "أخصائية نطق ولغة",
+      "titleHint": "يظهر تحت اسمك",
+      "headline": "العنوان التعريفي",
+      "headlinePlaceholder": "أساعد الأطفال على إيجاد كلماتهم",
+      "headlineHint": "سطر واحد يلخص عملك",
+      "bio": "النبذة",
+      "bioPlaceholder": "تدريبك، والأشخاص الذين تعمل معهم، وطريقة عملك.",
+      "bioCount": "{count} / {max} حرف",
+      "save": "حفظ النص باللغة {language}",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ"
     }
   }
 }

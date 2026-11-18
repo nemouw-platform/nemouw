@@ -1,5 +1,7 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -7,10 +9,8 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPromptLink } from "@/features/auth/components/auth-prompt"
-import { FormAlert } from "@/features/auth/components/form-alert"
 import { FormEmailField } from "@/features/auth/components/email-field"
 import { FormPasswordField } from "@/features/auth/components/password-input"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createLoginSchema,
   type LoginValues,
@@ -21,14 +21,14 @@ import { useResumeSession } from "@/features/auth/login/use-resume-session"
 export function LoginForm() {
   const t = useTranslations("Login")
   const tFields = useTranslations("Auth.fields")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
     () =>
       createLoginSchema(
         { email: tFields("email"), password: tFields("password") },
-        tAuthErrors
+        tFormErrors
       ),
-    [tFields, tAuthErrors]
+    [tFields, tFormErrors]
   )
 
   const form = useForm<LoginValues>({
@@ -55,6 +55,7 @@ export function LoginForm() {
           id="password"
           required
           label={tFields("password")}
+          placeholder={tFields("passwordPlaceholder")}
           autoComplete="current-password"
           labelAction={
             <AuthPromptLink href="/forgot-password">

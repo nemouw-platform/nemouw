@@ -1,7 +1,7 @@
+import { RESET_FIELDS } from "@/features/auth/reset/reset-schema"
 import { isApiError, type FieldErrorCode } from "@workspace/api"
 
-import { pickFieldErrors } from "@/features/auth/lib/api-errors"
-import { RESET_FIELDS } from "@/features/auth/reset/reset-schema"
+import { pickFieldErrors } from "@/lib/forms/api-errors"
 
 export type ResetFailure =
   | {

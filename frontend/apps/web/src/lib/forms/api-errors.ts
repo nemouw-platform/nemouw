@@ -4,10 +4,11 @@ import {
   type FieldErrorCode,
 } from "@workspace/api"
 import type { useTranslations } from "next-intl"
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form"
 
-/** Translator for the shared "Auth.errors" messages */
-export type AuthErrorsTranslator = ReturnType<
-  typeof useTranslations<"Auth.errors">
+/** Translator for the shared "Form.errors" messages */
+export type FormErrorsTranslator = ReturnType<
+  typeof useTranslations<"Form.errors">
 >
 
 /** Wait used when a 429 arrives without Retry-After */
@@ -46,15 +47,37 @@ export function pickFieldErrors<TField extends string>(
 /** Message for a backend field error code, used when the server rejects a field */
 export function fieldErrorMessage(
   code: FieldErrorCode,
-  t: AuthErrorsTranslator
+  t: FormErrorsTranslator
 ): string {
   return t(`field.${code}`)
+}
+
+/**
+ * Puts a 422's field errors on the form's fields (focusing the first) and
+ * returns true, or returns false when the error has none for this form.
+ * `fields` are the form's field names, which match the API body's keys.
+ */
+export function applyFieldErrors<TValues extends FieldValues>(
+  form: Pick<UseFormReturn<TValues>, "setError">,
+  error: unknown,
+  fields: readonly Path<TValues>[],
+  t: FormErrorsTranslator
+): boolean {
+  const found = pickFieldErrors(error, fields)
+  found.forEach(({ name, code }, index) =>
+    form.setError(
+      name,
+      { message: fieldErrorMessage(code, t) },
+      { shouldFocus: index === 0 }
+    )
+  )
+  return found.length > 0
 }
 
 /** Message for failures no screen handles itself: offline, throttled, or unexpected */
 export function generalErrorMessage(
   error: unknown,
-  t: AuthErrorsTranslator
+  t: FormErrorsTranslator
 ): string {
   if (isTooManyRequests(error)) {
     return t("tooManyRequests", { seconds: retryAfterSeconds(error) })

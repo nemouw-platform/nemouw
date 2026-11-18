@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createFieldRules } from "@/features/auth/lib/validation"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
+import { createFieldRules } from "@/lib/forms/validation"
 
 /** Translator stub that echoes the key and values */
 const t = ((key: string, values?: object) =>
-  values ? `${key} ${JSON.stringify(values)}` : key) as AuthErrorsTranslator
+  values ? `${key} ${JSON.stringify(values)}` : key) as FormErrorsTranslator
 
 const rules = createFieldRules(t)
 const errorOf = (result: {
@@ -25,6 +25,23 @@ describe("createFieldRules", () => {
     expect(errorOf(rules.text("First name", 5).safeParse("Ranaaa"))).toBe(
       'tooLong {"max":5}'
     )
+  })
+
+  it("optionalText: trims, allows blank, enforces the max length", () => {
+    expect(rules.optionalText(5).parse("   ")).toBe("")
+    expect(rules.optionalText(5).parse(" Rana ")).toBe("Rana")
+    expect(errorOf(rules.optionalText(5).safeParse("Ranaaa"))).toBe(
+      'tooLong {"max":5}'
+    )
+  })
+
+  it("optionalCount: blank or a whole number up to the max", () => {
+    const years = rules.optionalCount(70)
+    expect(years.parse("")).toBe("")
+    expect(years.parse(" 12 ")).toBe("12")
+    expect(errorOf(years.safeParse("1.5"))).toBe("wholeNumber")
+    expect(errorOf(years.safeParse("-3"))).toBe("wholeNumber")
+    expect(errorOf(years.safeParse("71"))).toBe('tooLarge {"max":70}')
   })
 
   it("email: required, then the backend's shape", () => {

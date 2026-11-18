@@ -1,7 +1,7 @@
+import { PASSWORD_FIELDS } from "@/features/auth/password/password-schema"
 import { isApiError, type FieldErrorCode } from "@workspace/api"
 
-import { pickFieldErrors } from "@/features/auth/lib/api-errors"
-import { PASSWORD_FIELDS } from "@/features/auth/password/password-schema"
+import { pickFieldErrors } from "@/lib/forms/api-errors"
 
 export type PasswordFailure =
   | {

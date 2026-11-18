@@ -1,16 +1,10 @@
 "use client"
 
 import type { SyndicateSummary } from "@workspace/api"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
 import { useTranslations } from "next-intl"
 
-import type { ControlProps } from "@/features/auth/components/form-field"
+import type { ControlProps } from "@/components/form/form-field"
+import { SelectControl } from "@/components/form/select-control"
 
 interface SyndicateSelectProps extends ControlProps {
   syndicates: SyndicateSummary[]
@@ -25,45 +19,22 @@ interface SyndicateSelectProps extends ControlProps {
 export function SyndicateSelect({
   syndicates,
   isLoading,
-  value,
-  onChange,
-  onBlur,
-  ref,
-  ...control
+  ...props
 }: SyndicateSelectProps) {
   const t = useTranslations("Onboarding")
-  const items = syndicates.map((syndicate) => ({
+  const options = syndicates.map((syndicate) => ({
     value: syndicate.id ?? "",
     label: syndicate.name ?? "",
   }))
 
   return (
-    <Select
-      items={items}
-      value={value || null}
-      onValueChange={(next) => onChange(next ?? "")}
-      disabled={isLoading || items.length === 0}
-    >
-      <SelectTrigger
-        {...control}
-        ref={ref}
-        onBlur={onBlur}
-        // Full width, white like the other fields on the lavender page
-        className="h-10 w-full bg-card"
-      >
-        <SelectValue
-          placeholder={
-            isLoading ? t("syndicatesLoading") : t("syndicatePlaceholder")
-          }
-        />
-      </SelectTrigger>
-      <SelectContent>
-        {items.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <SelectControl
+      {...props}
+      options={options}
+      disabled={isLoading || options.length === 0}
+      placeholder={
+        isLoading ? t("syndicatesLoading") : t("syndicatePlaceholder")
+      }
+    />
   )
 }

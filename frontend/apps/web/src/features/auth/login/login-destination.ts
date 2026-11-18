@@ -1,9 +1,6 @@
 import { isApiError, type Role } from "@workspace/api"
 
-import {
-  AFTER_LOGIN_PATH,
-  AFTER_SIGNUP_PATH,
-} from "@/features/auth/lib/constants"
+import { AFTER_SIGNUP_PATH, homePathFor } from "@/features/auth/lib/constants"
 import { NEXT_PARAM, safeNextPath } from "@/features/auth/session/route-access"
 import { specialistsApi } from "@/lib/api"
 
@@ -11,7 +8,7 @@ import { specialistsApi } from "@/lib/api"
  * Where a user goes right after logging in (or resuming a session):
  * a specialist without a profile (404 SPECIALIST_NOT_FOUND) must onboard
  * first; anyone else returns to `?next=` (the page the proxy sent them away
- * from) or the default page.
+ * from) or their home page.
  */
 export async function loginDestination(
   role: Role,
@@ -20,7 +17,7 @@ export async function loginDestination(
   if (role === "specialist" && !(await hasSpecialistProfile(signal))) {
     return AFTER_SIGNUP_PATH
   }
-  return nextFromLocation() ?? AFTER_LOGIN_PATH
+  return nextFromLocation() ?? homePathFor(role)
 }
 
 async function hasSpecialistProfile(signal?: AbortSignal): Promise<boolean> {

@@ -1,5 +1,8 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { FormField, FormTextField } from "@/components/form/form-field"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -7,9 +10,6 @@ import * as React from "react"
 import { Controller, useForm } from "react-hook-form"
 
 import { AuthPromptButton } from "@/features/auth/components/auth-prompt"
-import { FormAlert } from "@/features/auth/components/form-alert"
-import { FormField, FormTextField } from "@/features/auth/components/form-field"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createOnboardingSchema,
   type OnboardingValues,
@@ -23,7 +23,7 @@ import { useSyndicates } from "@/features/auth/onboarding/use-syndicates"
 
 export function OnboardingForm() {
   const t = useTranslations("Onboarding")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
     () =>
       createOnboardingSchema(
@@ -32,10 +32,10 @@ export function OnboardingForm() {
           syndicate: t("syndicate"),
           memberNumber: t("memberNumber"),
         },
-        tAuthErrors,
+        tFormErrors,
         t("errors.usernameFormat")
       ),
-    [t, tAuthErrors]
+    [t, tFormErrors]
   )
 
   const form = useForm<OnboardingValues>({

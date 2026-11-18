@@ -1,5 +1,6 @@
 import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
+import { Textarea } from "@workspace/ui/components/textarea"
 import { cn } from "@workspace/ui/lib/utils"
 import type { FieldError as FormFieldError } from "react-hook-form"
 
@@ -97,6 +98,14 @@ export function FormField({
 /** FormField's own props, for wrappers that pair it with one input */
 export type FieldOwnProps = Omit<FormFieldProps, "children" | "className">
 
+/**
+ * Every text box shows a placeholder (an example value or a short prompt),
+ * so the field wrappers require one
+ */
+export interface PlaceholderProps {
+  placeholder: string
+}
+
 const FIELD_OWN_KEYS = [
   "id",
   "label",
@@ -125,7 +134,9 @@ export function splitFieldProps<T extends FieldOwnProps>(
 
 /** FormField with a text input; `className` styles the input, like on <Input> */
 export function FormTextField(
-  props: FieldOwnProps & Omit<React.ComponentProps<typeof Input>, "id">
+  props: FieldOwnProps &
+    PlaceholderProps &
+    Omit<React.ComponentProps<typeof Input>, "id" | "placeholder">
 ) {
   const [field, { className, ...inputProps }] = splitFieldProps(props)
   return (
@@ -136,6 +147,26 @@ export function FormTextField(
           // White like the cards, so fields stand out on the lavender page
           className={cn("h-10 bg-card", className)}
           {...inputProps}
+        />
+      )}
+    </FormField>
+  )
+}
+
+/** FormField with a multi-line text box; `className` styles the textarea */
+export function FormTextareaField(
+  props: FieldOwnProps &
+    PlaceholderProps &
+    Omit<React.ComponentProps<typeof Textarea>, "id" | "placeholder">
+) {
+  const [field, { className, ...textareaProps }] = splitFieldProps(props)
+  return (
+    <FormField {...field}>
+      {(control) => (
+        <Textarea
+          {...control}
+          className={cn("min-h-32 bg-card", className)}
+          {...textareaProps}
         />
       )}
     </FormField>

@@ -1,7 +1,7 @@
+import { classifyResetError } from "@/features/auth/reset/reset-errors"
 import { describe, expect, it } from "vitest"
 
-import { apiError } from "@/features/auth/lib/testing"
-import { classifyResetError } from "@/features/auth/reset/reset-errors"
+import { apiError } from "@/lib/forms/testing"
 
 describe("classifyResetError", () => {
   it("treats the backend's 400 as an invalid link", () => {

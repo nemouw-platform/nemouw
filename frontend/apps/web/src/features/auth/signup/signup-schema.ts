@@ -1,7 +1,7 @@
 import { z } from "zod"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createFieldRules } from "@/features/auth/lib/validation"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
+import { createFieldRules } from "@/lib/forms/validation"
 
 /** The backend's limit for first and last names */
 export const NAME_MAX_LENGTH = 100
@@ -13,7 +13,7 @@ type SignupLabels = Record<"firstName" | "lastName" | "email", string>
 /** Step 1 fields, named like the API body (snake_case) so server errors map 1:1 */
 export function createSignupSchema(
   labels: SignupLabels,
-  t: AuthErrorsTranslator
+  t: FormErrorsTranslator
 ) {
   const rules = createFieldRules(t)
   return z.object({

@@ -1,11 +1,5 @@
 "use client"
 
-import { useTranslations } from "next-intl"
-import * as React from "react"
-import type { UseFormReturn } from "react-hook-form"
-
-import { fieldErrorMessage } from "@/features/auth/lib/api-errors"
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
 import { loginDestination } from "@/features/auth/login/login-destination"
 import {
   classifyLoginError,
@@ -14,6 +8,12 @@ import {
 import type { LoginValues } from "@/features/auth/login/login-schema"
 import { useRouter } from "@/i18n/navigation"
 import { authApi } from "@/lib/api"
+import { useTranslations } from "next-intl"
+import * as React from "react"
+import type { UseFormReturn } from "react-hook-form"
+
+import { fieldErrorMessage } from "@/lib/forms/api-errors"
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /** Failures the form shows with their own message and link */
 export type LoginNotice = Extract<
@@ -27,10 +27,10 @@ export type LoginNotice = Extract<
  */
 export function useLogin(form: UseFormReturn<LoginValues>) {
   const router = useRouter()
-  const tAuth = useTranslations("Auth.errors")
+  const tForm = useTranslations("Form.errors")
   const [notice, setNotice] = React.useState<LoginNotice | null>(null)
 
-  const login = useAuthRequest(
+  const login = useFormRequest(
     async (signal, values: LoginValues) => {
       const session = await authApi.login(values, { signal })
       return loginDestination(session.role, signal)
@@ -43,7 +43,7 @@ export function useLogin(form: UseFormReturn<LoginValues>) {
         switch (failure.kind) {
           case "fields":
             failure.fields.forEach(({ name, code }) =>
-              form.setError(name, { message: fieldErrorMessage(code, tAuth) })
+              form.setError(name, { message: fieldErrorMessage(code, tForm) })
             )
             return true
           case "general":

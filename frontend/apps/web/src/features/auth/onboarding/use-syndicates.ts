@@ -1,23 +1,12 @@
 "use client"
 
-import { useRequest } from "@workspace/ui/hooks/use-request"
-import * as React from "react"
-
 import { syndicatesApi } from "@/lib/api"
+import { useApiLoad } from "@/lib/use-api-load"
 
 /** The public syndicate list for the picker, loaded once, with a retry */
 export function useSyndicates() {
-  const { data, status, run, restart } = useRequest(
-    (signal) => syndicatesApi.list({ signal }),
-    { debounceMs: 0 }
+  const { data, isLoading, failed, retry } = useApiLoad((signal) =>
+    syndicatesApi.list({ signal })
   )
-
-  React.useEffect(() => run(), [run])
-
-  return {
-    syndicates: data ?? [],
-    isLoading: status === "idle" || status === "pending",
-    failed: status === "error",
-    retry: restart,
-  }
+  return { syndicates: data ?? [], isLoading, failed, retry }
 }

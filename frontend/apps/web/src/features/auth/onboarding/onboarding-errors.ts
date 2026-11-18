@@ -1,10 +1,10 @@
-import { isApiError, type FieldErrorCode } from "@workspace/api"
-
-import { pickFieldErrors } from "@/features/auth/lib/api-errors"
 import {
   ONBOARDING_FIELDS,
   type OnboardingValues,
 } from "@/features/auth/onboarding/onboarding-schema"
+import { isApiError, type FieldErrorCode } from "@workspace/api"
+
+import { pickFieldErrors } from "@/lib/forms/api-errors"
 
 export type OnboardingFailure =
   | {

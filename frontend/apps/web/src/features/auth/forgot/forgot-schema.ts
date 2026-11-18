@@ -1,11 +1,11 @@
 import { z } from "zod"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createFieldRules } from "@/features/auth/lib/validation"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
+import { createFieldRules } from "@/lib/forms/validation"
 
 export function createForgotSchema(
   labels: { email: string },
-  t: AuthErrorsTranslator
+  t: FormErrorsTranslator
 ) {
   return z.object({ email: createFieldRules(t).email(labels.email) })
 }

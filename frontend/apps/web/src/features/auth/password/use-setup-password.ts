@@ -1,16 +1,16 @@
 "use client"
 
-import { useTranslations } from "next-intl"
-import * as React from "react"
-import type { UseFormReturn } from "react-hook-form"
-
-import { fieldErrorMessage } from "@/features/auth/lib/api-errors"
 import { AFTER_SIGNUP_PATH } from "@/features/auth/lib/constants"
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
 import { classifyPasswordError } from "@/features/auth/password/password-errors"
 import type { PasswordValues } from "@/features/auth/password/password-schema"
 import { useRouter } from "@/i18n/navigation"
 import { authApi } from "@/lib/api"
+import { useTranslations } from "next-intl"
+import * as React from "react"
+import type { UseFormReturn } from "react-hook-form"
+
+import { fieldErrorMessage } from "@/lib/forms/api-errors"
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /**
  * Submits step 3: sets the first password, which activates the account and
@@ -19,10 +19,10 @@ import { authApi } from "@/lib/api"
  */
 export function useSetupPassword(form: UseFormReturn<PasswordValues>) {
   const router = useRouter()
-  const tAuth = useTranslations("Auth.errors")
+  const tForm = useTranslations("Form.errors")
   const [setupExpired, setSetupExpired] = React.useState(false)
 
-  const setup = useAuthRequest(
+  const setup = useFormRequest(
     (signal, values: PasswordValues) =>
       authApi.setupPassword(values, { signal }),
     {
@@ -38,7 +38,7 @@ export function useSetupPassword(form: UseFormReturn<PasswordValues>) {
             failure.fields.forEach(({ name, code }) =>
               form.setError(
                 name,
-                { message: fieldErrorMessage(code, tAuth) },
+                { message: fieldErrorMessage(code, tForm) },
                 { shouldFocus: true }
               )
             )

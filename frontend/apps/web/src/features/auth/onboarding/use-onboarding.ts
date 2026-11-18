@@ -1,16 +1,16 @@
 "use client"
 
-import { useTranslations } from "next-intl"
-import * as React from "react"
-import type { UseFormReturn } from "react-hook-form"
-
-import { fieldErrorMessage } from "@/features/auth/lib/api-errors"
-import { AFTER_LOGIN_PATH } from "@/features/auth/lib/constants"
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
+import { DASHBOARD_PATH } from "@/features/auth/lib/constants"
 import { classifyOnboardingError } from "@/features/auth/onboarding/onboarding-errors"
 import type { OnboardingValues } from "@/features/auth/onboarding/onboarding-schema"
 import { useRouter } from "@/i18n/navigation"
 import { specialistsApi } from "@/lib/api"
+import { useTranslations } from "next-intl"
+import * as React from "react"
+import type { UseFormReturn } from "react-hook-form"
+
+import { fieldErrorMessage } from "@/lib/forms/api-errors"
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /**
  * Sends the specialist away if onboarding is already done (they have a
@@ -23,7 +23,7 @@ export function useRedirectIfOnboarded() {
     const controller = new AbortController()
     specialistsApi
       .getMe({ signal: controller.signal })
-      .then(() => router.replace(AFTER_LOGIN_PATH))
+      .then(() => router.replace(DASHBOARD_PATH))
       // 404 SPECIALIST_NOT_FOUND is the expected "not onboarded yet": stay.
       // A dead session is handled by the API client (back to login).
       .catch(() => undefined)
@@ -31,17 +31,17 @@ export function useRedirectIfOnboarded() {
   }, [router])
 }
 
-/** Submits onboarding; success opens the rest of the app */
+/** Submits onboarding; success opens the dashboard */
 export function useOnboarding(form: UseFormReturn<OnboardingValues>) {
   const router = useRouter()
   const t = useTranslations("Onboarding.errors")
-  const tAuth = useTranslations("Auth.errors")
+  const tForm = useTranslations("Form.errors")
 
-  const onboarding = useAuthRequest(
+  const onboarding = useFormRequest(
     (signal, values: OnboardingValues) =>
       specialistsApi.onboard(values, { signal }),
     {
-      onSuccess: () => router.replace(AFTER_LOGIN_PATH),
+      onSuccess: () => router.replace(DASHBOARD_PATH),
       onError: (error) => {
         const failure = classifyOnboardingError(error)
         const focus = { shouldFocus: true }
@@ -64,11 +64,11 @@ export function useOnboarding(form: UseFormReturn<OnboardingValues>) {
             )
             return true
           case "alreadyOnboarded":
-            router.replace(AFTER_LOGIN_PATH)
+            router.replace(DASHBOARD_PATH)
             return true
           case "fields":
             failure.fields.forEach(({ name, code }) =>
-              form.setError(name, { message: fieldErrorMessage(code, tAuth) })
+              form.setError(name, { message: fieldErrorMessage(code, tForm) })
             )
             return true
           case "general":

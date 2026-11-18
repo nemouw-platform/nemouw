@@ -1,5 +1,7 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -12,9 +14,7 @@ import {
 } from "@/features/auth/components/auth-prompt"
 import { AuthStepHeader } from "@/features/auth/components/auth-step-header"
 import { FormEmailField } from "@/features/auth/components/email-field"
-import { FormAlert } from "@/features/auth/components/form-alert"
 import { ResendPrompt } from "@/features/auth/components/resend-prompt"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createForgotSchema,
   type ForgotValues,
@@ -26,10 +26,10 @@ import { richText } from "@/features/auth/lib/rich-text"
 export function ForgotFlow() {
   const t = useTranslations("ForgotPassword")
   const tAuth = useTranslations("Auth")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
-    () => createForgotSchema({ email: tAuth("fields.email") }, tAuthErrors),
-    [tAuth, tAuthErrors]
+    () => createForgotSchema({ email: tAuth("fields.email") }, tFormErrors),
+    [tAuth, tFormErrors]
   )
   const form = useForm<ForgotValues>({
     resolver: zodResolver(schema),

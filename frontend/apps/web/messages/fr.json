@@ -5,7 +5,37 @@
   },
   "Common": {
     "toggleTheme": "Changer de thème",
-    "language": "Langue"
+    "language": "Langue",
+    "retry": "Réessayer",
+    "signOut": "Se déconnecter"
+  },
+  "Form": {
+    "errors": {
+      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
+      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
+      "tooManyRequests": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
+      "required": "{field} est obligatoire",
+      "tooShort": "{min} caractères minimum",
+      "tooLong": "{max} caractères maximum",
+      "incompleteCode": "Saisissez les {length} chiffres",
+      "field": {
+        "REQUIRED": "Ce champ est obligatoire",
+        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
+        "TOO_SHORT": "C'est trop court",
+        "TOO_LONG": "C'est trop long",
+        "TOO_COMMON": "Ce mot de passe est trop courant",
+        "CONTAINS_PERSONAL_INFO": "N'incluez ni « nemouw » ni la partie de votre e-mail avant @",
+        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
+        "INVALID_FORMAT": "Vérifiez le format et réessayez"
+      },
+      "wholeNumber": "Saisissez un nombre entier, par exemple 5",
+      "tooLarge": "Saisissez {max} ou moins"
+    }
+  },
+  "PhoneInput": {
+    "country": "Pays : {country} (+{code})",
+    "search": "Rechercher un pays",
+    "noResults": "Aucun pays trouvé"
   },
   "Navbar": {
     "mainNav": "Principale",
@@ -14,6 +44,7 @@
     "forSpecialists": "Pour les spécialistes",
     "logIn": "Se connecter",
     "join": "Inscription spécialiste",
+    "dashboard": "Tableau de bord",
     "menu": "Menu",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu"
@@ -33,25 +64,6 @@
     },
     "step": "Étape {current} sur {total}.",
     "copyright": "© {year} Nemouw",
-    "errors": {
-      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
-      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
-      "tooManyRequests": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
-      "required": "{field} est obligatoire",
-      "tooShort": "{min} caractères minimum",
-      "tooLong": "{max} caractères maximum",
-      "incompleteCode": "Saisissez les {length} chiffres",
-      "field": {
-        "REQUIRED": "Ce champ est obligatoire",
-        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
-        "TOO_SHORT": "C'est trop court",
-        "TOO_LONG": "C'est trop long",
-        "TOO_COMMON": "Ce mot de passe est trop courant",
-        "CONTAINS_PERSONAL_INFO": "N'incluez ni « nemouw » ni la partie de votre e-mail avant @",
-        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
-        "INVALID_FORMAT": "Vérifiez le format et réessayez"
-      }
-    },
     "phone": {
       "search": "Orthophonie à Beyrouth",
       "filterLanguage": "Arabe",
@@ -97,7 +109,9 @@
     "fields": {
       "email": "Adresse e-mail",
       "emailPlaceholder": "jean.dupont@exemple.com",
-      "password": "Mot de passe"
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Saisissez votre mot de passe",
+      "newPasswordPlaceholder": "Créez un mot de passe"
     },
     "spamHint": "Vous ne le trouvez pas ? Vérifiez vos courriers indésirables."
   },
@@ -219,6 +233,107 @@
       "usernameTaken": "Ce nom d'utilisateur est déjà pris. Essayez-en un autre.",
       "usernameUnavailable": "Ce nom d'utilisateur n'est pas disponible. Essayez-en un autre.",
       "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat."
+    }
+  },
+  "Dashboard": {
+    "nav": {
+      "label": "Tableau de bord",
+      "overview": "Aperçu",
+      "profile": "Profil"
+    },
+    "overview": {
+      "metaTitle": "Tableau de bord",
+      "title": "Bon retour",
+      "description": "Connecté en tant que @{username}. Voici où en est votre profil."
+    },
+    "verification": {
+      "title": "Vérification",
+      "pending": {
+        "label": "En attente",
+        "description": "Votre syndicat n'a pas encore vérifié votre profil. Les patients pourront vous trouver une fois qu'il sera vérifié."
+      },
+      "active": {
+        "label": "Vérifié",
+        "description": "Votre syndicat a vérifié votre profil le {date}. Les patients peuvent vous trouver."
+      },
+      "rejected": {
+        "label": "Non vérifié",
+        "description": "Votre syndicat n'a pas pu vérifier votre profil : les patients ne peuvent pas encore vous trouver. Vérifiez vos informations et contactez votre syndicat."
+      }
+    },
+    "setup": {
+      "title": "Complétez votre profil",
+      "completeTitle": "Votre profil est complet",
+      "progress": "{done} sur {total} terminées",
+      "done": "terminé",
+      "toDo": "à faire",
+      "steps": {
+        "details": {
+          "title": "Ajoutez les détails de votre pratique",
+          "description": "Années d'expérience, langue principale et un numéro WhatsApp où les patients peuvent vous joindre."
+        },
+        "about": {
+          "title": "Présentez-vous",
+          "description": "Une courte biographie, dans au moins une langue, pour que les patients sachent qui vous êtes."
+        }
+      }
+    }
+  },
+  "Profile": {
+    "metaTitle": "Profil",
+    "title": "Votre profil",
+    "description": "Ce que les patients voient sur votre page publique. Les changements apparaissent dès l'enregistrement.",
+    "languages": {
+      "ar": "Arabe",
+      "en": "Anglais",
+      "fr": "Français"
+    },
+    "details": {
+      "title": "Détails de la pratique",
+      "description": "Les patients s'en servent pour choisir un spécialiste et le contacter.",
+      "experience": "Années d'expérience",
+      "experiencePlaceholder": "8",
+      "experienceHint": "Depuis le début de votre pratique",
+      "whatsapp": "Numéro WhatsApp",
+      "whatsappHint": "Les patients vous contactent à ce numéro",
+      "phoneFormat": "Saisissez un numéro valide pour ce pays",
+      "gender": "Genre",
+      "genders": {
+        "female": "Femme",
+        "male": "Homme"
+      },
+      "language": "Langue principale",
+      "languageHint": "La langue dans laquelle vous travaillez le plus",
+      "notSpecified": "Non précisé",
+      "minAge": "Âge minimum de vos patients",
+      "minAgePlaceholder": "3",
+      "maxAge": "Âge maximum de vos patients",
+      "maxAgePlaceholder": "18",
+      "ageHint": "En années. Laissez vide pour ne pas fixer de limite.",
+      "ageRange": "Doit être au moins égal à l'âge minimum",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    },
+    "about": {
+      "title": "À propos de vous",
+      "description": "Rédigez votre titre, votre accroche et votre biographie dans chaque langue où vous voulez que les patients les lisent. Ils voient la version dans leur langue, ou une autre si elle manque.",
+      "languages": "Langues",
+      "written": "Biographie rédigée",
+      "formTitle": "En {language}",
+      "formDescription": "Affiché aux patients qui consultent Nemouw en {language}.",
+      "titleLabel": "Titre professionnel",
+      "titlePlaceholder": "Orthophoniste",
+      "titleHint": "Affiché sous votre nom",
+      "headline": "Accroche",
+      "headlinePlaceholder": "J'aide les enfants à trouver leurs mots",
+      "headlineHint": "Une ligne qui résume votre travail",
+      "bio": "Biographie",
+      "bioPlaceholder": "Votre formation, les personnes que vous accompagnez et votre façon de travailler.",
+      "bioCount": "{count} / {max} caractères",
+      "save": "Enregistrer le texte en {language}",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
     }
   }
 }

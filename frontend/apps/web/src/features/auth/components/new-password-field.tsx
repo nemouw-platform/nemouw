@@ -40,6 +40,7 @@ export function NewPasswordField<T extends FieldValues>({
       id={name}
       required
       label={t("password")}
+      placeholder={t("newPasswordPlaceholder")}
       autoComplete="new-password"
       passwordrules={PASSWORD_RULES_ATTRIBUTE}
       autoFocus={autoFocus}

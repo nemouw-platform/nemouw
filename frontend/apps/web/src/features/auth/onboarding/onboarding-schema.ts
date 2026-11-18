@@ -1,7 +1,7 @@
 import { z } from "zod"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createFieldRules } from "@/features/auth/lib/validation"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
+import { createFieldRules } from "@/lib/forms/validation"
 
 // The backend's rules (openapi.yaml `Username`, ValidationLimits.TEXT_MAX)
 export const USERNAME_MIN_LENGTH = 3
@@ -23,7 +23,7 @@ type OnboardingLabels = Record<
 
 export function createOnboardingSchema(
   labels: OnboardingLabels,
-  t: AuthErrorsTranslator,
+  t: FormErrorsTranslator,
   usernameFormatMessage: string
 ) {
   const rules = createFieldRules(t)

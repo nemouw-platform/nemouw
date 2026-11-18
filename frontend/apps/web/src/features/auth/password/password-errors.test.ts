@@ -1,7 +1,7 @@
+import { classifyPasswordError } from "@/features/auth/password/password-errors"
 import { describe, expect, it } from "vitest"
 
-import { apiError } from "@/features/auth/lib/testing"
-import { classifyPasswordError } from "@/features/auth/password/password-errors"
+import { apiError } from "@/lib/forms/testing"
 
 describe("classifyPasswordError", () => {
   it.each([

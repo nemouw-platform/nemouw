@@ -5,7 +5,37 @@
   },
   "Common": {
     "toggleTheme": "Toggle theme",
-    "language": "Language"
+    "language": "Language",
+    "retry": "Try again",
+    "signOut": "Log out"
+  },
+  "Form": {
+    "errors": {
+      "network": "We can't reach Nemouw right now. Check your connection and try again.",
+      "unexpected": "Something went wrong on our side. Please try again.",
+      "tooManyRequests": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
+      "required": "{field} is required",
+      "tooShort": "Use at least {min} characters",
+      "tooLong": "Use {max} characters or fewer",
+      "incompleteCode": "Enter all {length} digits",
+      "field": {
+        "REQUIRED": "This field is required",
+        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
+        "TOO_SHORT": "This is too short",
+        "TOO_LONG": "This is too long",
+        "TOO_COMMON": "This password is too common",
+        "CONTAINS_PERSONAL_INFO": "Don't include “nemouw” or the part of your email before @",
+        "INVALID_ROLE": "Only specialists can create an account",
+        "INVALID_FORMAT": "Check the format and try again"
+      },
+      "wholeNumber": "Enter a whole number, like 5",
+      "tooLarge": "Enter {max} or less"
+    }
+  },
+  "PhoneInput": {
+    "country": "Country: {country} (+{code})",
+    "search": "Search countries",
+    "noResults": "No country found"
   },
   "Navbar": {
     "mainNav": "Main",
@@ -14,6 +44,7 @@
     "forSpecialists": "For specialists",
     "logIn": "Log in",
     "join": "Join as a specialist",
+    "dashboard": "Dashboard",
     "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
@@ -33,25 +64,6 @@
     },
     "step": "Step {current} of {total}.",
     "copyright": "© {year} Nemouw",
-    "errors": {
-      "network": "We can't reach Nemouw right now. Check your connection and try again.",
-      "unexpected": "Something went wrong on our side. Please try again.",
-      "tooManyRequests": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
-      "required": "{field} is required",
-      "tooShort": "Use at least {min} characters",
-      "tooLong": "Use {max} characters or fewer",
-      "incompleteCode": "Enter all {length} digits",
-      "field": {
-        "REQUIRED": "This field is required",
-        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
-        "TOO_SHORT": "This is too short",
-        "TOO_LONG": "This is too long",
-        "TOO_COMMON": "This password is too common",
-        "CONTAINS_PERSONAL_INFO": "Don't include “nemouw” or the part of your email before @",
-        "INVALID_ROLE": "Only specialists can create an account",
-        "INVALID_FORMAT": "Check the format and try again"
-      }
-    },
     "phone": {
       "search": "Speech therapy in Beirut",
       "filterLanguage": "Arabic",
@@ -97,7 +109,9 @@
     "fields": {
       "email": "Email address",
       "emailPlaceholder": "john.doe@example.com",
-      "password": "Password"
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "newPasswordPlaceholder": "Create a password"
     },
     "spamHint": "Can't find it? Check your spam folder."
   },
@@ -219,6 +233,107 @@
       "usernameTaken": "This username is taken. Try another.",
       "usernameUnavailable": "This username isn't available. Try another.",
       "memberNumberTaken": "This member number is already registered with this syndicate."
+    }
+  },
+  "Dashboard": {
+    "nav": {
+      "label": "Dashboard",
+      "overview": "Overview",
+      "profile": "Profile"
+    },
+    "overview": {
+      "metaTitle": "Dashboard",
+      "title": "Welcome back",
+      "description": "Signed in as @{username}. Here is where your profile stands."
+    },
+    "verification": {
+      "title": "Verification",
+      "pending": {
+        "label": "Pending",
+        "description": "Your syndicate hasn't verified your profile yet. Patients can find you once it's verified."
+      },
+      "active": {
+        "label": "Verified",
+        "description": "Your syndicate verified your profile on {date}. Patients can find you."
+      },
+      "rejected": {
+        "label": "Not verified",
+        "description": "Your syndicate couldn't verify your profile, so patients can't find you yet. Check your details and contact your syndicate."
+      }
+    },
+    "setup": {
+      "title": "Finish your profile",
+      "completeTitle": "Your profile is complete",
+      "progress": "{done} of {total} done",
+      "done": "done",
+      "toDo": "to do",
+      "steps": {
+        "details": {
+          "title": "Add your practice details",
+          "description": "Years of experience, your main language and a WhatsApp number patients can reach."
+        },
+        "about": {
+          "title": "Introduce yourself",
+          "description": "A short bio, in at least one language, so patients know who you are."
+        }
+      }
+    }
+  },
+  "Profile": {
+    "metaTitle": "Profile",
+    "title": "Your profile",
+    "description": "What patients see on your public page. Changes show as soon as you save.",
+    "languages": {
+      "ar": "Arabic",
+      "en": "English",
+      "fr": "French"
+    },
+    "details": {
+      "title": "Practice details",
+      "description": "Patients use these to choose a specialist and get in touch.",
+      "experience": "Years of experience",
+      "experiencePlaceholder": "8",
+      "experienceHint": "Since you started practising",
+      "whatsapp": "WhatsApp number",
+      "whatsappHint": "Patients contact you on this number",
+      "phoneFormat": "Enter a valid phone number for this country",
+      "gender": "Gender",
+      "genders": {
+        "female": "Female",
+        "male": "Male"
+      },
+      "language": "Main language",
+      "languageHint": "The language you work in most",
+      "notSpecified": "Not specified",
+      "minAge": "Youngest age you see",
+      "minAgePlaceholder": "3",
+      "maxAge": "Oldest age you see",
+      "maxAgePlaceholder": "18",
+      "ageHint": "In years. Leave blank for no limit.",
+      "ageRange": "Must be at least the youngest age",
+      "save": "Save details",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
+    "about": {
+      "title": "About you",
+      "description": "Write your title, headline and bio in each language you want patients to read them in. Patients see the version in their language, or another one when it is missing.",
+      "languages": "Languages",
+      "written": "Has a bio",
+      "formTitle": "In {language}",
+      "formDescription": "Shown to patients browsing Nemouw in {language}.",
+      "titleLabel": "Professional title",
+      "titlePlaceholder": "Speech and language therapist",
+      "titleHint": "Shown under your name",
+      "headline": "Headline",
+      "headlinePlaceholder": "Helping children find their words",
+      "headlineHint": "One line that sums up your work",
+      "bio": "Bio",
+      "bioPlaceholder": "Your training, the people you work with and how you work.",
+      "bioCount": "{count} / {max} characters",
+      "save": "Save {language} text",
+      "saving": "Saving…",
+      "saved": "Saved"
     }
   }
 }

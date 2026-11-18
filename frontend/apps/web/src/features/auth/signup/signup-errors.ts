@@ -1,14 +1,14 @@
+import {
+  SIGNUP_FIELDS,
+  type SignupValues,
+} from "@/features/auth/signup/signup-schema"
 import { isApiError, type FieldErrorCode } from "@workspace/api"
 
 import {
   isTooManyRequests,
   pickFieldErrors,
   retryAfterSeconds,
-} from "@/features/auth/lib/api-errors"
-import {
-  SIGNUP_FIELDS,
-  type SignupValues,
-} from "@/features/auth/signup/signup-schema"
+} from "@/lib/forms/api-errors"
 
 /** What the form should show for a failed sign-up request; anything else is general */
 export type SignupFailure =

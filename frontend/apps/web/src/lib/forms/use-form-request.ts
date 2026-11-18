@@ -4,9 +4,9 @@ import { useRequest, type RequestFn } from "@workspace/ui/hooks/use-request"
 import { useTranslations } from "next-intl"
 import * as React from "react"
 
-import { generalErrorMessage } from "@/features/auth/lib/api-errors"
+import { generalErrorMessage } from "@/lib/forms/api-errors"
 
-interface AuthRequestOptions<TData> {
+interface FormRequestOptions<TData> {
   onSuccess?: (data: TData) => void
   /**
    * Handle the errors this screen understands (put them on a field, show a
@@ -16,17 +16,21 @@ interface AuthRequestOptions<TData> {
 }
 
 /**
- * useRequest plus the form-level message every auth screen needs: cleared on
+ * useRequest plus the form-level message every form needs: cleared on
  * each run, set for errors the screen does not handle itself.
  */
-export function useAuthRequest<TArgs extends unknown[], TData>(
+export function useFormRequest<TArgs extends unknown[], TData>(
   request: RequestFn<TArgs, TData>,
-  { onSuccess, onError }: AuthRequestOptions<TData> = {}
+  { onSuccess, onError }: FormRequestOptions<TData> = {}
 ) {
-  const t = useTranslations("Auth.errors")
+  const t = useTranslations("Form.errors")
   const [formError, setFormError] = React.useState<string | null>(null)
 
-  const { run: runRequest, isPending } = useRequest(request, {
+  const {
+    run: runRequest,
+    isPending,
+    status,
+  } = useRequest(request, {
     onSuccess,
     onError: (error) => {
       if (!onError?.(error)) setFormError(generalErrorMessage(error, t))
@@ -41,5 +45,8 @@ export function useAuthRequest<TArgs extends unknown[], TData>(
     [runRequest]
   )
 
-  return { run, isPending, formError, setFormError }
+  /** The latest request succeeded (and none is running), e.g. to say "Saved" */
+  const succeeded = status === "success" && !isPending
+
+  return { run, isPending, succeeded, formError, setFormError }
 }

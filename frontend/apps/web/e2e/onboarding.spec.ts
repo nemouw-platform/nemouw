@@ -1,25 +1,10 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, test } from "@playwright/test"
 
 import { signUp, uniqueEmail } from "./support/auth"
-
-/** Onboarding needs syndicates: load e2e/fixtures/dev-seed.sql (see README) */
-async function requireSyndicates(page: Page) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"
-  const response = await page.request.get(`${apiUrl}/v1/syndicates`)
-  const syndicates = (await response.json()) as unknown[]
-  test.skip(
-    syndicates.length === 0,
-    "No syndicates: run e2e/fixtures/dev-seed.sql"
-  )
-}
-
-async function chooseSyndicate(page: Page, name: RegExp) {
-  await page.getByLabel("Syndicate").click()
-  await page.getByRole("option", { name }).click()
-}
+import { chooseSyndicate, requireSyndicates } from "./support/onboarding"
 
 test.describe("onboarding", () => {
-  test("validates, then creates the profile and opens the app", async ({
+  test("validates, then creates the profile and opens the dashboard", async ({
     page,
   }) => {
     await requireSyndicates(page)
@@ -27,7 +12,9 @@ test.describe("onboarding", () => {
 
     // A human-speed press: the focused field's blur must not move the button
     // away before the release (SubmitButton keeps focus in the field)
-    await page.getByRole("button", { name: "Finish setup" }).click({ delay: 120 })
+    await page
+      .getByRole("button", { name: "Finish setup" })
+      .click({ delay: 120 })
     await expect(page.getByText("Username is required")).toBeVisible()
     await expect(page.getByText("Syndicate is required")).toBeVisible()
     await expect(page.getByText("Member number is required")).toBeVisible()
@@ -49,11 +36,11 @@ test.describe("onboarding", () => {
 
     await page.getByLabel("Username").fill(`rana.${Date.now() % 1e8}`)
     await page.getByRole("button", { name: "Finish setup" }).click()
-    await expect(page).toHaveURL(/\/en$/)
+    await expect(page).toHaveURL(/\/en\/dashboard$/)
 
     // Done: onboarding sends them on
     await page.goto("/en/onboarding")
-    await expect(page).toHaveURL(/\/en$/)
+    await expect(page).toHaveURL(/\/en\/dashboard$/)
   })
 
   test("a taken username and member number land on their fields", async ({
@@ -70,7 +57,7 @@ test.describe("onboarding", () => {
     await chooseSyndicate(page, /Speech Therapists/)
     await page.getByLabel("Member number").fill(memberNumber)
     await page.getByRole("button", { name: "Finish setup" }).click()
-    await expect(page).toHaveURL(/\/en$/)
+    await expect(page).toHaveURL(/\/en\/dashboard$/)
 
     // Second specialist, own browser context (own cookies)
     const second = await (await browser.newContext()).newPage()

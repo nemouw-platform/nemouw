@@ -1,9 +1,6 @@
 import { useTranslations } from "next-intl"
 
-import {
-  FormTextField,
-  type FieldOwnProps,
-} from "@/features/auth/components/form-field"
+import { FormTextField, type FieldOwnProps } from "@/components/form/form-field"
 import type { Input } from "@workspace/ui/components/input"
 
 type EmailFieldProps = Omit<FieldOwnProps, "label"> &

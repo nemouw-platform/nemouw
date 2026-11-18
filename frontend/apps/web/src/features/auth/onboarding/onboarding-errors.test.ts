@@ -1,7 +1,7 @@
+import { classifyOnboardingError } from "@/features/auth/onboarding/onboarding-errors"
 import { describe, expect, it } from "vitest"
 
-import { apiError } from "@/features/auth/lib/testing"
-import { classifyOnboardingError } from "@/features/auth/onboarding/onboarding-errors"
+import { apiError } from "@/lib/forms/testing"
 
 const fieldError = (field: string, code: "INVALID_FORMAT" | "REQUIRED") =>
   apiError(422, "VALIDATION_ERROR", {

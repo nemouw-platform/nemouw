@@ -1,15 +1,15 @@
 "use client"
 
-import { useTranslations } from "next-intl"
-import * as React from "react"
-import type { UseFormReturn } from "react-hook-form"
-
-import { fieldErrorMessage } from "@/features/auth/lib/api-errors"
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
 import { classifyResetError } from "@/features/auth/reset/reset-errors"
 import type { ResetValues } from "@/features/auth/reset/reset-schema"
 import { forgetResetToken } from "@/features/auth/reset/use-reset-token"
 import { authApi } from "@/lib/api"
+import { useTranslations } from "next-intl"
+import * as React from "react"
+import type { UseFormReturn } from "react-hook-form"
+
+import { fieldErrorMessage } from "@/lib/forms/api-errors"
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /**
  * Sets the new password. Success revokes every session of the account, so the
@@ -19,11 +19,11 @@ export function useResetPassword(
   token: string,
   form: UseFormReturn<ResetValues>
 ) {
-  const tAuth = useTranslations("Auth.errors")
+  const tForm = useTranslations("Form.errors")
   const [done, setDone] = React.useState(false)
   const [invalidLink, setInvalidLink] = React.useState(false)
 
-  const reset = useAuthRequest(
+  const reset = useFormRequest(
     (signal, values: ResetValues) =>
       authApi.resetPassword({ token, ...values }, { signal }),
     {
@@ -41,7 +41,7 @@ export function useResetPassword(
             failure.fields.forEach(({ name, code }) =>
               form.setError(
                 name,
-                { message: fieldErrorMessage(code, tAuth) },
+                { message: fieldErrorMessage(code, tForm) },
                 { shouldFocus: true }
               )
             )

@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
 import { LoaderCircleIcon } from "lucide-react"
 
 interface SubmitButtonProps {
@@ -8,19 +9,24 @@ interface SubmitButtonProps {
   children: React.ReactNode
   /** Label while the request runs, e.g. "Sending code…" */
   pendingLabel: React.ReactNode
+  /** "lg" fills the form's width (auth screens); "default" hugs its label (cards) */
+  size?: "lg" | "default"
+  className?: string
 }
 
-/** Full-width primary submit button with a spinner while the request runs */
+/** Primary submit button with a spinner while the request runs */
 export function SubmitButton({
   pending,
   children,
   pendingLabel,
+  size = "lg",
+  className,
 }: SubmitButtonProps) {
   return (
     <Button
       type="submit"
-      size="lg"
-      className="w-full"
+      size={size}
+      className={cn(size === "lg" && "w-full", className)}
       disabled={pending}
       // Keep focus in the field on press. Otherwise the field's blur shows
       // its error, the button moves down, and the release misses it: no click

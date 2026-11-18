@@ -2,17 +2,18 @@ import { CLIENT_ERROR_CODES } from "@workspace/api"
 import { describe, expect, it, vi } from "vitest"
 
 import {
+  applyFieldErrors,
   generalErrorMessage,
   pickFieldErrors,
   retryAfterSeconds,
-  type AuthErrorsTranslator,
-} from "@/features/auth/lib/api-errors"
-import { apiError } from "@/features/auth/lib/testing"
+  type FormErrorsTranslator,
+} from "@/lib/forms/api-errors"
+import { apiError } from "@/lib/forms/testing"
 
 /** Translator stub that echoes the key and values */
 const t = vi.fn((key: string, values?: object) =>
   values ? `${key} ${JSON.stringify(values)}` : key
-) as unknown as AuthErrorsTranslator
+) as unknown as FormErrorsTranslator
 
 describe("pickFieldErrors", () => {
   const error = apiError(422, "VALIDATION_ERROR", {
@@ -31,6 +32,31 @@ describe("pickFieldErrors", () => {
   it("is empty for anything but a validation error", () => {
     expect(pickFieldErrors(apiError(409, "EMAIL_TAKEN"), ["email"])).toEqual([])
     expect(pickFieldErrors(new Error("x"), ["email"])).toEqual([])
+  })
+})
+
+describe("applyFieldErrors", () => {
+  it("sets each of the form's field errors, focusing the first", () => {
+    const form = { setError: vi.fn() }
+    const error = apiError(422, "VALIDATION_ERROR", {
+      errors: [
+        { field: "bio", code: "TOO_LONG", message: "bad" },
+        { field: "title", code: "TOO_LONG", message: "bad" },
+        { field: "role", code: "INVALID_ROLE", message: "bad" },
+      ],
+    })
+
+    expect(applyFieldErrors(form, error, ["title", "bio"], t)).toBe(true)
+    expect(form.setError.mock.calls).toEqual([
+      ["bio", { message: "field.TOO_LONG" }, { shouldFocus: true }],
+      ["title", { message: "field.TOO_LONG" }, { shouldFocus: false }],
+    ])
+  })
+
+  it("returns false when none belong to the form", () => {
+    const form = { setError: vi.fn() }
+    expect(applyFieldErrors(form, apiError(500, "X"), ["title"], t)).toBe(false)
+    expect(form.setError).not.toHaveBeenCalled()
   })
 })
 
