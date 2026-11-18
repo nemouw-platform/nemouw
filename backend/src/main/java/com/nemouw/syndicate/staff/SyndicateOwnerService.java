@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/** Who owns a syndicate. The previous owner always stays on as regular staff. */
+/**
+ * Who owns a syndicate. The previous owner always stays on as regular staff.
+ */
 @Service
 class SyndicateOwnerService {
     private static final Logger log = LoggerFactory.getLogger(SyndicateOwnerService.class);
@@ -28,9 +30,10 @@ class SyndicateOwnerService {
 
     @Transactional
     SyndicateStaffResponse changeOwner(UUID syndicateId, SyndicateOwnerChangeRequest req) {
+        if (!staff.syndicateExists(syndicateId)) throw new ApiException(ErrorCode.NOT_FOUND);
+
         new Validator().notNull("staff_id", req.staffId()).throwIfInvalid();
 
-        if (!staff.syndicateExists(syndicateId)) throw new ApiException(ErrorCode.NOT_FOUND);
         SyndicateStaffRow next = staff.findInSyndicate(req.staffId(), syndicateId)   // must be staff of THIS syndicate
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));
         if (next.isOwner()) throw new ApiException(ErrorCode.ALREADY_OWNER);
