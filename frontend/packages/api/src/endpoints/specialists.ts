@@ -1,6 +1,7 @@
 import type { ApiClient } from "../client"
 import type {
   ApiLocale,
+  ImageResponse,
   SpecialistOnboardingRequest,
   SpecialistProfileResponse,
   SpecialistProfileWriteRequest,
@@ -58,7 +59,43 @@ export function createSpecialistsApi(client: ApiClient) {
         body,
         options
       ),
+
+    /**
+     * Sets or replaces the profile picture (JPEG, PNG or WebP, up to 2 MB;
+     * stored as a 512 x 512 WebP). 413 FILE_TOO_LARGE, 415
+     * UNSUPPORTED_FILE_TYPE, 422 on `file` (missing or unreadable), 429, 503
+     * MEDIA_BUSY.
+     */
+    setProfilePicture: (file: Blob, options?: CallOptions) =>
+      client.put<ImageResponse>(
+        "/specialists/me/profile-picture",
+        formWithFile(file),
+        options
+      ),
+
+    /** 204, also when there is none */
+    removeProfilePicture: (options?: CallOptions) =>
+      client.delete<void>("/specialists/me/profile-picture", options),
+
+    /** Like setProfilePicture: up to 5 MB, stored as a 1600 x 600 WebP */
+    setCoverImage: (file: Blob, options?: CallOptions) =>
+      client.put<ImageResponse>(
+        "/specialists/me/cover-image",
+        formWithFile(file),
+        options
+      ),
+
+    /** 204, also when there is none */
+    removeCoverImage: (options?: CallOptions) =>
+      client.delete<void>("/specialists/me/cover-image", options),
   }
+}
+
+/** The multipart body image uploads expect: the file under "file" */
+function formWithFile(file: Blob): FormData {
+  const form = new FormData()
+  form.append("file", file)
+  return form
 }
 
 export type SpecialistsApi = ReturnType<typeof createSpecialistsApi>

@@ -34,3 +34,14 @@ export type SpecialistProfileResponse = Schemas["SpecialistProfileResponse"]
 export type SpecialistProfileWriteRequest =
   Schemas["SpecialistProfileWriteRequest"]
 export type SyndicateSummary = Schemas["SyndicateSummary"]
+
+/** A stored public image: its URL changes on every upload */
+export type ImageResponse = Schemas["ImageResponse"]
+
+export type CredentialType = Schemas["CredentialType"]
+export type CredentialStatus = Schemas["CredentialsVerificationStatus"]
+export type CredentialResponse = Schemas["CredentialResponse"]
+/** The fields of a credential (create and edit); the document is sent apart */
+export type CredentialFields = Schemas["CredentialUpdateRequest"]
+/** A short-lived link to a private document: open it, never store it */
+export type DocumentAccessResponse = Schemas["DocumentAccessResponse"]
