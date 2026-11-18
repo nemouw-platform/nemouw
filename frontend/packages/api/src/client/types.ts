@@ -1,3 +1,5 @@
+import type { ThrottleRetry } from "./throttle-retry"
+
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
 
 export interface ApiClientOptions {
@@ -13,6 +15,11 @@ export interface ApiClientOptions {
   headers?: () => HeadersInit | Promise<HeadersInit>
   /** Called when a 401 could not be fixed by refreshing: the session is over */
   onSessionExpired?: () => void
+  /**
+   * Wait out short 429s (the backend's per-IP rate limit) and try again,
+   * outside /auth/. Default: 2 retries, waits up to 5 s. false turns it off.
+   */
+  throttleRetry?: ThrottleRetry | false
   /** Custom fetch (tests, instrumentation). Default: globalThis.fetch */
   fetch?: typeof fetch
 }

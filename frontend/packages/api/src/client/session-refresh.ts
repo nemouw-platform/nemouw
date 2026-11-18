@@ -28,6 +28,11 @@ export function createSessionRefresher(
   return { refresh }
 }
 
+/** Auth endpoints: their errors are answers, not session or traffic trouble */
+export function isAuthPath(path: string): boolean {
+  return path.startsWith(AUTH_PATH_PREFIX)
+}
+
 /**
  * Whether a failed call is worth one session refresh and a retry.
  *
@@ -38,5 +43,5 @@ export function createSessionRefresher(
  * password, missing setup cookie), which a refresh never fixes.
  */
 export function shouldRefreshAndRetry(error: ApiError, path: string): boolean {
-  return error.status === 401 && !path.startsWith(AUTH_PATH_PREFIX)
+  return error.status === 401 && !isAuthPath(path)
 }
