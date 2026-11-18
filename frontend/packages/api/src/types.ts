@@ -25,5 +25,12 @@ export type ForgotPasswordRequest = Schemas["ForgotPasswordRequest"]
 export type ResetPasswordRequest = Schemas["ResetPasswordRequest"]
 
 export type SpecialistResponse = Schemas["SpecialistResponse"]
+export type SpecialistVerificationStatus =
+  Schemas["SpecialistVerificationStatus"]
 export type SpecialistOnboardingRequest = Schemas["SpecialistOnboardingRequest"]
+export type SpecialistUpdateRequest = Schemas["SpecialistUpdateRequest"]
+/** A specialist's public text (title, headline, bio) in one locale */
+export type SpecialistProfileResponse = Schemas["SpecialistProfileResponse"]
+export type SpecialistProfileWriteRequest =
+  Schemas["SpecialistProfileWriteRequest"]
 export type SyndicateSummary = Schemas["SyndicateSummary"]
