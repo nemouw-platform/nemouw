@@ -11,9 +11,12 @@ export interface UseLoadResult<TData, TError> {
   /** The loaded data; undefined until the first load succeeds */
   data: TData | undefined
   error: TError | undefined
-  /** No data yet and the load is running (also true before it starts) */
+  /**
+   * No data yet and the load is running (also true before it starts). A
+   * reload keeps the data on screen instead, so this stays false
+   */
   isLoading: boolean
-  /** The latest load failed; offer `retry` */
+  /** No data, because the load failed; offer `retry` */
   failed: boolean
   /** Load again right away, e.g. a "Try again" button */
   retry: () => void
@@ -34,11 +37,12 @@ export function useLoad<TData, TError = unknown>(
 
   React.useEffect(() => run(), [run])
 
+  const hasData = data !== undefined
   return {
     data,
     error,
-    isLoading: status === "idle" || status === "pending",
-    failed: status === "error",
+    isLoading: !hasData && (status === "idle" || status === "pending"),
+    failed: !hasData && status === "error",
     retry: restart,
   }
 }

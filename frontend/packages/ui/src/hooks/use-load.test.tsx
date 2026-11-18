@@ -44,6 +44,22 @@ describe("useLoad", () => {
     expect(onSuccess).toHaveBeenCalledExactlyOnceWith("ok")
   })
 
+  it("keeps the data on screen while it loads again", async () => {
+    const load = vi
+      .fn()
+      .mockResolvedValueOnce(["a"])
+      .mockReturnValueOnce(new Promise(() => undefined))
+    const { result } = renderHook(() => useLoad(load))
+    await flush()
+
+    act(() => result.current.retry())
+    expect(result.current).toMatchObject({
+      data: ["a"],
+      isLoading: false,
+      failed: false,
+    })
+  })
+
   it("aborts the load on unmount", async () => {
     let signal: AbortSignal | undefined
     const { unmount } = renderHook(() =>
