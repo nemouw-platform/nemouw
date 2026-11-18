@@ -1,8 +1,5 @@
 package com.nemouw.syndicate.staff;
 
-import com.nemouw.user.api.AccountService;
-import com.nemouw.user.api.InviteService;
-import com.nemouw.user.api.InviteService.Invite;
 import com.nemouw.common.enums.LocaleCode;
 import com.nemouw.common.enums.UserRole;
 import com.nemouw.common.exception.ApiException;
@@ -12,6 +9,9 @@ import com.nemouw.syndicate.staff.SyndicateStaffDtos.SyndicateStaffEmailRequest;
 import com.nemouw.syndicate.staff.SyndicateStaffDtos.SyndicateStaffInviteRequest;
 import com.nemouw.syndicate.staff.SyndicateStaffDtos.SyndicateStaffResponse;
 import com.nemouw.syndicate.staff.SyndicateStaffDtos.SyndicateStaffUpdateRequest;
+import com.nemouw.user.api.AccountService;
+import com.nemouw.user.api.InviteService;
+import com.nemouw.user.api.InviteService.Invite;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -54,6 +54,8 @@ class SyndicateStaffService {
     }
 
     public SyndicateStaffResponse invite(UUID syndicateId, SyndicateStaffInviteRequest req) {
+        requireSyndicate(syndicateId);
+
         new Validator()
                 .required("first_name", req.firstName())
                 .required("last_name", req.lastName())
@@ -65,7 +67,7 @@ class SyndicateStaffService {
                 .throwIfInvalid();
 
         Created created = tx.execute(status -> {
-            requireSyndicate(syndicateId);
+            requireSyndicate(syndicateId);   // re-check inside the tx in case it was deleted concurrently
             Invite invite = invites.createPendingAccount(
                     UserRole.SYNDICATE_STAFF, req.firstName(), req.lastName(), req.email());
             UUID memberId = staff.insertMember(syndicateId, invite.userId(), strip(req.title()));
@@ -77,12 +79,15 @@ class SyndicateStaffService {
 
     @Transactional
     SyndicateStaffResponse updateTitle(UUID syndicateId, UUID staffId, SyndicateStaffUpdateRequest req) {
+        findRow(syndicateId, staffId);
+
         new Validator()
                 .required("title", req.title())
                 .maxLength("title", req.title(), TEXT_MAX)
                 .throwIfInvalid();
+
         if (!staff.updateTitle(staffId, syndicateId, strip(req.title()))) {
-            throw new ApiException(ErrorCode.NOT_FOUND);
+            throw new ApiException(ErrorCode.NOT_FOUND);   // deleted concurrently
         }
         return assembler.toResponse(findRow(syndicateId, staffId));
     }
@@ -93,10 +98,9 @@ class SyndicateStaffService {
      */
     SyndicateStaffResponse changePendingEmail(UUID syndicateId, UUID staffId,
                                               SyndicateStaffEmailRequest req) {
-        new Validator().requiredEmail("email", req.email()).throwIfInvalid();
-
         Created created = tx.execute(status -> {
             SyndicateStaffRow member = findRow(syndicateId, staffId);
+            new Validator().requiredEmail("email", req.email()).throwIfInvalid();
             Invite invite = invites.changePendingEmail(member.userId(), req.email());
             return new Created(assembler.toResponse(findRow(syndicateId, staffId)), invite);
         });
@@ -116,7 +120,9 @@ class SyndicateStaffService {
         if (!staff.syndicateExists(syndicateId)) throw new ApiException(ErrorCode.NOT_FOUND);
     }
 
-    /** Both ids must match: a staff id from another syndicate is a 404, never a cross-syndicate edit. */
+    /**
+     * Both ids must match: a staff id from another syndicate is a 404, never a cross-syndicate edit.
+     */
     private SyndicateStaffRow findRow(UUID syndicateId, UUID staffId) {
         return staff.findInSyndicate(staffId, syndicateId)
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND));

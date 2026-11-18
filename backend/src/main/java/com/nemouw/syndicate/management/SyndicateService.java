@@ -1,10 +1,10 @@
 package com.nemouw.syndicate.management;
 
-import com.nemouw.common.exception.*;
-import com.nemouw.user.api.InviteService;
-import com.nemouw.user.api.InviteService.Invite;
 import com.nemouw.common.enums.LocaleCode;
 import com.nemouw.common.enums.UserRole;
+import com.nemouw.common.exception.ApiException;
+import com.nemouw.common.exception.ErrorCode;
+import com.nemouw.common.exception.Errors;
 import com.nemouw.common.util.TextNormalizer;
 import com.nemouw.common.util.Validator;
 import com.nemouw.country.CountryLookup;
@@ -15,6 +15,8 @@ import com.nemouw.syndicate.management.SyndicateDtos.SyndicateSummary;
 import com.nemouw.syndicate.management.SyndicateDtos.SyndicateUpdateRequest;
 import com.nemouw.syndicate.staff.SyndicateOwners;
 import com.nemouw.syndicate.staff.SyndicateStaffDtos.SyndicateStaffResponse;
+import com.nemouw.user.api.InviteService;
+import com.nemouw.user.api.InviteService.Invite;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,8 +89,8 @@ class SyndicateService {
 
     @Transactional
     SyndicateResponse update(UUID id, SyndicateUpdateRequest req) {
-        validate(req);
         Syndicate current = find(id);
+        validate(req);
 
         String name = req.name() != null ? TextNormalizer.strip(req.name()) : current.name();
         String email = req.contactEmail() != null
