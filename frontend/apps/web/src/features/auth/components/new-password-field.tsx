@@ -45,6 +45,8 @@ export function NewPasswordField<T extends FieldValues>({
       passwordrules={PASSWORD_RULES_ATTRIBUTE}
       autoFocus={autoFocus}
       error={form.getFieldState(name, form.formState).error}
+      // The checklist explains the error, so it stays under it
+      keepDescription
       description={
         <PasswordRequirements password={String(value ?? "")} email={email} />
       }

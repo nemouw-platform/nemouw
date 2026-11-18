@@ -20,8 +20,13 @@ export interface FormFieldProps {
   error?: FormFieldError
   /** Extra content after the error, e.g. a "Log in instead" link */
   errorAction?: React.ReactNode
-  /** Content under the control when there is no error, e.g. a hint */
+  /** Content under the control, e.g. a hint. An error takes its place */
   description?: React.ReactNode
+  /**
+   * Keep the description under the error, for one the error refers to (the
+   * password checklist). The field then grows by the error's line.
+   */
+  keepDescription?: boolean
   /** Shown at the end of the label row, e.g. a "Forgot password?" link */
   labelAction?: React.ReactNode
   /** Renders the control with the ids and aria state wired up */
@@ -38,6 +43,7 @@ export function FormField({
   error,
   errorAction,
   description,
+  keepDescription = false,
   labelAction,
   children,
   className,
@@ -45,9 +51,10 @@ export function FormField({
   const errorId = `${id}-error`
   const descriptionId = `${id}-description`
   const invalid = Boolean(error)
+  const showDescription = Boolean(description) && (!invalid || keepDescription)
   // Screen readers announce the error first, then the hint
   const describedBy =
-    [invalid && errorId, description && descriptionId]
+    [invalid && errorId, showDescription && descriptionId]
       .filter(Boolean)
       .join(" ") || undefined
 
@@ -79,18 +86,22 @@ export function FormField({
         "aria-describedby": describedBy,
         "aria-required": required || undefined,
       })}
-      {invalid && (
-        <FieldError id={errorId}>
-          {error?.message}
-          {errorAction && <> {errorAction}</>}
-        </FieldError>
-      )}
-      {/* A div, not a <p>: hints may be lists (e.g. password rules) */}
-      {description && (
-        <div id={descriptionId} className="text-sm text-muted-foreground">
-          {description}
-        </div>
-      )}
+      {/* One line is always kept under the control, and the error takes the
+          hint's place, so an error appearing never moves the fields below */}
+      <div className="flex min-h-5 flex-col gap-2">
+        {invalid && (
+          <FieldError id={errorId}>
+            {error?.message}
+            {errorAction && <> {errorAction}</>}
+          </FieldError>
+        )}
+        {/* A div, not a <p>: hints may be lists (e.g. password rules) */}
+        {showDescription && (
+          <div id={descriptionId} className="text-sm text-muted-foreground">
+            {description}
+          </div>
+        )}
+      </div>
     </Field>
   )
 }
@@ -113,6 +124,7 @@ const FIELD_OWN_KEYS = [
   "error",
   "errorAction",
   "description",
+  "keepDescription",
   "labelAction",
 ] as const satisfies ReadonlyArray<keyof FieldOwnProps>
 
