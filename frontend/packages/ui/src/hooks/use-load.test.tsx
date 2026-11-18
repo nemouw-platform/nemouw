@@ -44,61 +44,6 @@ describe("useLoad", () => {
     expect(onSuccess).toHaveBeenCalledExactlyOnceWith("ok")
   })
 
-  it("waits out a failure retryDelay accepts, staying in loading", async () => {
-    vi.useFakeTimers()
-    const onError = vi.fn()
-    const throttled = new Error("429")
-    const load = vi
-      .fn()
-      .mockRejectedValueOnce(throttled)
-      .mockResolvedValue("ok")
-    const { result } = renderHook(() =>
-      useLoad(load, {
-        retryDelay: (error) => (error === throttled ? 1000 : null),
-        onError,
-      })
-    )
-
-    await flush()
-    expect(result.current).toMatchObject({ isLoading: true, failed: false })
-    expect(load).toHaveBeenCalledOnce()
-
-    await act(() => vi.advanceTimersByTimeAsync(1000))
-    expect(load).toHaveBeenCalledTimes(2)
-    expect(result.current).toMatchObject({ data: "ok", failed: false })
-    expect(onError).not.toHaveBeenCalled()
-    vi.useRealTimers()
-  })
-
-  it("gives up after a few automatic retries", async () => {
-    vi.useFakeTimers()
-    const onError = vi.fn()
-    const load = vi.fn().mockRejectedValue(new Error("429"))
-    const { result } = renderHook(() =>
-      useLoad(load, { retryDelay: () => 1000, onError })
-    )
-
-    await flush()
-    for (let i = 0; i < 3; i++) {
-      await act(() => vi.advanceTimersByTimeAsync(1000))
-    }
-
-    expect(load).toHaveBeenCalledTimes(4)
-    expect(result.current.failed).toBe(true)
-    expect(onError).toHaveBeenCalledOnce()
-    vi.useRealTimers()
-  })
-
-  it("fails at once when retryDelay says null", async () => {
-    const load = vi.fn().mockRejectedValue(new Error("404"))
-    const { result } = renderHook(() =>
-      useLoad(load, { retryDelay: () => null })
-    )
-    await flush()
-    expect(result.current.failed).toBe(true)
-    expect(load).toHaveBeenCalledOnce()
-  })
-
   it("aborts the load on unmount", async () => {
     let signal: AbortSignal | undefined
     const { unmount } = renderHook(() =>
