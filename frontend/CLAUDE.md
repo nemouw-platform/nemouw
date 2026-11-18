@@ -42,7 +42,7 @@ Use **pnpm** only. Run from `frontend/` (the monorepo root):
 - `pnpm dev` runs both apps (web :3000, admin :3001)
 - `pnpm dev --filter=web` / `pnpm dev --filter=admin` runs one app
 - `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test` run across all workspaces (Turborepo caches results). Unit tests use Vitest (`*.test.ts` next to the code)
-- `pnpm --filter web test:e2e` runs the Playwright end-to-end suite (`apps/web/e2e/`) against a production build and the real local backend; setup in `apps/web/e2e/README.md`. Run it after changing any auth flow
+- `pnpm --filter web test:e2e` runs the Playwright end-to-end suite (`apps/web/e2e/`) against a production build and the real local backend; setup in `apps/web/e2e/README.md`. Run it after changing any auth flow. Next keeps pages visited by client navigation mounted but hidden (React `<Activity>`), so count or match elements with `:visible` (e.g. `main [data-slot=card]:visible`)
 - Add a dependency to one workspace: `pnpm add <pkg> --filter=web`
 - Add a shadcn component (lands in `packages/ui`): `pnpm dlx shadcn@latest add <component> -c apps/web`
   Import it as `import { Button } from "@workspace/ui/components/button"`.

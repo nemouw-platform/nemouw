@@ -258,7 +258,8 @@
       "label": "Dashboard",
       "overview": "Overview",
       "profile": "Profile",
-      "credentials": "Credentials"
+      "credentials": "Credentials",
+      "locations": "Locations & hours"
     },
     "overview": {
       "metaTitle": "Dashboard",
@@ -290,6 +291,10 @@
         "credentials": {
           "title": "Add your credentials",
           "description": "Your degree or licence, so your syndicate can verify you. Patients find you once you're verified."
+        },
+        "location": {
+          "title": "Add where and when you work",
+          "description": "Your clinic's address and your opening hours, so patients know where to go and when."
         },
         "photo": {
           "title": "Add a profile picture",
@@ -440,6 +445,76 @@
     },
     "errors": {
       "verified": "This credential was verified in the meantime, so it can't be changed. Withdraw it and add a new one instead."
+    }
+  },
+  "Locations": {
+    "metaTitle": "Locations & hours",
+    "title": "Locations & hours",
+    "description": "Where you see patients, and when. Your main location is the one patients see first.",
+    "add": "Add a location",
+    "empty": {
+      "title": "No locations yet",
+      "description": "Add the clinic or centre where you see patients, then its opening hours."
+    },
+    "card": {
+      "primary": "Main location",
+      "makePrimary": "Make main",
+      "edit": "Edit",
+      "editHours": "Opening hours"
+    },
+    "remove": {
+      "action": "Remove",
+      "title": "Remove this location?",
+      "description": "“{place}” and its opening hours will be deleted.",
+      "confirm": "Remove",
+      "cancel": "Keep it",
+      "primary": "This is your main location. Make another location main before removing it.",
+      "primaryHint": "To remove your main location, make another one main first."
+    },
+    "hours": {
+      "title": "Opening hours at {place}",
+      "unplacedTitle": "Hours without a location",
+      "description": "Add a time range for each day you're open. Add more than one for a break in the day.",
+      "closed": "Closed",
+      "open": "Add hours",
+      "addMore": "Add more hours",
+      "addFor": "Add hours on {day}",
+      "opens": "{day}, opens",
+      "closes": "{day}, closes",
+      "remove": "Remove these hours on {day}",
+      "none": "No opening hours yet",
+      "cancel": "Cancel",
+      "save": "Save hours",
+      "saving": "Saving…",
+      "problems": {
+        "missing": "Fill in both times",
+        "order": "Must close after it opens",
+        "overlap": "Overlaps other hours that day"
+      }
+    },
+    "form": {
+      "newTitle": "New location",
+      "editTitle": "Edit location",
+      "firstDescription": "Your first location becomes your main one.",
+      "label": "Name",
+      "labelPlaceholder": "Hamra clinic",
+      "labelHint": "Optional. We show the city when there's no name.",
+      "country": "Country",
+      "countryPlaceholder": "Choose a country",
+      "city": "City",
+      "cityPlaceholder": "Beirut",
+      "phone": "Phone",
+      "phoneHint": "The clinic's number, if patients can call it",
+      "phoneFormat": "Enter a valid phone number for this country",
+      "address1": "Address",
+      "address1Placeholder": "Bliss Street, Al-Rayyes building",
+      "address2": "Address line 2",
+      "address2Placeholder": "3rd floor",
+      "makePrimary": "Make this my main location",
+      "cancel": "Cancel",
+      "add": "Add location",
+      "save": "Save",
+      "saving": "Saving…"
     }
   }
 }

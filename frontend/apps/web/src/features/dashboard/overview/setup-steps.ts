@@ -1,11 +1,16 @@
-import type { CredentialResponse, SpecialistResponse } from "@workspace/api"
+import type {
+  CredentialResponse,
+  SpecialistAvailability,
+  SpecialistLocation,
+  SpecialistResponse,
+} from "@workspace/api"
 
 import { DASHBOARD_SECTIONS } from "@/features/dashboard/sections"
 import { hasBio } from "@/features/specialists/about/about-schema"
 import type { ContentByLocale } from "@/features/specialists/about/use-profile-content"
 
 export interface SetupStep {
-  key: "credentials" | "photo" | "details" | "about"
+  key: "credentials" | "location" | "photo" | "details" | "about"
   done: boolean
   /** Where to complete it, without locale */
   href: string
@@ -15,6 +20,8 @@ interface SetupData {
   specialist: SpecialistResponse
   content: ContentByLocale
   credentials: CredentialResponse[]
+  locations: SpecialistLocation[]
+  hours: SpecialistAvailability[]
 }
 
 /**
@@ -26,6 +33,8 @@ export function setupSteps({
   specialist,
   content,
   credentials,
+  locations,
+  hours,
 }: SetupData): SetupStep[] {
   const profile = DASHBOARD_SECTIONS.profile.href
   return [
@@ -33,6 +42,12 @@ export function setupSteps({
       key: "credentials",
       done: credentials.length > 0,
       href: DASHBOARD_SECTIONS.credentials.href,
+    },
+    {
+      key: "location",
+      // Patients need both: where to go, and when
+      done: locations.length > 0 && hours.length > 0,
+      href: DASHBOARD_SECTIONS.locations.href,
     },
     {
       key: "photo",

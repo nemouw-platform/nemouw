@@ -258,7 +258,8 @@
       "label": "Tableau de bord",
       "overview": "Aperçu",
       "profile": "Profil",
-      "credentials": "Diplômes"
+      "credentials": "Diplômes",
+      "locations": "Lieux et horaires"
     },
     "overview": {
       "metaTitle": "Tableau de bord",
@@ -290,6 +291,10 @@
         "credentials": {
           "title": "Ajoutez vos diplômes",
           "description": "Votre diplôme ou votre licence, pour que votre syndicat puisse vous vérifier. Les patients vous trouvent une fois vérifié."
+        },
+        "location": {
+          "title": "Indiquez où et quand vous exercez",
+          "description": "L'adresse de votre cabinet et vos horaires, pour que les patients sachent où aller et quand."
         },
         "photo": {
           "title": "Ajoutez une photo de profil",
@@ -440,6 +445,76 @@
     },
     "errors": {
       "verified": "Ce titre a été vérifié entre-temps et ne peut plus être modifié. Retirez-le et ajoutez-en un nouveau."
+    }
+  },
+  "Locations": {
+    "metaTitle": "Lieux et horaires",
+    "title": "Lieux et horaires",
+    "description": "Où vous recevez vos patients, et quand. Votre lieu principal est celui que les patients voient en premier.",
+    "add": "Ajouter un lieu",
+    "empty": {
+      "title": "Aucun lieu pour l'instant",
+      "description": "Ajoutez le cabinet ou le centre où vous recevez vos patients, puis ses horaires."
+    },
+    "card": {
+      "primary": "Lieu principal",
+      "makePrimary": "Définir comme principal",
+      "edit": "Modifier",
+      "editHours": "Horaires"
+    },
+    "remove": {
+      "action": "Supprimer",
+      "title": "Supprimer ce lieu ?",
+      "description": "« {place} » et ses horaires seront supprimés.",
+      "confirm": "Supprimer",
+      "cancel": "Le garder",
+      "primary": "C'est votre lieu principal. Définissez un autre lieu comme principal avant de le supprimer.",
+      "primaryHint": "Pour supprimer votre lieu principal, définissez d'abord un autre lieu comme principal."
+    },
+    "hours": {
+      "title": "Horaires à {place}",
+      "unplacedTitle": "Horaires sans lieu",
+      "description": "Ajoutez une plage horaire pour chaque jour d'ouverture. Ajoutez-en plusieurs pour une pause dans la journée.",
+      "closed": "Fermé",
+      "open": "Ajouter des horaires",
+      "addMore": "Ajouter une plage",
+      "addFor": "Ajouter des horaires le {day}",
+      "opens": "{day}, ouverture",
+      "closes": "{day}, fermeture",
+      "remove": "Retirer ces horaires du {day}",
+      "none": "Pas encore d'horaires",
+      "cancel": "Annuler",
+      "save": "Enregistrer les horaires",
+      "saving": "Enregistrement…",
+      "problems": {
+        "missing": "Indiquez les deux heures",
+        "order": "Doit fermer après l'ouverture",
+        "overlap": "Chevauche d'autres horaires ce jour-là"
+      }
+    },
+    "form": {
+      "newTitle": "Nouveau lieu",
+      "editTitle": "Modifier le lieu",
+      "firstDescription": "Votre premier lieu devient votre lieu principal.",
+      "label": "Nom",
+      "labelPlaceholder": "Cabinet de Hamra",
+      "labelHint": "Facultatif. Nous affichons la ville en l'absence de nom.",
+      "country": "Pays",
+      "countryPlaceholder": "Choisissez un pays",
+      "city": "Ville",
+      "cityPlaceholder": "Beyrouth",
+      "phone": "Téléphone",
+      "phoneHint": "Le numéro du cabinet, si les patients peuvent l'appeler",
+      "phoneFormat": "Saisissez un numéro valide pour ce pays",
+      "address1": "Adresse",
+      "address1Placeholder": "Rue Bliss, immeuble Al-Rayyes",
+      "address2": "Complément d'adresse",
+      "address2Placeholder": "3e étage",
+      "makePrimary": "En faire mon lieu principal",
+      "cancel": "Annuler",
+      "add": "Ajouter le lieu",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
     }
   }
 }

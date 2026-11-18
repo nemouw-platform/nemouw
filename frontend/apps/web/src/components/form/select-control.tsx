@@ -13,6 +13,8 @@ import type { ControlProps } from "@/components/form/form-field"
 export interface SelectOption {
   value: string
   label: string
+  /** Shown before the label in the list, e.g. a flag */
+  icon?: React.ReactNode
 }
 
 interface SelectControlProps extends ControlProps {
@@ -71,6 +73,7 @@ export function SelectControl({
       <SelectContent>
         {items.map((item) => (
           <SelectItem key={item.value ?? ""} value={item.value}>
+            {"icon" in item && item.icon}
             {item.label}
           </SelectItem>
         ))}

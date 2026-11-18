@@ -68,6 +68,11 @@ export function joinPhone(national: string, country: CountryCode): string {
   return parsed?.number ?? `+${getCountryCallingCode(country)}${digits}`
 }
 
+/** A saved number written for people ("+961 1 123 456"), or as stored */
+export function formatPhone(value: string): string {
+  return parsePhoneNumberFromString(value)?.formatInternational() ?? value
+}
+
 /** A sample mobile number in national format, as a placeholder ("71 123 456") */
 export function examplePhone(country: CountryCode): string {
   return getExampleNumber(country, examples)?.formatNational() ?? ""

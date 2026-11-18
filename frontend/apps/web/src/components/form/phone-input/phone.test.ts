@@ -6,6 +6,7 @@ import {
 } from "@/components/form/phone-input/countries"
 import {
   examplePhone,
+  formatPhone,
   isPhoneNumber,
   joinPhone,
   readTyped,
@@ -55,6 +56,13 @@ describe("readTyped", () => {
       country: "LB",
       national: "70 12",
     })
+  })
+})
+
+describe("formatPhone", () => {
+  it("writes a saved number with spaces, leaving others as they are", () => {
+    expect(formatPhone("+96170123456")).toBe("+961 70 123 456")
+    expect(formatPhone("call me")).toBe("call me")
   })
 })
 

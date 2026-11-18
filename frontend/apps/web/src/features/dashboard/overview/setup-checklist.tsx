@@ -16,6 +16,7 @@ import { CardHeading } from "@/features/dashboard/card-heading"
 import { setupSteps } from "@/features/dashboard/overview/setup-steps"
 import { useProfileContent } from "@/features/specialists/about/use-profile-content"
 import { useCredentials } from "@/features/specialists/credentials/use-credentials"
+import { useLocations } from "@/features/specialists/locations/use-locations"
 import { useSpecialist } from "@/features/specialists/me/specialist-provider"
 import { Link } from "@/i18n/navigation"
 import { generalErrorMessage } from "@/lib/forms/api-errors"
@@ -27,13 +28,17 @@ export function SetupChecklist() {
   const { specialist } = useSpecialist()
   const about = useProfileContent()
   const credentials = useCredentials()
-  const isLoading = about.isLoading || credentials.isLoading
-  const failure = [about, credentials].find((load) => load.failed)
+  const places = useLocations()
+  const isLoading = about.isLoading || credentials.isLoading || places.isLoading
+  const failure =
+    [about, credentials].find((load) => load.failed) ?? places.failure
 
   const steps = setupSteps({
     specialist,
     content: about.content,
     credentials: credentials.credentials,
+    locations: places.locations,
+    hours: places.hours,
   })
   const doneCount = steps.filter((step) => step.done).length
   const complete = doneCount === steps.length

@@ -5,6 +5,8 @@ import {
   type CountryCode,
 } from "libphonenumber-js"
 
+import { regionName } from "@/lib/region-names"
+
 export interface CountryOption {
   code: CountryCode
   /** In the page's language, e.g. "Liban" on a French page */
@@ -22,12 +24,11 @@ const byLocale = new Map<string, CountryOption[]>()
 export function countryOptions(locale: string): CountryOption[] {
   let options = byLocale.get(locale)
   if (!options) {
-    const names = new Intl.DisplayNames([locale], { type: "region" })
     options = getCountries()
       .filter((code) => hasFlag(code))
       .map((code) => ({
         code,
-        name: names.of(code) ?? code,
+        name: regionName(code, locale) ?? code,
         callingCode: getCountryCallingCode(code),
       }))
       .sort((a, b) => a.name.localeCompare(b.name, locale))

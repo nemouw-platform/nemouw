@@ -10,7 +10,13 @@ const fresh: SpecialistResponse = {
   whatsapp_number: null,
   profile_picture_url: null,
 }
-const none = { specialist: fresh, content: {}, credentials: [] }
+const none = {
+  specialist: fresh,
+  content: {},
+  credentials: [],
+  locations: [],
+  hours: [],
+}
 
 const done = (steps: ReturnType<typeof setupSteps>) =>
   Object.fromEntries(steps.map((step) => [step.key, step.done]))
@@ -20,12 +26,14 @@ describe("setupSteps", () => {
     const steps = setupSteps(none)
     expect(done(steps)).toEqual({
       credentials: false,
+      location: false,
       photo: false,
       details: false,
       about: false,
     })
     expect(steps.map((step) => step.href)).toEqual([
       "/dashboard/credentials",
+      "/dashboard/locations",
       "/dashboard/profile#photos",
       "/dashboard/profile",
       "/dashboard/profile#about",
@@ -39,6 +47,22 @@ describe("setupSteps", () => {
       credentials: [{ id: "c1", verification_status: "pending" }],
     })
     expect(done(steps)).toMatchObject({ credentials: true, photo: true })
+  })
+
+  it("needs a location with opening hours", () => {
+    const place = { id: "l1", city: "Beirut", is_primary: true }
+    expect(done(setupSteps({ ...none, locations: [place] })).location).toBe(
+      false
+    )
+    expect(
+      done(
+        setupSteps({
+          ...none,
+          locations: [place],
+          hours: [{ id: "h1", location_id: "l1", day_of_week: "monday" }],
+        })
+      ).location
+    ).toBe(true)
   })
 
   it("needs experience, language and WhatsApp for the details", () => {

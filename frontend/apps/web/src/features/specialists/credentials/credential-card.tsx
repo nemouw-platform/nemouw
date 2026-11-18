@@ -1,17 +1,6 @@
 "use client"
 
 import type { CredentialResponse } from "@workspace/api"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@workspace/ui/components/alert-dialog"
 import { Button } from "@workspace/ui/components/button"
 import {
   Card,
@@ -28,15 +17,14 @@ import {
   Trash2Icon,
 } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
-import * as React from "react"
 
+import { ConfirmButton } from "@/components/confirm-button"
 import { FormAlert } from "@/components/form/form-alert"
 import { FileTypeIcon } from "@/components/upload"
 import { CardHeading } from "@/features/dashboard/card-heading"
 import { StatusBadge } from "@/features/dashboard/status-badge"
 import { useDocumentLink } from "@/features/specialists/credentials/use-credentials"
 import { credentialsApi } from "@/lib/api"
-import { generalErrorMessage } from "@/lib/forms/api-errors"
 
 interface CredentialCardProps {
   credential: CredentialResponse
@@ -155,71 +143,26 @@ function WithdrawButton({
   onWithdrawn: (id: string) => void
 }) {
   const t = useTranslations("Credentials.withdraw")
-  const tFormErrors = useTranslations("Form.errors")
-  const [open, setOpen] = React.useState(false)
-  const [pending, setPending] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
-
-  async function withdraw() {
-    if (!credential.id) return
-    setPending(true)
-    setError(null)
-    try {
-      await credentialsApi.withdraw(credential.id)
-      setOpen(false)
-      onWithdrawn(credential.id)
-    } catch (failure) {
-      setError(generalErrorMessage(failure, tFormErrors))
-    } finally {
-      setPending(false)
-    }
-  }
 
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={(next) => {
-        if (pending) return
-        setOpen(next)
-        setError(null)
+    <ConfirmButton
+      title={t("title")}
+      description={t(
+        credential.verification_status === "verified"
+          ? "verifiedDescription"
+          : "description",
+        { title: credential.title ?? "" }
+      )}
+      confirmLabel={t("confirm")}
+      cancelLabel={t("cancel")}
+      onConfirm={async () => {
+        if (!credential.id) return
+        await credentialsApi.withdraw(credential.id)
+        onWithdrawn(credential.id)
       }}
     >
-      <AlertDialogTrigger render={<Button variant="ghost" size="sm" />}>
-        <Trash2Icon data-icon="inline-start" />
-        {t("action")}
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t("title")}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t(
-              credential.verification_status === "verified"
-                ? "verifiedDescription"
-                : "description",
-              { title: credential.title ?? "" }
-            )}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <FormAlert>{error}</FormAlert>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>
-            {t("cancel")}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            variant="destructive"
-            disabled={pending}
-            onClick={() => void withdraw()}
-          >
-            {pending && (
-              <LoaderCircleIcon
-                className="animate-spin"
-                data-icon="inline-start"
-              />
-            )}
-            {t("confirm")}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      <Trash2Icon data-icon="inline-start" />
+      {t("action")}
+    </ConfirmButton>
   )
 }
