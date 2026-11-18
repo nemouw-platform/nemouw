@@ -37,6 +37,24 @@
     "search": "Rechercher un pays",
     "noResults": "Aucun pays trouvé"
   },
+  "Upload": {
+    "choosePhoto": "Ajouter une photo",
+    "changePhoto": "Changer la photo",
+    "remove": "Supprimer",
+    "saving": "Enregistrement…",
+    "hint": "{types}, jusqu'à {size}",
+    "dropTitle": "Déposez un fichier ici, ou cliquez pour en choisir un",
+    "change": "Changer",
+    "replace": "Remplacer",
+    "removeFile": "Retirer {name}",
+    "view": "Voir",
+    "problems": {
+      "type": "Ce type de fichier n'est pas accepté. Utilisez {types}.",
+      "size": "Ce fichier est trop volumineux. La limite est de {size}.",
+      "unreadable": "Impossible de lire ce fichier. Essayez-en un autre.",
+      "busy": "Nous traitons beaucoup de fichiers en ce moment. Réessayez dans un instant."
+    }
+  },
   "Navbar": {
     "mainNav": "Principale",
     "findSpecialist": "Trouver un spécialiste",
@@ -239,7 +257,8 @@
     "nav": {
       "label": "Tableau de bord",
       "overview": "Aperçu",
-      "profile": "Profil"
+      "profile": "Profil",
+      "credentials": "Diplômes"
     },
     "overview": {
       "metaTitle": "Tableau de bord",
@@ -268,6 +287,14 @@
       "done": "terminé",
       "toDo": "à faire",
       "steps": {
+        "credentials": {
+          "title": "Ajoutez vos diplômes",
+          "description": "Votre diplôme ou votre licence, pour que votre syndicat puisse vous vérifier. Les patients vous trouvent une fois vérifié."
+        },
+        "photo": {
+          "title": "Ajoutez une photo de profil",
+          "description": "Une photo nette de vous met les patients en confiance avant de vous contacter."
+        },
         "details": {
           "title": "Ajoutez les détails de votre pratique",
           "description": "Années d'expérience, langue principale et un numéro WhatsApp où les patients peuvent vous joindre."
@@ -287,6 +314,13 @@
       "ar": "Arabe",
       "en": "Anglais",
       "fr": "Français"
+    },
+    "photos": {
+      "title": "Photos",
+      "description": "Les patients les voient sur votre page publique. Elles sont enregistrées dès que vous les choisissez.",
+      "picture": "Photo de profil",
+      "cover": "Image de couverture",
+      "coverHint": "Une image large en haut de votre page. Nous la recadrons en 1600 × 600."
     },
     "details": {
       "title": "Détails de la pratique",
@@ -334,6 +368,78 @@
       "save": "Enregistrer le texte en {language}",
       "saving": "Enregistrement…",
       "saved": "Enregistré"
+    }
+  },
+  "Credentials": {
+    "metaTitle": "Diplômes",
+    "title": "Diplômes et titres",
+    "description": "Ajoutez vos diplômes, licences et adhésions. Votre syndicat examine chacun d'eux ; une fois vérifié, les patients peuvent vous trouver.",
+    "add": "Ajouter un titre",
+    "types": {
+      "degree": "Diplôme",
+      "license": "Licence d'exercice",
+      "certification": "Certification",
+      "membership": "Adhésion"
+    },
+    "status": {
+      "pending": "En cours d'examen",
+      "verified": "Vérifié",
+      "rejected": "Refusé"
+    },
+    "empty": {
+      "title": "Aucun titre pour l'instant",
+      "description": "Ajoutez votre diplôme ou votre licence pour l'envoyer à votre syndicat."
+    },
+    "card": {
+      "number": "N° {number}",
+      "issued": "Délivré le {date}",
+      "expires": "Expire le {date}",
+      "rejected": "Votre syndicat n'a pas pu vérifier ce titre. Modifiez-le ou remplacez son document pour le renvoyer à l'examen.",
+      "rejectedBecause": "Votre syndicat n'a pas pu vérifier ce titre : {reason}. Modifiez-le ou remplacez son document pour le renvoyer à l'examen.",
+      "view": "Voir le document",
+      "viewFailed": "Impossible d'ouvrir le document. Réessayez.",
+      "edit": "Modifier"
+    },
+    "withdraw": {
+      "action": "Retirer",
+      "title": "Retirer ce titre ?",
+      "description": "« {title} » et son document seront supprimés, et votre syndicat ne l'examinera plus.",
+      "verifiedDescription": "« {title} » est vérifié. Le retirer le supprime avec son document ; pour l'afficher de nouveau, il faudra le soumettre et attendre un nouvel examen.",
+      "cancel": "Le garder",
+      "confirm": "Retirer"
+    },
+    "form": {
+      "newTitle": "Nouveau titre",
+      "editTitle": "Modifier le titre",
+      "description": "Votre syndicat compare ces informations au document.",
+      "resubmitDescription": "L'enregistrement renvoie ce titre à votre syndicat pour examen.",
+      "type": "Type",
+      "typePlaceholder": "Choisissez un type",
+      "title": "Intitulé",
+      "titlePlaceholder": "Licence d'exercice en orthophonie",
+      "organization": "Délivré par",
+      "organizationPlaceholder": "Université libanaise",
+      "number": "Numéro",
+      "numberPlaceholder": "LB-2020-1234",
+      "issueDate": "Date de délivrance",
+      "expiryDate": "Date d'expiration",
+      "datePlaceholder": "AAAA-MM-JJ",
+      "expiryHint": "Laissez vide s'il n'expire pas",
+      "document": "Document",
+      "documentHint": "Un scan ou une photo de l'original, ou un PDF. Seuls vous et votre syndicat pouvez le voir.",
+      "dateOrder": "Doit être postérieure ou égale à la date de délivrance",
+      "cancel": "Annuler",
+      "submit": "Envoyer pour examen",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "document": {
+      "pdf": "Document PDF",
+      "image": "Image",
+      "uploaded": "Ajouté le {date}"
+    },
+    "errors": {
+      "verified": "Ce titre a été vérifié entre-temps et ne peut plus être modifié. Retirez-le et ajoutez-en un nouveau."
     }
   }
 }

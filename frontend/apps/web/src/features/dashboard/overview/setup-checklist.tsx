@@ -15,6 +15,7 @@ import { useTranslations } from "next-intl"
 import { CardHeading } from "@/features/dashboard/card-heading"
 import { setupSteps } from "@/features/dashboard/overview/setup-steps"
 import { useProfileContent } from "@/features/specialists/about/use-profile-content"
+import { useCredentials } from "@/features/specialists/credentials/use-credentials"
 import { useSpecialist } from "@/features/specialists/me/specialist-provider"
 import { Link } from "@/i18n/navigation"
 import { generalErrorMessage } from "@/lib/forms/api-errors"
@@ -24,9 +25,16 @@ export function SetupChecklist() {
   const t = useTranslations("Dashboard.setup")
   const tFormErrors = useTranslations("Form.errors")
   const { specialist } = useSpecialist()
-  const { content, isLoading, failed, error, retry } = useProfileContent()
+  const about = useProfileContent()
+  const credentials = useCredentials()
+  const isLoading = about.isLoading || credentials.isLoading
+  const failure = [about, credentials].find((load) => load.failed)
 
-  const steps = setupSteps(specialist, content)
+  const steps = setupSteps({
+    specialist,
+    content: about.content,
+    credentials: credentials.credentials,
+  })
   const doneCount = steps.filter((step) => step.done).length
   const complete = doneCount === steps.length
 
@@ -35,14 +43,16 @@ export function SetupChecklist() {
       <CardHeader>
         <CardHeading>{complete ? t("completeTitle") : t("title")}</CardHeading>
         <CardDescription>
-          {t("progress", { done: doneCount, total: steps.length })}
+          {!isLoading &&
+            !failure &&
+            t("progress", { done: doneCount, total: steps.length })}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {failed ? (
+        {failure ? (
           <LoadError
-            message={generalErrorMessage(error, tFormErrors)}
-            onRetry={retry}
+            message={generalErrorMessage(failure.error, tFormErrors)}
+            onRetry={failure.retry}
           />
         ) : isLoading ? (
           <Skeleton className="h-32 w-full" />

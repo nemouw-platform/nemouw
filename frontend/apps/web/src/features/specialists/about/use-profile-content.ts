@@ -1,10 +1,10 @@
 "use client"
 
 import type { ApiLocale, SpecialistProfileResponse } from "@workspace/api"
+import { useLoad } from "@workspace/ui/hooks/use-load"
 import * as React from "react"
 
 import { specialistsApi } from "@/lib/api"
-import { useApiLoad } from "@/lib/use-api-load"
 
 export type ContentByLocale = Partial<
   Record<ApiLocale, SpecialistProfileResponse>
@@ -20,7 +20,7 @@ function byLocale(rows: SpecialistProfileResponse[]): ContentByLocale {
  */
 export function useProfileContent() {
   const [content, setContent] = React.useState<ContentByLocale>({})
-  const { isLoading, failed, error, retry } = useApiLoad(
+  const { isLoading, failed, error, retry } = useLoad(
     (signal) => specialistsApi.listContent({ signal }),
     { onSuccess: (rows) => setContent(byLocale(rows)) }
   )

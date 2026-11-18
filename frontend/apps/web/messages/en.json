@@ -37,6 +37,24 @@
     "search": "Search countries",
     "noResults": "No country found"
   },
+  "Upload": {
+    "choosePhoto": "Upload a photo",
+    "changePhoto": "Change photo",
+    "remove": "Remove",
+    "saving": "Saving…",
+    "hint": "{types}, up to {size}",
+    "dropTitle": "Drop a file here, or click to choose one",
+    "change": "Change",
+    "replace": "Replace",
+    "removeFile": "Remove {name}",
+    "view": "View",
+    "problems": {
+      "type": "This file type isn't accepted. Use {types}.",
+      "size": "This file is too large. The limit is {size}.",
+      "unreadable": "We couldn't read this file. Try another one.",
+      "busy": "We're processing a lot of files right now. Try again in a moment."
+    }
+  },
   "Navbar": {
     "mainNav": "Main",
     "findSpecialist": "Find a specialist",
@@ -239,7 +257,8 @@
     "nav": {
       "label": "Dashboard",
       "overview": "Overview",
-      "profile": "Profile"
+      "profile": "Profile",
+      "credentials": "Credentials"
     },
     "overview": {
       "metaTitle": "Dashboard",
@@ -268,6 +287,14 @@
       "done": "done",
       "toDo": "to do",
       "steps": {
+        "credentials": {
+          "title": "Add your credentials",
+          "description": "Your degree or licence, so your syndicate can verify you. Patients find you once you're verified."
+        },
+        "photo": {
+          "title": "Add a profile picture",
+          "description": "A clear photo of you helps patients feel at ease before they get in touch."
+        },
         "details": {
           "title": "Add your practice details",
           "description": "Years of experience, your main language and a WhatsApp number patients can reach."
@@ -287,6 +314,13 @@
       "ar": "Arabic",
       "en": "English",
       "fr": "French"
+    },
+    "photos": {
+      "title": "Photos",
+      "description": "Patients see these on your public page. They save as soon as you pick them.",
+      "picture": "Profile picture",
+      "cover": "Cover image",
+      "coverHint": "A wide image across the top of your page. We crop it to 1600 × 600."
     },
     "details": {
       "title": "Practice details",
@@ -334,6 +368,78 @@
       "save": "Save {language} text",
       "saving": "Saving…",
       "saved": "Saved"
+    }
+  },
+  "Credentials": {
+    "metaTitle": "Credentials",
+    "title": "Credentials",
+    "description": "Add your degrees, licences and memberships. Your syndicate reviews each one; once they verify you, patients can find you.",
+    "add": "Add a credential",
+    "types": {
+      "degree": "Degree",
+      "license": "Licence",
+      "certification": "Certification",
+      "membership": "Membership"
+    },
+    "status": {
+      "pending": "In review",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "empty": {
+      "title": "No credentials yet",
+      "description": "Add your degree or licence to send it to your syndicate for review."
+    },
+    "card": {
+      "number": "No. {number}",
+      "issued": "Issued {date}",
+      "expires": "Expires {date}",
+      "rejected": "Your syndicate couldn't verify this credential. Edit it or replace its document to send it for review again.",
+      "rejectedBecause": "Your syndicate couldn't verify this credential: {reason}. Edit it or replace its document to send it for review again.",
+      "view": "View document",
+      "viewFailed": "We couldn't open the document. Try again.",
+      "edit": "Edit"
+    },
+    "withdraw": {
+      "action": "Withdraw",
+      "title": "Withdraw this credential?",
+      "description": "“{title}” and its document will be deleted, and your syndicate will no longer review it.",
+      "verifiedDescription": "“{title}” is verified. Withdrawing it deletes it and its document; to show it again you'll have to submit it and wait for a new review.",
+      "cancel": "Keep it",
+      "confirm": "Withdraw"
+    },
+    "form": {
+      "newTitle": "New credential",
+      "editTitle": "Edit credential",
+      "description": "Your syndicate checks these details against the document.",
+      "resubmitDescription": "Saving sends this credential back to your syndicate for review.",
+      "type": "Type",
+      "typePlaceholder": "Choose a type",
+      "title": "Title",
+      "titlePlaceholder": "Licence to practise speech therapy",
+      "organization": "Issued by",
+      "organizationPlaceholder": "Lebanese University",
+      "number": "Number",
+      "numberPlaceholder": "LB-2020-1234",
+      "issueDate": "Issue date",
+      "expiryDate": "Expiry date",
+      "datePlaceholder": "YYYY-MM-DD",
+      "expiryHint": "Leave empty if it doesn't expire",
+      "document": "Document",
+      "documentHint": "A scan or photo of the original, or a PDF. Only you and your syndicate can see it.",
+      "dateOrder": "Must be on or after the issue date",
+      "cancel": "Cancel",
+      "submit": "Send for review",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "document": {
+      "pdf": "PDF document",
+      "image": "Image",
+      "uploaded": "Uploaded {date}"
+    },
+    "errors": {
+      "verified": "This credential was verified in the meantime, so it can't be changed. Withdraw it and add a new one instead."
     }
   }
 }

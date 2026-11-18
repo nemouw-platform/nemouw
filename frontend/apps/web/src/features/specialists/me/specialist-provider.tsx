@@ -1,6 +1,7 @@
 "use client"
 
 import { isApiError, type SpecialistResponse } from "@workspace/api"
+import { useLoad } from "@workspace/ui/hooks/use-load"
 import { useTranslations } from "next-intl"
 import * as React from "react"
 
@@ -9,12 +10,16 @@ import { AFTER_SIGNUP_PATH } from "@/features/auth/lib/constants"
 import { useRouter } from "@/i18n/navigation"
 import { specialistsApi } from "@/lib/api"
 import { generalErrorMessage } from "@/lib/forms/api-errors"
-import { useApiLoad } from "@/lib/use-api-load"
 
 interface SpecialistContextValue {
   specialist: SpecialistResponse
   /** Swap in the profile a save returned, so every section shows it */
   setSpecialist: (specialist: SpecialistResponse) => void
+  /**
+   * Change some fields from the latest profile, e.g. a new photo URL. Safe
+   * when two saves finish together, unlike setSpecialist({ ...specialist })
+   */
+  updateSpecialist: (change: Partial<SpecialistResponse>) => void
 }
 
 const SpecialistContext = React.createContext<SpecialistContextValue | null>(
@@ -49,7 +54,7 @@ export function SpecialistProvider({
     null
   )
 
-  const { error, failed, retry } = useApiLoad(
+  const { error, failed, retry } = useLoad(
     (signal) => specialistsApi.getMe({ signal }),
     {
       onSuccess: setSpecialist,
@@ -60,7 +65,15 @@ export function SpecialistProvider({
   )
 
   const value = React.useMemo(
-    () => (specialist ? { specialist, setSpecialist } : null),
+    () =>
+      specialist
+        ? {
+            specialist,
+            setSpecialist,
+            updateSpecialist: (change: Partial<SpecialistResponse>) =>
+              setSpecialist((current) => current && { ...current, ...change }),
+          }
+        : null,
     [specialist]
   )
 

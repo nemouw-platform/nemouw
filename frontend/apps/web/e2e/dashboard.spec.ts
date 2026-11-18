@@ -17,7 +17,7 @@ test.describe("specialist dashboard", () => {
       page.getByRole("heading", { name: "Welcome back" })
     ).toBeVisible()
     await expect(page.getByText("Pending", { exact: true })).toBeVisible()
-    await expect(page.getByText("0 of 2 done")).toBeVisible()
+    await expect(page.getByText("0 of 4 done")).toBeVisible()
 
     await page.getByRole("link", { name: /Add your practice details/ }).click()
     await expect(page).toHaveURL(/\/en\/dashboard\/profile$/)
@@ -65,10 +65,7 @@ test.describe("specialist dashboard", () => {
     await expect(page.getByLabel("Years of experience")).toHaveValue("8")
     await expect(bio).toHaveValue("I help children find their words.")
     await page.getByRole("link", { name: "Overview" }).first().click()
-    await expect(page.getByText("2 of 2 done")).toBeVisible()
-    await expect(
-      page.getByRole("heading", { name: "Your profile is complete" })
-    ).toBeVisible()
+    await expect(page.getByText("2 of 4 done")).toBeVisible()
   })
 
   test("the phone field starts on the visitor's country, found on the server", async ({
