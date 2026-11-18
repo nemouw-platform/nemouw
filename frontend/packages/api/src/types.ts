@@ -45,3 +45,13 @@ export type CredentialResponse = Schemas["CredentialResponse"]
 export type CredentialFields = Schemas["CredentialUpdateRequest"]
 /** A short-lived link to a private document: open it, never store it */
 export type DocumentAccessResponse = Schemas["DocumentAccessResponse"]
+
+export type Country = Schemas["Country"]
+export type SpecialistLocation = Schemas["SpecialistLocation"]
+export type SpecialistLocationWriteRequest =
+  Schemas["SpecialistLocationWriteRequest"]
+export type WeekDay = Schemas["WeekDay"]
+/** One opening window on one weekday, "HH:mm" to "HH:mm" */
+export type SpecialistAvailability = Schemas["SpecialistAvailability"]
+export type SpecialistAvailabilityWriteRequest =
+  Schemas["SpecialistAvailabilityWriteRequest"]
