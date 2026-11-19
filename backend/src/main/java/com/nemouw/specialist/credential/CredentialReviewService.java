@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.DESCRIPTION_MAX;
 
 /** Reviewer actions. Authorization is on the controller; these methods assume it has passed. */
@@ -55,7 +56,7 @@ class CredentialReviewService {
                 .maxLength("rejection_reason", req.rejectionReason(), DESCRIPTION_MAX)
                 .throwIfInvalid();
         locked(credentialId);
-        credentials.markRejected(credentialId, reviewerId, req.rejectionReason().trim());
+        credentials.markRejected(credentialId, reviewerId, strip(req.rejectionReason()));
         log.info("CREDENTIAL_REJECTED credential={} reviewer={}", credentialId, reviewerId);
         return respond(credentialId);
     }

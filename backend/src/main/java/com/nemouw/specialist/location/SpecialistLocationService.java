@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 @Service
@@ -95,7 +96,7 @@ class SpecialistLocationService {
         if (!locations.countryExists(req.countryId())) throw Errors.invalidField("country_id", "unknown country");
 
         return new LocationFields(req.countryId(), blankToNull(req.label()), blankToNull(req.addressLine1()),
-                blankToNull(req.addressLine2()), req.city().trim(), req.latitude(), req.longitude(),
+                blankToNull(req.addressLine2()), strip(req.city()), req.latitude(), req.longitude(),
                 blankToNull(req.phone()));
     }
 

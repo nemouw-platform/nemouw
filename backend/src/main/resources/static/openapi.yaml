@@ -53,7 +53,7 @@ tags:
   - name: Analytics
     description: Public event tracking
 security:
-  - cookieAuth: []
+  - cookieAuth: [ ]
 paths:
   # ---------------------------------------------------------------------
   # Auth
@@ -66,7 +66,7 @@ paths:
       summary: Sign up (step 1 of 3)
       description: |
         Creates a pending account and emails a one-time code. Next: verifySignupOtp. Only SignupRole roles can self-register.
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -104,7 +104,7 @@ paths:
       summary: Verify the signup code (step 2 of 3)
       description: |
         Proves mailbox ownership and sets a short-lived setup cookie, accepted only by setInitialPassword. Every failure returns the same 400.
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -135,7 +135,7 @@ paths:
       summary: Resend the signup code
       description: |
         Always 202, so account existence is not revealed. Throttled per account.
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -160,7 +160,7 @@ paths:
       description: |
         Sets the first password, activates the account, and starts a session. Needs the setup cookie from verifySignupOtp.
       security:
-        - passwordSetupCookie: []
+        - passwordSetupCookie: [ ]
       requestBody:
         required: true
         content:
@@ -195,7 +195,7 @@ paths:
       summary: Log in
       description: |
         identifier is an email, phone, or username. Wrong credentials, unknown identifiers, and deleted accounts all return 401; only a correct password reveals a suspended or unverified account (403).
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -245,7 +245,7 @@ paths:
       summary: Rotate the session
       description: |
         Rotates both cookies. Refresh tokens are single-use; reuse after a short grace window revokes the session.
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/RefreshTokenCookie"
       responses:
@@ -269,7 +269,7 @@ paths:
         - Auth
       summary: Log out
       description: Revokes the refresh token if present and clears both cookies. Always `204`.
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/RefreshTokenCookie"
       responses:
@@ -288,7 +288,7 @@ paths:
       summary: Request a password reset email
       description: |
         Always `202`, so account existence is not revealed. Throttled per account; `429` carries `Retry-After`.
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -312,7 +312,7 @@ paths:
       summary: Complete a password reset or invite
       description: |
         Sets a new password from a single-use, expiring token. Also sets the first password for invited admins and syndicate staff, activating a pending account. Success revokes all sessions.
-      security: []
+      security: [ ]
       requestBody:
         required: true
         content:
@@ -627,7 +627,7 @@ paths:
       tags:
         - Specialties & Conditions
       summary: List specialties
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/IsActive"
       responses:
@@ -701,7 +701,7 @@ paths:
         - Specialties & Conditions
       summary: List conditions
       description: Global list, not scoped by specialty.
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/IsActive"
         - name: search
@@ -803,7 +803,7 @@ paths:
       tags:
         - Countries
       summary: List countries
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/IsActive"
       responses:
@@ -847,7 +847,7 @@ paths:
       tags:
         - Countries
       summary: Get a country
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/CountryId"
       responses:
@@ -916,7 +916,7 @@ paths:
         - Syndicates
       summary: List syndicates
       description: Public. Used by specialists to pick a syndicate during onboarding.
-      security: []
+      security: [ ]
       parameters:
         - name: specialty_id
           in: query
@@ -986,7 +986,7 @@ paths:
       tags:
         - Syndicates
       summary: Get a syndicate
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/SyndicateId"
       responses:
@@ -1458,7 +1458,7 @@ paths:
       tags:
         - Verification
       summary: Get a specialist for staff review
-      description: Bypasses the discovery gate, so pending and rejected profiles are included.
+      description: Bypasses the discovery gate, so pending, rejected and suspended profiles are included.
       x-required-roles:
         - admin
         - "syndicate_staff:same_syndicate_as_specialist"
@@ -2199,7 +2199,7 @@ paths:
         - Credentials
       summary: Edit a credential
       description:
-        Allowed while pending or rejected; a rejected credential returns to pending for review. 
+        Allowed while pending or rejected; a rejected credential returns to pending for review.
         A verified credential cannot be edited; withdraw it and submit a new one.
       parameters:
         - $ref: "#/components/parameters/CredentialId"
@@ -2352,44 +2352,89 @@ paths:
       tags:
         - Discovery
       summary: Search specialists
-      description: Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`).
+      description: |
+        Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`). All filters combine with AND. Each result shows one location: the nearest one that matches every place and availability filter, otherwise the primary. A comma list inside one filter means any of (max 10 values). Max 20 filters and 3 sort keys. Default order is `recommended`. Every public specialist field is filterable and sortable through `filter` and `sort`; see `GET /specialists/search/fields`.
       security: []
       parameters:
         - name: search
           in: query
-          description: Matches username and the resolved title.
+          description: Free text. Every word must match name, headline, bio, specialty, condition or place. Fuzzy on name, specialty and condition.
           schema:
             type: string
-        - name: specialty_id
+        - name: condition_ids
           in: query
+          description: Comma separated condition ids (any of).
           schema:
             type: string
-            format: uuid
+        - name: location
+          in: query
+          description: City or place words.
+          schema:
+            type: string
         - name: country_id
           in: query
           schema:
             type: string
             format: uuid
-        - name: city
+        - name: lat
           in: query
+          description: Near me. Requires `lng`.
+          schema:
+            type: number
+            minimum: -90
+            maximum: 90
+        - name: lng
+          in: query
+          description: Near me. Requires `lat`.
+          schema:
+            type: number
+            minimum: -180
+            maximum: 180
+        - name: radius_km
+          in: query
+          description: Search radius around `lat`/`lng`.
+          schema:
+            type: number
+            default: 25
+            minimum: 0.1
+            maximum: 200
+        - name: patient_age
+          in: query
+          description: Keeps specialists who treat this age. Specialists with no age range are kept.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 120
+        - name: available_days
+          in: query
+          description: |
+            Comma separated weekdays (any of): `monday` to `sunday`. Keeps specialists with a weekly window on one of these days. Combine with `available_from` / `available_to` to require the same window to fit both. Must match the same location as `location`, `country_id` and `lat`/`lng`.
           schema:
             type: string
-        - name: condition_id
+            example: monday,wednesday
+        - name: available_from
           in: query
+          description: Wanted start time `HH:mm` (24h). Keeps windows that end after this time.
           schema:
             type: string
-            format: uuid
-        - name: language
+            example: "09:00"
+        - name: available_to
           in: query
+          description: Wanted end time `HH:mm` (24h). Keeps windows that start before this time. Must be after `available_from`.
           schema:
             type: string
-        - name: gender
-          in: query
-          schema:
-            type: string
+            example: "13:00"
+        - $ref: "#/components/parameters/FilterQuery"
+        - $ref: "#/components/parameters/SortQuery"
         - $ref: "#/components/parameters/LocaleQuery"
         - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/PageSize"
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
       responses:
         "200":
           description: Search results
@@ -2397,6 +2442,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SpecialistSearchPage"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /specialists/search/fields:
+    get:
+      operationId: getSpecialistSearchFields
+      tags:
+        - Discovery
+      summary: List filterable and sortable fields
+      description: Public. Drives the filter UI. New fields appear here automatically.
+      security: [ ]
+      responses:
+        "200":
+          description: Fields and computed sort keys
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialistSearchOptions"
   "/specialists/{username}":
     get:
       operationId: getPublicSpecialistProfile
@@ -2405,7 +2467,7 @@ paths:
       summary: Get a public profile
       description: |
         Public. `404` unless the specialist is discoverable. Hide the contact button when `whatsapp_number` is `null`. The response `locale` reports the locale actually used. `credentials` lists only verified credentials that have not expired.
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/Username"
         - $ref: "#/components/parameters/LocaleQuery"
@@ -2418,6 +2480,8 @@ paths:
                 $ref: "#/components/schemas/SpecialistPublicProfile"
         "404":
           $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
   "/specialists/{username}/events":
     post:
       operationId: recordAnalyticsEvent
@@ -2426,7 +2490,7 @@ paths:
       summary: Record a profile view or WhatsApp click
       description: |
         Public. Events are deduplicated per specialist, visitor, and event type per day; duplicates still return `202`. Events without `visitor_id` count toward totals but not unique visitors. The username is resolved to the specialist id before storage.
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/Username"
       requestBody:
@@ -2590,6 +2654,35 @@ components:
       required: true
       schema:
         type: string
+    FilterQuery:
+      name: filter
+      in: query
+      style: deepObject
+      explode: true
+      description: |
+        `filter[field]=a,b` (any of, max 10 values) or `filter[field][op]=value`. Ops: `eq`, `gt`, `gte`, `lt`, `lte`, `contains`, `is_null`. Allowed ops and values come from the endpoint's fields listing. Max 20 filters. Dates are `YYYY-MM-DD`; timestamps are ISO 8601 or `YYYY-MM-DD` (start of day, UTC).
+      schema:
+        type: object
+        additionalProperties:
+          oneOf:
+            - type: string
+            - type: object
+              additionalProperties:
+                type: string
+    SortQuery:
+      name: sort
+      in: query
+      description: Comma separated keys, `-` prefix for descending, max 3. Computed keys (for example `distance`) cannot be descending.
+      schema:
+        type: string
+        example: -created_at,last_name
+    ListPageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 20
   schemas:
     Role:
       type: string
@@ -3031,6 +3124,13 @@ components:
       maxLength: 30
       pattern: "^[A-Za-z0-9._-]+$"
       example: dr.jane-doe
+    Gender:
+      type: string
+      enum: [ male, female ]
+    Currency:
+      type: string
+      enum: [ USD ]
+      description: Session price currency. Defaults from the specialist's country at onboarding, else `USD`.
     SpecialistOnboardingRequest:
       type: object
       required:
@@ -3057,12 +3157,16 @@ components:
           $ref: "#/components/schemas/Username"
         gender:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Gender"
           nullable: true
         whatsapp_number:
           type: string
           nullable: true
         primary_language:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Locale"
           nullable: true
         years_of_experience:
           type: integer
@@ -3075,6 +3179,18 @@ components:
           type: integer
           nullable: true
           minimum: 0
+        session_price_min:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Up to 2 decimals.
+        session_price_max:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Needs `session_price_min` and must be greater than or equal to it.
+        price_currency:
+          $ref: "#/components/schemas/Currency"
     SpecialistResponse:
       type: object
       properties:
@@ -3097,12 +3213,16 @@ components:
           type: string
         gender:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Gender"
           nullable: true
         whatsapp_number:
           type: string
           nullable: true
         primary_language:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Locale"
           nullable: true
         years_of_experience:
           type: integer
@@ -3121,10 +3241,25 @@ components:
           nullable: true
         verification_status:
           $ref: "#/components/schemas/SpecialistVerificationStatus"
-        verified_at:
+        reviewed_at:
           type: string
           format: date-time
           nullable: true
+          description: When the last verify or reject decision was made. `null` while pending.
+        rejection_reason:
+          type: string
+          nullable: true
+          description: Why the specialist was rejected. `null` unless `verification_status` is `rejected`.
+        user_status:
+          $ref: "#/components/schemas/UserStatus"
+        session_price_min:
+          type: number
+          nullable: true
+        session_price_max:
+          type: number
+          nullable: true
+        price_currency:
+          $ref: "#/components/schemas/Currency"
         created_at:
           type: string
           format: date-time
@@ -3414,11 +3549,14 @@ components:
               description: The document file.
     RejectionRequest:
       type: object
+      description: Removes the profile from discovery and stores the reason, which the specialist sees in `rejection_reason`. Does not affect login. A later `verifySpecialist` reinstates it.
       required:
         - rejection_reason
       properties:
         rejection_reason:
           type: string
+          minLength: 1
+          maxLength: 1000
     CredentialResponse:
       type: object
       properties:
@@ -3599,6 +3737,10 @@ components:
           format: uuid
         username:
           type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
         title:
           type: string
           nullable: true
@@ -3608,6 +3750,12 @@ components:
         specialty_id:
           type: string
           format: uuid
+        profile_picture_url:
+          type: string
+          nullable: true
+        years_of_experience:
+          type: integer
+          nullable: true
         city:
           type: string
           nullable: true
@@ -3615,15 +3763,48 @@ components:
           type: string
           format: uuid
           nullable: true
-        profile_picture_url:
-          type: string
+        distance_km:
+          type: number
           nullable: true
-        years_of_experience:
+          description: Distance in km to the location shown in `city`. `null` unless `lat` and `lng` are sent.
+        primary_language:
+          allOf:
+            - $ref: "#/components/schemas/Locale"
+          nullable: true
+        session_price_min:
+          type: number
+          nullable: true
+        session_price_max:
+          type: number
+          nullable: true
+        price_currency:
+          $ref: "#/components/schemas/Currency"
+        min_age_treated:
           type: integer
           nullable: true
-        primary_language:
-          type: string
+        max_age_treated:
+          type: integer
           nullable: true
+        treated_condition_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        locations:
+          type: array
+          description: All of the specialist's locations, primary first. `city` above is the one that matched your filters.
+          items:
+            $ref: "#/components/schemas/SearchResultLocation"
+    SearchResultLocation:
+      type: object
+      properties:
+        country_id:
+          type: string
+          format: uuid
+        city:
+          type: string
+        is_primary:
+          type: boolean
     SpecialistSearchPage:
       type: object
       properties:
@@ -3637,6 +3818,36 @@ components:
           type: integer
         total:
           type: integer
+    SearchFieldInfo:
+      type: object
+      description: One filterable and sortable field of a list endpoint.
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ uuid, text, enum, number, date, timestamp, boolean ]
+        operators:
+          type: array
+          items:
+            type: string
+            enum: [ eq, gt, gte, lt, lte, contains, is_null ]
+        values:
+          type: array
+          description: Allowed values. Empty unless `type` is `enum`.
+          items:
+            type: string
+    SpecialistSearchOptions:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchFieldInfo"
+        computed_sorts:
+          type: array
+          items:
+            type: string
     SpecialistPublicProfile:
       type: object
       properties:
@@ -3644,6 +3855,10 @@ components:
           type: string
           format: uuid
         username:
+          type: string
+        first_name:
+          type: string
+        last_name:
           type: string
         locale:
           allOf:
@@ -3663,13 +3878,25 @@ components:
           format: uuid
         gender:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Gender"
           nullable: true
         years_of_experience:
           type: integer
           nullable: true
         primary_language:
           type: string
+          allOf:
+            - $ref: "#/components/schemas/Locale"
           nullable: true
+        session_price_min:
+          type: number
+          nullable: true
+        session_price_max:
+          type: number
+          nullable: true
+        price_currency:
+          $ref: "#/components/schemas/Currency"
         whatsapp_number:
           type: string
           nullable: true

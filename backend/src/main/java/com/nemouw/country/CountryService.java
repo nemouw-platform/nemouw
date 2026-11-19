@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static com.nemouw.common.util.TextNormalizer.blankToNull;
+import static com.nemouw.common.util.TextNormalizer.strip;
 import static com.nemouw.common.util.ValidationLimits.TEXT_MAX;
 
 @Service
@@ -90,11 +92,11 @@ class CountryService {
      * Copies only the fields that were sent. Validation has already run.
      */
     private static void apply(Country c, CountryWriteRequest r) {
-        if (r.name() != null) c.setName(r.name().trim());
+        if (r.name() != null) c.setName(strip(r.name()));
         if (r.isoCode() != null) c.setIsoCode(r.isoCode().trim().toUpperCase(Locale.ROOT));
         if (r.currencyCode() != null) c.setCurrencyCode(r.currencyCode().trim().toUpperCase(Locale.ROOT));
         if (r.phoneCode() != null) c.setPhoneCode(r.phoneCode().trim());
-        if (r.region() != null) c.setRegion(r.region().isBlank() ? null : r.region().trim());
+        if (r.region() != null) c.setRegion(blankToNull(r.region()));
         if (r.active() != null) c.setActive(r.active());
     }
 

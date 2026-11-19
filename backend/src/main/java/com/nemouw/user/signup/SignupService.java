@@ -63,8 +63,8 @@ class SignupService {
         new Validator().check(role != null && SELF_REGISTERABLE.contains(role), FieldErrors.invalidRole("role")).required("first_name", req.firstName()).maxLength("first_name", req.firstName(), NAME_MAX_LENGTH).required("last_name", req.lastName()).maxLength("last_name", req.lastName(), NAME_MAX_LENGTH).requiredEmail("email", req.email()).throwIfInvalid();
 
         String email = TextNormalizer.normalizeEmail(req.email());
-        String firstName = req.firstName().trim();
-        String lastName = req.lastName().trim();
+        String firstName = TextNormalizer.strip(req.firstName());
+        String lastName = TextNormalizer.strip(req.lastName());
 
         EmailIdentity exist = users.findByEmail(email).orElse(null);
         if (exist != null) {

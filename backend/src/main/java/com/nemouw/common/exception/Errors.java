@@ -31,6 +31,10 @@ public final class Errors {
         return new ApiException(ErrorCode.ACCOUNT_SUSPENDED);
     }
 
+    public static ApiException accountDeleted() {
+        return new ApiException(ErrorCode.ACCOUNT_DELETED);
+    }
+
     public static ApiException invalidRefreshToken() {
         return new ApiException(ErrorCode.INVALID_TOKEN, "Invalid or expired refresh token");
     }
