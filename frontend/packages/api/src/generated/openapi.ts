@@ -732,7 +732,7 @@ export interface paths {
         };
         /**
          * Get a specialist for staff review
-         * @description Bypasses the discovery gate, so pending and rejected profiles are included.
+         * @description Bypasses the discovery gate, so pending, rejected and suspended profiles are included.
          */
         get: operations["getSpecialistForReview"];
         put?: never;
@@ -1185,9 +1185,29 @@ export interface paths {
         };
         /**
          * Search specialists
-         * @description Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`).
+         * @description Public. Returns only discoverable specialists (see `SpecialistVerificationStatus`). All filters combine with AND. Each result shows one location: the nearest one that matches every place and availability filter, otherwise the primary. A comma list inside one filter means any of (max 10 values). Max 20 filters and 3 sort keys. Default order is `recommended`. Every public specialist field is filterable and sortable through `filter` and `sort`; see `GET /specialists/search/fields`.
          */
         get: operations["searchSpecialists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/specialists/search/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List filterable and sortable fields
+         * @description Public. Drives the filter UI. New fields appear here automatically.
+         */
+        get: operations["getSpecialistSearchFields"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1474,6 +1494,13 @@ export interface components {
          * @example dr.jane-doe
          */
         Username: string;
+        /** @enum {string} */
+        Gender: "male" | "female";
+        /**
+         * @description Session price currency. Defaults from the specialist's country at onboarding, else `USD`.
+         * @enum {string}
+         */
+        Currency: "USD";
         SpecialistOnboardingRequest: {
             username: components["schemas"]["Username"];
             /** Format: uuid */
@@ -1485,12 +1512,17 @@ export interface components {
             syndicate_id?: string;
             syndicate_member_number?: string;
             username?: components["schemas"]["Username"];
-            gender?: string | null;
+            gender?: (string & components["schemas"]["Gender"]) | null;
             whatsapp_number?: string | null;
-            primary_language?: string | null;
+            primary_language?: (string & components["schemas"]["Locale"]) | null;
             years_of_experience?: number | null;
             min_age_treated?: number | null;
             max_age_treated?: number | null;
+            /** @description Up to 2 decimals. */
+            session_price_min?: number | null;
+            /** @description Needs `session_price_min` and must be greater than or equal to it. */
+            session_price_max?: number | null;
+            price_currency?: components["schemas"]["Currency"];
         };
         SpecialistResponse: {
             /** Format: uuid */
@@ -1503,17 +1535,26 @@ export interface components {
             syndicate_id?: string;
             syndicate_member_number?: string;
             username?: string;
-            gender?: string | null;
+            gender?: (string & components["schemas"]["Gender"]) | null;
             whatsapp_number?: string | null;
-            primary_language?: string | null;
+            primary_language?: (string & components["schemas"]["Locale"]) | null;
             years_of_experience?: number | null;
             profile_picture_url?: string | null;
             cover_image_url?: string | null;
             min_age_treated?: number | null;
             max_age_treated?: number | null;
             verification_status?: components["schemas"]["SpecialistVerificationStatus"];
-            /** Format: date-time */
-            verified_at?: string | null;
+            /**
+             * Format: date-time
+             * @description When the last verify or reject decision was made. `null` while pending.
+             */
+            reviewed_at?: string | null;
+            /** @description Why the specialist was rejected. `null` unless `verification_status` is `rejected`. */
+            rejection_reason?: string | null;
+            user_status?: components["schemas"]["UserStatus"];
+            session_price_min?: number | null;
+            session_price_max?: number | null;
+            price_currency?: components["schemas"]["Currency"];
             /** Format: date-time */
             created_at?: string;
             /** Format: date-time */
@@ -1668,6 +1709,7 @@ export interface components {
              */
             document: string;
         };
+        /** @description Removes the profile from discovery and stores the reason, which the specialist sees in `rejection_reason`. Does not affect login. A later `verifySpecialist` reinstates it. */
         RejectionRequest: {
             rejection_reason: string;
         };
@@ -1771,16 +1813,34 @@ export interface components {
             /** Format: uuid */
             id?: string;
             username?: string;
+            first_name?: string;
+            last_name?: string;
             title?: string | null;
             headline?: string | null;
             /** Format: uuid */
             specialty_id?: string;
+            profile_picture_url?: string | null;
+            years_of_experience?: number | null;
             city?: string | null;
             /** Format: uuid */
             country_id?: string | null;
-            profile_picture_url?: string | null;
-            years_of_experience?: number | null;
-            primary_language?: string | null;
+            /** @description Distance in km to the location shown in `city`. `null` unless `lat` and `lng` are sent. */
+            distance_km?: number | null;
+            primary_language?: components["schemas"]["Locale"] | null;
+            session_price_min?: number | null;
+            session_price_max?: number | null;
+            price_currency?: components["schemas"]["Currency"];
+            min_age_treated?: number | null;
+            max_age_treated?: number | null;
+            treated_condition_ids?: string[];
+            /** @description All of the specialist's locations, primary first. `city` above is the one that matched your filters. */
+            locations?: components["schemas"]["SearchResultLocation"][];
+        };
+        SearchResultLocation: {
+            /** Format: uuid */
+            country_id?: string;
+            city?: string;
+            is_primary?: boolean;
         };
         SpecialistSearchPage: {
             data?: components["schemas"]["SpecialistSearchResult"][];
@@ -1788,10 +1848,25 @@ export interface components {
             page_size?: number;
             total?: number;
         };
+        /** @description One filterable and sortable field of a list endpoint. */
+        SearchFieldInfo: {
+            name?: string;
+            /** @enum {string} */
+            type?: "uuid" | "text" | "enum" | "number" | "date" | "timestamp" | "boolean";
+            operators?: ("eq" | "gt" | "gte" | "lt" | "lte" | "contains" | "is_null")[];
+            /** @description Allowed values. Empty unless `type` is `enum`. */
+            values?: string[];
+        };
+        SpecialistSearchOptions: {
+            fields?: components["schemas"]["SearchFieldInfo"][];
+            computed_sorts?: string[];
+        };
         SpecialistPublicProfile: {
             /** Format: uuid */
             id?: string;
             username?: string;
+            first_name?: string;
+            last_name?: string;
             /** @description Locale actually used for `title`, `headline`, and `bio`. */
             locale?: components["schemas"]["Locale"];
             title?: string | null;
@@ -1799,9 +1874,12 @@ export interface components {
             bio?: string | null;
             /** Format: uuid */
             specialty_id?: string;
-            gender?: string | null;
+            gender?: (string & components["schemas"]["Gender"]) | null;
             years_of_experience?: number | null;
-            primary_language?: string | null;
+            primary_language?: (string & components["schemas"]["Locale"]) | null;
+            session_price_min?: number | null;
+            session_price_max?: number | null;
+            price_currency?: components["schemas"]["Currency"];
             whatsapp_number?: string | null;
             min_age_treated?: number | null;
             max_age_treated?: number | null;
@@ -2189,6 +2267,15 @@ export interface components {
         SpecialtyId: string;
         CountryId: string;
         Username: string;
+        /** @description `filter[field]=a,b` (any of, max 10 values) or `filter[field][op]=value`. Ops: `eq`, `gt`, `gte`, `lt`, `lte`, `contains`, `is_null`. Allowed ops and values come from the endpoint's fields listing. Max 20 filters. Dates are `YYYY-MM-DD`; timestamps are ISO 8601 or `YYYY-MM-DD` (start of day, UTC). */
+        FilterQuery: {
+            [key: string]: string | {
+                [key: string]: string;
+            };
+        };
+        /** @description Comma separated keys, `-` prefix for descending, max 3. Computed keys (for example `distance`) cannot be descending. */
+        SortQuery: string;
+        ListPageSize: number;
     };
     requestBodies: never;
     headers: {
@@ -4578,18 +4665,35 @@ export interface operations {
     searchSpecialists: {
         parameters: {
             query?: {
-                /** @description Matches username and the resolved title. */
+                /** @description Free text. Every word must match name, headline, bio, specialty, condition or place. Fuzzy on name, specialty and condition. */
                 search?: string;
-                specialty_id?: string;
+                /** @description Comma separated condition ids (any of). */
+                condition_ids?: string;
+                /** @description City or place words. */
+                location?: string;
                 country_id?: string;
-                city?: string;
-                condition_id?: string;
-                language?: string;
-                gender?: string;
+                /** @description Near me. Requires `lng`. */
+                lat?: number;
+                /** @description Near me. Requires `lat`. */
+                lng?: number;
+                /** @description Search radius around `lat`/`lng`. */
+                radius_km?: number;
+                /** @description Keeps specialists who treat this age. Specialists with no age range are kept. */
+                patient_age?: number;
+                /** @description Comma separated weekdays (any of): `monday` to `sunday`. Keeps specialists with a weekly window on one of these days. Combine with `available_from` / `available_to` to require the same window to fit both. Must match the same location as `location`, `country_id` and `lat`/`lng`. */
+                available_days?: string;
+                /** @description Wanted start time `HH:mm` (24h). Keeps windows that end after this time. */
+                available_from?: string;
+                /** @description Wanted end time `HH:mm` (24h). Keeps windows that start before this time. Must be after `available_from`. */
+                available_to?: string;
+                /** @description `filter[field]=a,b` (any of, max 10 values) or `filter[field][op]=value`. Ops: `eq`, `gt`, `gte`, `lt`, `lte`, `contains`, `is_null`. Allowed ops and values come from the endpoint's fields listing. Max 20 filters. Dates are `YYYY-MM-DD`; timestamps are ISO 8601 or `YYYY-MM-DD` (start of day, UTC). */
+                filter?: components["parameters"]["FilterQuery"];
+                /** @description Comma separated keys, `-` prefix for descending, max 3. Computed keys (for example `distance`) cannot be descending. */
+                sort?: components["parameters"]["SortQuery"];
                 /** @description Locale for localized fields; falls back to the default. */
                 locale?: components["parameters"]["LocaleQuery"];
                 page?: components["parameters"]["Page"];
-                page_size?: components["parameters"]["PageSize"];
+                page_size?: number;
             };
             header?: never;
             path?: never;
@@ -4604,6 +4708,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SpecialistSearchPage"];
+                };
+            };
+            422: components["responses"]["ValidationError"];
+        };
+    };
+    getSpecialistSearchFields: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fields and computed sort keys */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpecialistSearchOptions"];
                 };
             };
         };
@@ -4632,6 +4757,7 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
         };
     };
     recordAnalyticsEvent: {

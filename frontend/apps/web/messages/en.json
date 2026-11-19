@@ -284,7 +284,8 @@
       },
       "rejected": {
         "label": "Not verified",
-        "description": "Your syndicate couldn't verify your profile, so patients can't find you yet. Check your details and contact your syndicate."
+        "description": "Your syndicate couldn't verify your profile, so patients can't find you yet. Check your details and contact your syndicate.",
+        "descriptionWithReason": "Your syndicate couldn't verify your profile: {reason}. Patients can't find you yet. Update your credentials, or contact your syndicate."
       }
     },
     "setup": {

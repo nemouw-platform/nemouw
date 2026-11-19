@@ -18,16 +18,20 @@ export function VerificationCard() {
   const format = useFormatter()
   const { specialist } = useSpecialist()
   const status = specialist.verification_status ?? "pending"
-  const verifiedAt = specialist.verified_at
-    ? format.dateTime(new Date(specialist.verified_at), { dateStyle: "long" })
+  // When the syndicate last decided (verified or rejected)
+  const reviewedAt = specialist.reviewed_at
+    ? format.dateTime(new Date(specialist.reviewed_at), { dateStyle: "long" })
     : null
+  const reason = status === "rejected" ? specialist.rejection_reason : null
 
   return (
     <Card className="[--card-spacing:--spacing(6)]">
       <CardHeader>
         <CardHeading>{t("title")}</CardHeading>
         <CardDescription className="text-pretty">
-          {t(`${status}.description`, { date: verifiedAt ?? "" })}
+          {reason
+            ? t("rejected.descriptionWithReason", { reason })
+            : t(`${status}.description`, { date: reviewedAt ?? "" })}
         </CardDescription>
         <CardAction>
           <StatusBadge status={status}>{t(`${status}.label`)}</StatusBadge>

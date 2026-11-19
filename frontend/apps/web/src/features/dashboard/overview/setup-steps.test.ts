@@ -69,7 +69,11 @@ describe("setupSteps", () => {
   })
 
   it("needs experience, language and WhatsApp for the details", () => {
-    const partly = { ...fresh, years_of_experience: 0, primary_language: "ar" }
+    const partly: SpecialistResponse = {
+      ...fresh,
+      years_of_experience: 0,
+      primary_language: "ar",
+    }
     expect(done(setupSteps({ ...none, specialist: partly })).details).toBe(
       false
     )

@@ -1,4 +1,6 @@
 import type {
+  ApiLocale,
+  Gender,
   SpecialistResponse,
   SpecialistUpdateRequest,
 } from "@workspace/api"
@@ -19,9 +21,13 @@ export const DETAILS_FIELDS = [
 ] as const
 
 /** Stored as free text by the backend; these are the values we offer */
-export const GENDERS = ["female", "male"] as const
+export const GENDERS = ["female", "male"] as const satisfies readonly Gender[]
 /** Locale codes, so search can match them against the site's languages */
-export const PRIMARY_LANGUAGES = ["ar", "en", "fr"] as const
+export const PRIMARY_LANGUAGES = [
+  "ar",
+  "en",
+  "fr",
+] as const satisfies readonly ApiLocale[]
 
 // Sanity caps (the backend only asks for 0 or more)
 const MAX_YEARS_OF_EXPERIENCE = 70
@@ -39,8 +45,9 @@ export function createDetailsSchema(
   return z
     .object({
       years_of_experience: rules.optionalCount(MAX_YEARS_OF_EXPERIENCE),
-      gender: z.string(),
-      primary_language: z.string(),
+      // "" while not picked
+      gender: z.enum(["", ...GENDERS]),
+      primary_language: z.enum(["", ...PRIMARY_LANGUAGES]),
       // International ("+96170123456"), as PhoneInput gives it
       whatsapp_number: z
         .string()
@@ -68,8 +75,8 @@ const count = (value: number | null | undefined) =>
 export function toDetailsValues(specialist: SpecialistResponse): DetailsValues {
   return {
     years_of_experience: count(specialist.years_of_experience),
-    gender: text(specialist.gender),
-    primary_language: text(specialist.primary_language),
+    gender: specialist.gender ?? "",
+    primary_language: specialist.primary_language ?? "",
     whatsapp_number: text(specialist.whatsapp_number),
     min_age_treated: count(specialist.min_age_treated),
     max_age_treated: count(specialist.max_age_treated),
@@ -85,8 +92,8 @@ export function toUpdateRequest(
 ): SpecialistUpdateRequest {
   return {
     years_of_experience: countOrNull(values.years_of_experience),
-    gender: orNull(values.gender),
-    primary_language: orNull(values.primary_language),
+    gender: values.gender || null,
+    primary_language: values.primary_language || null,
     whatsapp_number: orNull(values.whatsapp_number),
     min_age_treated: countOrNull(values.min_age_treated),
     max_age_treated: countOrNull(values.max_age_treated),

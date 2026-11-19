@@ -284,7 +284,8 @@
       },
       "rejected": {
         "label": "Non vérifié",
-        "description": "Votre syndicat n'a pas pu vérifier votre profil : les patients ne peuvent pas encore vous trouver. Vérifiez vos informations et contactez votre syndicat."
+        "description": "Votre syndicat n'a pas pu vérifier votre profil : les patients ne peuvent pas encore vous trouver. Vérifiez vos informations et contactez votre syndicat.",
+        "descriptionWithReason": "Votre syndicat n'a pas pu vérifier votre profil : {reason}. Les patients ne peuvent pas encore vous trouver. Mettez vos titres à jour ou contactez votre syndicat."
       }
     },
     "setup": {

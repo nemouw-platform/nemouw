@@ -25,6 +25,7 @@ export type ForgotPasswordRequest = Schemas["ForgotPasswordRequest"]
 export type ResetPasswordRequest = Schemas["ResetPasswordRequest"]
 
 export type SpecialistResponse = Schemas["SpecialistResponse"]
+export type Gender = Schemas["Gender"]
 export type SpecialistVerificationStatus =
   Schemas["SpecialistVerificationStatus"]
 export type SpecialistOnboardingRequest = Schemas["SpecialistOnboardingRequest"]
