@@ -233,6 +233,10 @@
     "metaTitle": "Configurez votre profil",
     "title": "Configurez votre profil",
     "description": "Choisissez votre nom d'utilisateur public et confirmez votre adhésion à votre syndicat. Vous compléterez le reste de votre profil ensuite.",
+    "submit": "Terminer",
+    "submitting": "Enregistrement…"
+  },
+  "Membership": {
     "username": "Nom d'utilisateur",
     "usernamePlaceholder": "dr.rana-haddad",
     "usernameHint": "3 à 30 lettres, chiffres, points, tirets ou tirets bas. Il devient le lien de votre profil public.",
@@ -245,13 +249,12 @@
     "memberNumber": "Numéro d'adhérent",
     "memberNumberPlaceholder": "12345",
     "memberNumberHint": "Votre numéro d'adhérent dans ce syndicat. Il nous sert à vérifier vos diplômes.",
-    "submit": "Terminer",
-    "submitting": "Enregistrement…",
     "errors": {
       "usernameFormat": "Utilisez uniquement des lettres, chiffres, points, tirets et tirets bas",
       "usernameTaken": "Ce nom d'utilisateur est déjà pris. Essayez-en un autre.",
       "usernameUnavailable": "Ce nom d'utilisateur n'est pas disponible. Essayez-en un autre.",
-      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat."
+      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat.",
+      "syndicateLocked": "Votre syndicat a vérifié votre profil : votre syndicat ne peut plus changer. Contactez le support Nemouw s'il est erroné."
     }
   },
   "Dashboard": {
@@ -260,7 +263,9 @@
       "overview": "Aperçu",
       "profile": "Profil",
       "credentials": "Diplômes",
-      "locations": "Lieux et horaires"
+      "locations": "Lieux et horaires",
+      "conditions": "Troubles traités",
+      "settings": "Paramètres"
     },
     "overview": {
       "metaTitle": "Tableau de bord",
@@ -308,6 +313,10 @@
         "about": {
           "title": "Présentez-vous",
           "description": "Une courte biographie, dans au moins une langue, pour que les patients sachent qui vous êtes."
+        },
+        "conditions": {
+          "title": "Choisissez les troubles que vous traitez",
+          "description": "Les patients cherchent par trouble : c'est ainsi qu'ils vous trouvent."
         }
       }
     }
@@ -517,6 +526,43 @@
       "add": "Ajouter le lieu",
       "save": "Enregistrer",
       "saving": "Enregistrement…"
+    }
+  },
+  "Conditions": {
+    "metaTitle": "Troubles traités",
+    "title": "Troubles que vous traitez",
+    "description": "Les patients cherchent par trouble. Cochez tous ceux que vous traitez.",
+    "empty": "Aucun trouble n'est encore répertorié sur Nemouw. Revenez bientôt.",
+    "form": {
+      "title": "Troubles",
+      "description": "Vos choix apparaissent sur votre page publique.",
+      "search": "Rechercher un trouble",
+      "searchPlaceholder": "Rechercher, par ex. autisme",
+      "selected": "{count, plural, =0 {Aucun sélectionné} one {# sélectionné} other {# sélectionnés}}",
+      "noMatch": "Aucun trouble ne correspond à votre recherche.",
+      "save": "Enregistrer les troubles",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    }
+  },
+  "Settings": {
+    "metaTitle": "Paramètres",
+    "title": "Paramètres",
+    "description": "Votre nom d'utilisateur public et votre adhésion au syndicat.",
+    "username": {
+      "title": "Nom d'utilisateur",
+      "description": "Il forme le lien vers votre page publique : changez-le avec soin, les anciens liens ne fonctionneront plus.",
+      "save": "Enregistrer le nom",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    },
+    "membership": {
+      "title": "Adhésion au syndicat",
+      "description": "Votre syndicat s'en sert pour vérifier vos titres.",
+      "locked": "Verrouillé : votre syndicat a vérifié votre profil.",
+      "save": "Enregistrer l'adhésion",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
     }
   }
 }

@@ -1,15 +1,16 @@
 "use client"
 
-import { DASHBOARD_PATH } from "@/features/auth/lib/constants"
-import { classifyOnboardingError } from "@/features/auth/onboarding/onboarding-errors"
-import type { OnboardingValues } from "@/features/auth/onboarding/onboarding-schema"
-import { useRouter } from "@/i18n/navigation"
-import { specialistsApi } from "@/lib/api"
-import { useTranslations } from "next-intl"
 import * as React from "react"
 import type { UseFormReturn } from "react-hook-form"
 
-import { fieldErrorMessage } from "@/lib/forms/api-errors"
+import { DASHBOARD_PATH } from "@/features/auth/lib/constants"
+import {
+  ONBOARDING_FIELDS,
+  type OnboardingValues,
+} from "@/features/auth/onboarding/onboarding-schema"
+import { useMembershipErrors } from "@/features/specialists/membership/use-membership-errors"
+import { useRouter } from "@/i18n/navigation"
+import { specialistsApi } from "@/lib/api"
 import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /**
@@ -34,48 +35,16 @@ export function useRedirectIfOnboarded() {
 /** Submits onboarding; success opens the dashboard */
 export function useOnboarding(form: UseFormReturn<OnboardingValues>) {
   const router = useRouter()
-  const t = useTranslations("Onboarding.errors")
-  const tForm = useTranslations("Form.errors")
+  const onError = useMembershipErrors(form.setError, {
+    fields: ONBOARDING_FIELDS,
+    // Done already, e.g. in another tab: on to the dashboard
+    onAlreadyOnboarded: () => router.replace(DASHBOARD_PATH),
+  })
 
   const onboarding = useFormRequest(
     (signal, values: OnboardingValues) =>
       specialistsApi.onboard(values, { signal }),
-    {
-      onSuccess: () => router.replace(DASHBOARD_PATH),
-      onError: (error) => {
-        const failure = classifyOnboardingError(error)
-        const focus = { shouldFocus: true }
-        switch (failure.kind) {
-          case "usernameTaken":
-            form.setError("username", { message: t("usernameTaken") }, focus)
-            return true
-          case "usernameUnavailable":
-            form.setError(
-              "username",
-              { message: t("usernameUnavailable") },
-              focus
-            )
-            return true
-          case "memberNumberTaken":
-            form.setError(
-              "syndicate_member_number",
-              { message: t("memberNumberTaken") },
-              focus
-            )
-            return true
-          case "alreadyOnboarded":
-            router.replace(DASHBOARD_PATH)
-            return true
-          case "fields":
-            failure.fields.forEach(({ name, code }) =>
-              form.setError(name, { message: fieldErrorMessage(code, tForm) })
-            )
-            return true
-          case "general":
-            return false
-        }
-      },
-    }
+    { onSuccess: () => router.replace(DASHBOARD_PATH), onError }
   )
 
   return {

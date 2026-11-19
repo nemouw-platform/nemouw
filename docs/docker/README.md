@@ -10,7 +10,7 @@ no Node.js, Java or Maven.
 | `admin`   | Staff dashboard                               | http://localhost:3001                  |
 | `backend` | Spring Boot API (debugger on port 5005)       | http://localhost:8080                  |
 | `db`      | PostgreSQL 18, reachable from your machine only | `localhost:5432`                     |
-| `seed`    | Loads the reference data once, then exits     | (no page)                              |
+| `seed`    | Loads the reference data (Lebanon, syndicates, conditions) once, then exits | (no page) |
 
 The frontend apps run as **production builds**, so they behave like the real
 site. To see code changes in them, rebuild (see [Everyday commands](#everyday-commands)).

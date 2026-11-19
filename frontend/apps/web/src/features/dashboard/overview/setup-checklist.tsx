@@ -15,6 +15,7 @@ import { useTranslations } from "next-intl"
 import { CardHeading } from "@/features/dashboard/card-heading"
 import { setupSteps } from "@/features/dashboard/overview/setup-steps"
 import { useProfileContent } from "@/features/specialists/about/use-profile-content"
+import { useTreatedConditions } from "@/features/specialists/conditions/use-conditions"
 import { useCredentials } from "@/features/specialists/credentials/use-credentials"
 import { useLocations } from "@/features/specialists/locations/use-locations"
 import { useSpecialist } from "@/features/specialists/me/specialist-provider"
@@ -29,9 +30,14 @@ export function SetupChecklist() {
   const about = useProfileContent()
   const credentials = useCredentials()
   const places = useLocations()
-  const isLoading = about.isLoading || credentials.isLoading || places.isLoading
+  const treated = useTreatedConditions()
+  const isLoading =
+    about.isLoading ||
+    credentials.isLoading ||
+    places.isLoading ||
+    treated.isLoading
   const failure =
-    [about, credentials].find((load) => load.failed) ?? places.failure
+    [about, credentials, treated].find((load) => load.failed) ?? places.failure
 
   const steps = setupSteps({
     specialist,
@@ -39,6 +45,7 @@ export function SetupChecklist() {
     credentials: credentials.credentials,
     locations: places.locations,
     hours: places.hours,
+    conditions: treated.ids,
   })
   const doneCount = steps.filter((step) => step.done).length
   const complete = doneCount === steps.length

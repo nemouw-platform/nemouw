@@ -13,13 +13,16 @@ import { SubmitButton } from "@/components/form/submit-button"
 import { FormCard } from "@/features/dashboard/form-card"
 import {
   createDetailsSchema,
+  DETAILS_FIELDS,
   GENDERS,
   PRIMARY_LANGUAGES,
   toDetailsValues,
+  toUpdateRequest,
   type DetailsValues,
 } from "@/features/specialists/details/details-schema"
-import { useSaveDetails } from "@/features/specialists/details/use-save-details"
 import { useSpecialist } from "@/features/specialists/me/specialist-provider"
+import { useUpdateSpecialist } from "@/features/specialists/me/use-update-specialist"
+import { applyFieldErrors } from "@/lib/forms/api-errors"
 
 /** Practical facts patients filter and decide by */
 export function DetailsForm() {
@@ -41,7 +44,12 @@ export function DetailsForm() {
     defaultValues: toDetailsValues(specialist),
     mode: "onTouched",
   })
-  const { submit, isPending, formError, saved } = useSaveDetails(form)
+  const { submit, isPending, formError, saved } = useUpdateSpecialist(form, {
+    toRequest: toUpdateRequest,
+    toValues: toDetailsValues,
+    onError: (error) =>
+      applyFieldErrors(form, error, DETAILS_FIELDS, tFormErrors),
+  })
   const { errors } = form.formState
 
   const genders = GENDERS.map((value) => ({

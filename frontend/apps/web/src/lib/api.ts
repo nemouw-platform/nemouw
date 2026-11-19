@@ -1,6 +1,7 @@
 import {
   createApiClient,
   createAuthApi,
+  createConditionsApi,
   createCountriesApi,
   createCredentialsApi,
   createLocationsApi,
@@ -30,6 +31,8 @@ export const apiClient = createApiClient({
 })
 
 export const authApi = createAuthApi(apiClient)
+
+export const conditionsApi = createConditionsApi(apiClient)
 
 export const countriesApi = createCountriesApi(apiClient)
 

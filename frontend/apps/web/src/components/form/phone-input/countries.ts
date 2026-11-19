@@ -6,6 +6,7 @@ import {
 } from "libphonenumber-js"
 
 import { regionName } from "@/lib/region-names"
+import { fold } from "@/lib/search"
 
 export interface CountryOption {
   code: CountryCode
@@ -35,14 +36,6 @@ export function countryOptions(locale: string): CountryOption[] {
     byLocale.set(locale, options)
   }
   return options
-}
-
-/** Lowercase without accents, so "cote" finds "Côte d'Ivoire" */
-function fold(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/\p{Mark}/gu, "")
-    .toLowerCase()
 }
 
 /** Search by name ("leb"), ISO code ("lb") or dialing code ("961", "+961") */

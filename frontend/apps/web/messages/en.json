@@ -233,6 +233,10 @@
     "metaTitle": "Set up your profile",
     "title": "Set up your profile",
     "description": "Pick your public username and confirm your syndicate membership. You can fill in the rest of your profile next.",
+    "submit": "Finish setup",
+    "submitting": "Saving…"
+  },
+  "Membership": {
     "username": "Username",
     "usernamePlaceholder": "dr.rana-haddad",
     "usernameHint": "3 to 30 letters, numbers, dots, dashes or underscores. It becomes your public profile link.",
@@ -245,13 +249,12 @@
     "memberNumber": "Member number",
     "memberNumberPlaceholder": "12345",
     "memberNumberHint": "Your membership number in this syndicate. We use it to verify your credentials.",
-    "submit": "Finish setup",
-    "submitting": "Saving…",
     "errors": {
       "usernameFormat": "Use only letters, numbers, dots, dashes and underscores",
       "usernameTaken": "This username is taken. Try another.",
       "usernameUnavailable": "This username isn't available. Try another.",
-      "memberNumberTaken": "This member number is already registered with this syndicate."
+      "memberNumberTaken": "This member number is already registered with this syndicate.",
+      "syndicateLocked": "Your syndicate verified your profile, so your syndicate can't change any more. Contact Nemouw support if it is wrong."
     }
   },
   "Dashboard": {
@@ -260,7 +263,9 @@
       "overview": "Overview",
       "profile": "Profile",
       "credentials": "Credentials",
-      "locations": "Locations & hours"
+      "locations": "Locations & hours",
+      "conditions": "Conditions",
+      "settings": "Settings"
     },
     "overview": {
       "metaTitle": "Dashboard",
@@ -308,6 +313,10 @@
         "about": {
           "title": "Introduce yourself",
           "description": "A short bio, in at least one language, so patients know who you are."
+        },
+        "conditions": {
+          "title": "Choose the conditions you treat",
+          "description": "Patients search by condition, so this is how they find you."
         }
       }
     }
@@ -517,6 +526,43 @@
       "add": "Add location",
       "save": "Save",
       "saving": "Saving…"
+    }
+  },
+  "Conditions": {
+    "metaTitle": "Conditions",
+    "title": "Conditions you treat",
+    "description": "Patients search by condition. Pick every condition you treat.",
+    "empty": "No conditions are listed on Nemouw yet. Check back soon.",
+    "form": {
+      "title": "Conditions",
+      "description": "Your choices show on your public page.",
+      "search": "Search conditions",
+      "searchPlaceholder": "Search, e.g. autism",
+      "selected": "{count, plural, =0 {None selected} one {# selected} other {# selected}}",
+      "noMatch": "No condition matches your search.",
+      "save": "Save conditions",
+      "saving": "Saving…",
+      "saved": "Saved"
+    }
+  },
+  "Settings": {
+    "metaTitle": "Settings",
+    "title": "Settings",
+    "description": "Your public username and your syndicate membership.",
+    "username": {
+      "title": "Username",
+      "description": "It becomes the link to your public page, so change it with care: old links stop working.",
+      "save": "Save username",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
+    "membership": {
+      "title": "Syndicate membership",
+      "description": "Your syndicate uses these to verify your credentials.",
+      "locked": "Locked: your syndicate has verified your profile.",
+      "save": "Save membership",
+      "saving": "Saving…",
+      "saved": "Saved"
     }
   }
 }

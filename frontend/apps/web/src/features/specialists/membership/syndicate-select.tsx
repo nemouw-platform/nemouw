@@ -9,6 +9,8 @@ import { SelectControl } from "@/components/form/select-control"
 interface SyndicateSelectProps extends ControlProps {
   syndicates: SyndicateSummary[]
   isLoading: boolean
+  /** e.g. once the profile is verified and the syndicate is locked */
+  disabled?: boolean
   value: string
   onChange: (value: string) => void
   onBlur?: () => void
@@ -19,9 +21,10 @@ interface SyndicateSelectProps extends ControlProps {
 export function SyndicateSelect({
   syndicates,
   isLoading,
+  disabled,
   ...props
 }: SyndicateSelectProps) {
-  const t = useTranslations("Onboarding")
+  const t = useTranslations("Membership")
   const options = syndicates.map((syndicate) => ({
     value: syndicate.id ?? "",
     label: syndicate.name ?? "",
@@ -31,7 +34,7 @@ export function SyndicateSelect({
     <SelectControl
       {...props}
       options={options}
-      disabled={isLoading || options.length === 0}
+      disabled={disabled || isLoading || options.length === 0}
       placeholder={
         isLoading ? t("syndicatesLoading") : t("syndicatePlaceholder")
       }

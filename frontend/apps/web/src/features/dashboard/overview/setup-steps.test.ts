@@ -16,6 +16,7 @@ const none = {
   credentials: [],
   locations: [],
   hours: [],
+  conditions: [],
 }
 
 const done = (steps: ReturnType<typeof setupSteps>) =>
@@ -30,6 +31,7 @@ describe("setupSteps", () => {
       photo: false,
       details: false,
       about: false,
+      conditions: false,
     })
     expect(steps.map((step) => step.href)).toEqual([
       "/dashboard/credentials",
@@ -37,6 +39,7 @@ describe("setupSteps", () => {
       "/dashboard/profile#photos",
       "/dashboard/profile",
       "/dashboard/profile#about",
+      "/dashboard/conditions",
     ])
   })
 
@@ -78,6 +81,12 @@ describe("setupSteps", () => {
         })
       ).details
     ).toBe(true)
+  })
+
+  it("counts the conditions once one is picked", () => {
+    expect(done(setupSteps({ ...none, conditions: ["c1"] })).conditions).toBe(
+      true
+    )
   })
 
   it("counts the about text once any language has a bio", () => {

@@ -10,7 +10,7 @@ import { hasBio } from "@/features/specialists/about/about-schema"
 import type { ContentByLocale } from "@/features/specialists/about/use-profile-content"
 
 export interface SetupStep {
-  key: "credentials" | "location" | "photo" | "details" | "about"
+  key: "credentials" | "location" | "photo" | "details" | "about" | "conditions"
   done: boolean
   /** Where to complete it, without locale */
   href: string
@@ -22,6 +22,8 @@ interface SetupData {
   credentials: CredentialResponse[]
   locations: SpecialistLocation[]
   hours: SpecialistAvailability[]
+  /** Ids of the conditions treated */
+  conditions: string[]
 }
 
 /**
@@ -35,6 +37,7 @@ export function setupSteps({
   credentials,
   locations,
   hours,
+  conditions,
 }: SetupData): SetupStep[] {
   const profile = DASHBOARD_SECTIONS.profile.href
   return [
@@ -67,6 +70,12 @@ export function setupSteps({
       key: "about",
       done: Object.values(content).some(hasBio),
       href: `${profile}#about`,
+    },
+    {
+      key: "conditions",
+      // What patients search by
+      done: conditions.length > 0,
+      href: DASHBOARD_SECTIONS.conditions.href,
     },
   ]
 }
