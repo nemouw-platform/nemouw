@@ -131,6 +131,8 @@ class SpecialistService {
             v.check(false, FieldErrors.invalidFormat("min_age_treated",
                     "min_age_treated must be less than or equal to max_age_treated"));
         }
+        // Report every invalid field at once, before any conflict check or write
+        v.throwIfInvalid();
 
         if (!username.equals(cur.username())) {
             if (specialists.usernameTaken(username, cur.id())) throw new ApiException(ErrorCode.USERNAME_TAKEN);
