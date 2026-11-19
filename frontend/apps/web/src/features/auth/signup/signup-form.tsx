@@ -1,5 +1,8 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { FormTextField } from "@/components/form/form-field"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -7,10 +10,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 
 import { AuthPromptLink } from "@/features/auth/components/auth-prompt"
-import { FormAlert } from "@/features/auth/components/form-alert"
 import { FormEmailField } from "@/features/auth/components/email-field"
-import { FormTextField } from "@/features/auth/components/form-field"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createSignupSchema,
   type SignupValues,
@@ -20,7 +20,7 @@ import { EMAIL_TAKEN, useSignup } from "@/features/auth/signup/use-signup"
 export function SignupForm() {
   const t = useTranslations("Signup")
   const tErrors = useTranslations("Signup.errors")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const tFields = useTranslations("Auth.fields")
   const schema = React.useMemo(
     () =>
@@ -30,9 +30,9 @@ export function SignupForm() {
           lastName: t("lastName"),
           email: tFields("email"),
         },
-        tAuthErrors
+        tFormErrors
       ),
-    [t, tFields, tAuthErrors]
+    [t, tFields, tFormErrors]
   )
 
   const form = useForm<SignupValues>({

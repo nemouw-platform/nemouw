@@ -40,10 +40,13 @@ export function NewPasswordField<T extends FieldValues>({
       id={name}
       required
       label={t("password")}
+      placeholder={t("newPasswordPlaceholder")}
       autoComplete="new-password"
       passwordrules={PASSWORD_RULES_ATTRIBUTE}
       autoFocus={autoFocus}
       error={form.getFieldState(name, form.formState).error}
+      // The checklist explains the error, so it stays under it
+      keepDescription
       description={
         <PasswordRequirements password={String(value ?? "")} email={email} />
       }

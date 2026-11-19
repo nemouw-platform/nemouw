@@ -5,6 +5,7 @@ import {
   type SessionRefresher,
   shouldRefreshAndRetry,
 } from "./session-refresh"
+import { DEFAULT_THROTTLE_RETRY, sleep, throttleWait } from "./throttle-retry"
 import type {
   ApiClient,
   ApiClientOptions,
@@ -20,24 +21,32 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
   const transport = createHttpTransport(options)
   const refresher = createSessionRefresher(transport)
   const autoRefresh = options.autoRefresh ?? true
+  const throttle = options.throttleRetry ?? DEFAULT_THROTTLE_RETRY
 
   async function request<T>(
     method: HttpMethod,
     path: string,
     init: RequestOptions = {}
   ): Promise<T> {
-    const response = await transport.send(method, path, init)
-    if (response.ok) return (await readBody(response)) as T
+    for (let attempt = 0; ; attempt++) {
+      const response = await transport.send(method, path, init)
+      if (response.ok) return (await readBody(response)) as T
 
-    const error = await toApiError(response)
-    if (autoRefresh && shouldRefreshAndRetry(error, path)) {
-      return retryAfterRefresh<T>({ transport, refresher, options }, error, {
-        method,
-        path,
-        init,
-      })
+      const error = await toApiError(response)
+      const wait = throttleWait(error, path, attempt, throttle)
+      if (wait !== null) {
+        await sleep(wait * 1000, init.signal)
+        continue
+      }
+      if (autoRefresh && shouldRefreshAndRetry(error, path)) {
+        return retryAfterRefresh<T>({ transport, refresher, options }, error, {
+          method,
+          path,
+          init,
+        })
+      }
+      throw error
     }
-    throw error
   }
 
   return {

@@ -1,6 +1,10 @@
 import {
   createApiClient,
   createAuthApi,
+  createConditionsApi,
+  createCountriesApi,
+  createCredentialsApi,
+  createLocationsApi,
   createSpecialistsApi,
   createSyndicatesApi,
 } from "@workspace/api"
@@ -27,6 +31,14 @@ export const apiClient = createApiClient({
 })
 
 export const authApi = createAuthApi(apiClient)
+
+export const conditionsApi = createConditionsApi(apiClient)
+
+export const countriesApi = createCountriesApi(apiClient)
+
+export const credentialsApi = createCredentialsApi(apiClient)
+
+export const locationsApi = createLocationsApi(apiClient)
 
 export const specialistsApi = createSpecialistsApi(apiClient)
 

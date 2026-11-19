@@ -1,7 +1,7 @@
+import { classifyVerifyError } from "@/features/auth/verify/verify-errors"
 import { describe, expect, it } from "vitest"
 
-import { apiError } from "@/features/auth/lib/testing"
-import { classifyVerifyError } from "@/features/auth/verify/verify-errors"
+import { apiError } from "@/lib/forms/testing"
 
 describe("classifyVerifyError", () => {
   it("treats the backend's single 400 as a rejected code", () => {

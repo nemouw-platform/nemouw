@@ -1,8 +1,8 @@
+import { classifySignupError } from "@/features/auth/signup/signup-errors"
 import { CLIENT_ERROR_CODES } from "@workspace/api"
 import { describe, expect, it } from "vitest"
 
-import { apiError } from "@/features/auth/lib/testing"
-import { classifySignupError } from "@/features/auth/signup/signup-errors"
+import { apiError } from "@/lib/forms/testing"
 
 describe("classifySignupError", () => {
   it("maps 409 EMAIL_TAKEN to the email field case", () => {

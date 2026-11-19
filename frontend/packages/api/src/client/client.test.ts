@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { createAuthApi } from "../endpoints"
 import { createApiClient } from "."
@@ -279,5 +279,89 @@ describe("session refresh", () => {
     expect(new Headers(calls[0]!.init.headers).get("Cookie")).toBe(
       "access_token=abc"
     )
+  })
+})
+
+describe("throttle retry", () => {
+  afterEach(() => vi.useRealTimers())
+
+  const throttled = (seconds: number) => () =>
+    json(
+      429,
+      { status: 429, code: "TOO_MANY_REQUESTS", message: "slow down" },
+      { "Retry-After": String(seconds) }
+    )
+
+  it("waits out a short 429 and tries again", async () => {
+    vi.useFakeTimers()
+    const { fetch, calls } = fakeFetch({
+      "GET /v1/countries": [throttled(1), () => json(200, [{ id: "lb" }])],
+    })
+
+    const result = createApiClient({ baseUrl: BASE, fetch }).get("/countries")
+    await vi.advanceTimersByTimeAsync(999)
+    expect(calls).toHaveLength(1)
+    await vi.advanceTimersByTimeAsync(1)
+
+    await expect(result).resolves.toEqual([{ id: "lb" }])
+    expect(calls).toHaveLength(2)
+  })
+
+  it("gives up after two retries", async () => {
+    vi.useFakeTimers()
+    const { fetch, calls } = fakeFetch({
+      "GET /v1/countries": [throttled(1), throttled(1), throttled(1)],
+    })
+
+    const result = createApiClient({ baseUrl: BASE, fetch })
+      .get("/countries")
+      .catch((e: unknown) => e)
+    await vi.runAllTimersAsync()
+
+    expect(await result).toMatchObject({ code: "TOO_MANY_REQUESTS" })
+    expect(calls).toHaveLength(3)
+  })
+
+  it("leaves long waits and auth calls to the screen", async () => {
+    const { fetch, calls } = fakeFetch({
+      "GET /v1/countries": [throttled(60)],
+      "POST /v1/auth/resend-otp": [throttled(1)],
+    })
+    const client = createApiClient({ baseUrl: BASE, fetch })
+
+    await expect(client.get("/countries")).rejects.toMatchObject({
+      retryAfter: 60,
+    })
+    await expect(client.post("/auth/resend-otp", {})).rejects.toMatchObject({
+      retryAfter: 1,
+    })
+    expect(calls).toHaveLength(2)
+  })
+
+  it("stops waiting when the call is aborted", async () => {
+    vi.useFakeTimers()
+    const { fetch, calls } = fakeFetch({ "GET /v1/countries": [throttled(3)] })
+    const controller = new AbortController()
+
+    const result = createApiClient({ baseUrl: BASE, fetch })
+      .get("/countries", { signal: controller.signal })
+      .catch((e: unknown) => e)
+    await vi.advanceTimersByTimeAsync(10)
+    controller.abort()
+
+    expect(await result).toMatchObject({ name: "AbortError" })
+    expect(calls).toHaveLength(1)
+  })
+
+  it("can be turned off", async () => {
+    const { fetch } = fakeFetch({ "GET /v1/countries": [throttled(1)] })
+    const client = createApiClient({
+      baseUrl: BASE,
+      fetch,
+      throttleRetry: false,
+    })
+    await expect(client.get("/countries")).rejects.toMatchObject({
+      status: 429,
+    })
   })
 })

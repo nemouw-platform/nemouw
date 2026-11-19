@@ -31,6 +31,52 @@ services:
         - path: ./backend/pom.xml
           action: rebuild
 
+  # Loads the reference data (Lebanon, two specialties and their syndicates)
+  # once the backend is up, so onboarding has something to pick. Runs once
+  # and exits; safe on every start. Local only, never in production.
+  seed:
+    image: postgres:18-alpine
+    env_file: .env
+    environment:
+      PGHOST: db
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./frontend/apps/web/e2e/fixtures/dev-seed.sql:/seed/dev-seed.sql:ro
+    # The backend answers once Flyway has created the tables
+    command: >
+      sh -c 'until wget -q -O /dev/null http://backend:8080/v1/countries; do
+      echo "waiting for the backend..."; sleep 5; done;
+      psql -v ON_ERROR_STOP=1 -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -f /seed/dev-seed.sql'
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  # The public site, built like production (rebuild to see code changes:
+  # docker compose up -d --build web)
+  web:
+    build:
+      context: ./frontend
+      args:
+        APP: web
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      - backend
+
+  # The staff dashboard, same image recipe
+  admin:
+    build:
+      context: ./frontend
+      args:
+        APP: admin
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    ports:
+      - "${ADMIN_PORT:-3001}:3000"
+    depends_on:
+      - backend
+
   db:
     image: postgres:18-alpine
     env_file: .env

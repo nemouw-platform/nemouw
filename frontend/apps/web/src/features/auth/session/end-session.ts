@@ -44,11 +44,21 @@ async function clearWithRetry(
   }
 }
 
+/**
+ * The user chose to log out: clear the cookies, then do a full page load to
+ * the login page (a full load drops everything this session had in memory).
+ * Browser only. Runs once, however many times it is clicked.
+ */
+export function signOut(clearCookies: () => Promise<unknown>) {
+  if (ending) return
+  ending = true
+  void clearWithRetry(clearCookies).finally(() => {
+    window.location.assign(`/${currentLocation().locale}/login`)
+  })
+}
+
 function redirectToLogin() {
-  const [, first, ...rest] = window.location.pathname.split("/")
-  const hasLocale = isLocale(first)
-  const locale = hasLocale ? first : defaultLocale
-  const path = hasLocale ? `/${rest.join("/")}` : window.location.pathname
+  const { locale, path } = currentLocation()
 
   // Already on login / sign-up: stay, the form is what they need
   if (routeAccess(path) === "guestOnly") {
@@ -59,4 +69,12 @@ function redirectToLogin() {
     [NEXT_PARAM]: path + window.location.search,
   })
   window.location.assign(`/${locale}/login?${next}`)
+}
+
+/** The page's locale and its path without it ("/ar/onboarding" -> "/onboarding") */
+function currentLocation() {
+  const [, first, ...rest] = window.location.pathname.split("/")
+  return isLocale(first)
+    ? { locale: first, path: `/${rest.join("/")}` }
+    : { locale: defaultLocale, path: window.location.pathname }
 }

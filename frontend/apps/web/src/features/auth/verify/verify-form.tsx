@@ -1,5 +1,8 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { FormField } from "@/components/form/form-field"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
@@ -11,10 +14,7 @@ import {
   AuthPromptLink,
 } from "@/features/auth/components/auth-prompt"
 import { CodeInput } from "@/features/auth/components/code-input"
-import { FormAlert } from "@/features/auth/components/form-alert"
-import { FormField } from "@/features/auth/components/form-field"
 import { ResendPrompt } from "@/features/auth/components/resend-prompt"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import { OTP_LENGTH } from "@/features/auth/lib/constants"
 import { richText } from "@/features/auth/lib/rich-text"
 import { useResendCode } from "@/features/auth/verify/use-resend-code"
@@ -27,10 +27,10 @@ import {
 export function VerifyForm({ email }: { email: string }) {
   const t = useTranslations("Verify")
   const tAuth = useTranslations("Auth")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
-    () => createVerifySchema({ code: t("codeLabel") }, tAuthErrors),
-    [t, tAuthErrors]
+    () => createVerifySchema({ code: t("codeLabel") }, tFormErrors),
+    [t, tFormErrors]
   )
 
   const form = useForm<VerifyValues>({

@@ -1,5 +1,7 @@
 "use client"
 
+import { FormAlert } from "@/components/form/form-alert"
+import { SubmitButton } from "@/components/form/submit-button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { buttonVariants } from "@workspace/ui/components/button"
 import { FieldGroup } from "@workspace/ui/components/field"
@@ -9,9 +11,7 @@ import { useForm } from "react-hook-form"
 
 import { AuthPromptLink } from "@/features/auth/components/auth-prompt"
 import { AuthStepHeader } from "@/features/auth/components/auth-step-header"
-import { FormAlert } from "@/features/auth/components/form-alert"
 import { NewPasswordField } from "@/features/auth/components/new-password-field"
-import { SubmitButton } from "@/features/auth/components/submit-button"
 import {
   createResetSchema,
   type ResetValues,
@@ -40,11 +40,11 @@ export function ResetFlow() {
 function ResetForm({ token }: { token: string }) {
   const t = useTranslations("ResetPassword")
   const tAuth = useTranslations("Auth")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
     () =>
-      createResetSchema({ password: tAuth("fields.password") }, tAuthErrors),
-    [tAuth, tAuthErrors]
+      createResetSchema({ password: tAuth("fields.password") }, tFormErrors),
+    [tAuth, tFormErrors]
   )
   const form = useForm<ResetValues>({
     resolver: zodResolver(schema),

@@ -141,7 +141,6 @@ class SpecialistService {
             v.check(false, FieldErrors.invalidFormat("min_age_treated",
                     "min_age_treated must be less than or equal to max_age_treated"));
         }
-
         changes.putAll(PriceRangeUpdate.parse(body, cur, v));
         v.throwIfInvalid();
 

@@ -1,13 +1,13 @@
 "use client"
 
-import { useTranslations } from "next-intl"
-import type { UseFormReturn } from "react-hook-form"
-
-import { useAuthRequest } from "@/features/auth/lib/use-auth-request"
 import { classifyVerifyError } from "@/features/auth/verify/verify-errors"
 import type { VerifyValues } from "@/features/auth/verify/verify-schema"
 import { useRouter } from "@/i18n/navigation"
 import { authApi } from "@/lib/api"
+import { useTranslations } from "next-intl"
+import type { UseFormReturn } from "react-hook-form"
+
+import { useFormRequest } from "@/lib/forms/use-form-request"
 
 /**
  * Submits step 2. Success sets the short-lived setup cookie and moves to the
@@ -20,7 +20,7 @@ export function useVerifyCode(
   const router = useRouter()
   const t = useTranslations("Verify.errors")
 
-  const verify = useAuthRequest(
+  const verify = useFormRequest(
     (signal, code: string) => authApi.verifyOtp({ email, code }, { signal }),
     {
       // The email lets step 3 flag passwords that contain it

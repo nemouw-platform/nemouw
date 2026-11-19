@@ -5,7 +5,56 @@
   },
   "Common": {
     "toggleTheme": "Changer de thème",
-    "language": "Langue"
+    "language": "Langue",
+    "retry": "Réessayer",
+    "signOut": "Se déconnecter",
+    "close": "Fermer"
+  },
+  "Form": {
+    "errors": {
+      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
+      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
+      "tooManyRequests": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
+      "required": "{field} est obligatoire",
+      "tooShort": "{min} caractères minimum",
+      "tooLong": "{max} caractères maximum",
+      "incompleteCode": "Saisissez les {length} chiffres",
+      "field": {
+        "REQUIRED": "Ce champ est obligatoire",
+        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
+        "TOO_SHORT": "C'est trop court",
+        "TOO_LONG": "C'est trop long",
+        "TOO_COMMON": "Ce mot de passe est trop courant",
+        "CONTAINS_PERSONAL_INFO": "N'incluez ni « nemouw » ni la partie de votre e-mail avant @",
+        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
+        "INVALID_FORMAT": "Vérifiez le format et réessayez"
+      },
+      "wholeNumber": "Saisissez un nombre entier, par exemple 5",
+      "tooLarge": "Saisissez {max} ou moins"
+    }
+  },
+  "PhoneInput": {
+    "country": "Pays : {country} (+{code})",
+    "search": "Rechercher un pays",
+    "noResults": "Aucun pays trouvé"
+  },
+  "Upload": {
+    "choosePhoto": "Ajouter une photo",
+    "changePhoto": "Changer la photo",
+    "remove": "Supprimer",
+    "saving": "Enregistrement…",
+    "hint": "{types}, jusqu'à {size}",
+    "dropTitle": "Déposez un fichier ici, ou cliquez pour en choisir un",
+    "change": "Changer",
+    "replace": "Remplacer",
+    "removeFile": "Retirer {name}",
+    "view": "Voir",
+    "problems": {
+      "type": "Ce type de fichier n'est pas accepté. Utilisez {types}.",
+      "size": "Ce fichier est trop volumineux. La limite est de {size}.",
+      "unreadable": "Impossible de lire ce fichier. Essayez-en un autre.",
+      "busy": "Nous traitons beaucoup de fichiers en ce moment. Réessayez dans un instant."
+    }
   },
   "Navbar": {
     "mainNav": "Principale",
@@ -14,6 +63,7 @@
     "forSpecialists": "Pour les spécialistes",
     "logIn": "Se connecter",
     "join": "Inscription spécialiste",
+    "dashboard": "Tableau de bord",
     "menu": "Menu",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu"
@@ -33,25 +83,6 @@
     },
     "step": "Étape {current} sur {total}.",
     "copyright": "© {year} Nemouw",
-    "errors": {
-      "network": "Impossible de joindre Nemouw pour le moment. Vérifiez votre connexion et réessayez.",
-      "unexpected": "Un problème est survenu de notre côté. Veuillez réessayer.",
-      "tooManyRequests": "Trop de tentatives. Réessayez dans {seconds, plural, one {# seconde} other {# secondes}}.",
-      "required": "{field} est obligatoire",
-      "tooShort": "{min} caractères minimum",
-      "tooLong": "{max} caractères maximum",
-      "incompleteCode": "Saisissez les {length} chiffres",
-      "field": {
-        "REQUIRED": "Ce champ est obligatoire",
-        "MUST_BE_EMAIL": "Saisissez une adresse e-mail valide, par exemple nom@exemple.com",
-        "TOO_SHORT": "C'est trop court",
-        "TOO_LONG": "C'est trop long",
-        "TOO_COMMON": "Ce mot de passe est trop courant",
-        "CONTAINS_PERSONAL_INFO": "N'incluez ni « nemouw » ni la partie de votre e-mail avant @",
-        "INVALID_ROLE": "Seuls les spécialistes peuvent créer un compte",
-        "INVALID_FORMAT": "Vérifiez le format et réessayez"
-      }
-    },
     "phone": {
       "search": "Orthophonie à Beyrouth",
       "filterLanguage": "Arabe",
@@ -97,7 +128,9 @@
     "fields": {
       "email": "Adresse e-mail",
       "emailPlaceholder": "jean.dupont@exemple.com",
-      "password": "Mot de passe"
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Saisissez votre mot de passe",
+      "newPasswordPlaceholder": "Créez un mot de passe"
     },
     "spamHint": "Vous ne le trouvez pas ? Vérifiez vos courriers indésirables."
   },
@@ -200,6 +233,10 @@
     "metaTitle": "Configurez votre profil",
     "title": "Configurez votre profil",
     "description": "Choisissez votre nom d'utilisateur public et confirmez votre adhésion à votre syndicat. Vous compléterez le reste de votre profil ensuite.",
+    "submit": "Terminer",
+    "submitting": "Enregistrement…"
+  },
+  "Membership": {
     "username": "Nom d'utilisateur",
     "usernamePlaceholder": "dr.rana-haddad",
     "usernameHint": "3 à 30 lettres, chiffres, points, tirets ou tirets bas. Il devient le lien de votre profil public.",
@@ -212,13 +249,321 @@
     "memberNumber": "Numéro d'adhérent",
     "memberNumberPlaceholder": "12345",
     "memberNumberHint": "Votre numéro d'adhérent dans ce syndicat. Il nous sert à vérifier vos diplômes.",
-    "submit": "Terminer",
-    "submitting": "Enregistrement…",
     "errors": {
       "usernameFormat": "Utilisez uniquement des lettres, chiffres, points, tirets et tirets bas",
       "usernameTaken": "Ce nom d'utilisateur est déjà pris. Essayez-en un autre.",
       "usernameUnavailable": "Ce nom d'utilisateur n'est pas disponible. Essayez-en un autre.",
-      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat."
+      "memberNumberTaken": "Ce numéro d'adhérent est déjà enregistré auprès de ce syndicat.",
+      "syndicateLocked": "Votre syndicat a vérifié votre profil : votre syndicat ne peut plus changer. Contactez le support Nemouw s'il est erroné."
+    }
+  },
+  "Dashboard": {
+    "nav": {
+      "label": "Tableau de bord",
+      "overview": "Aperçu",
+      "profile": "Profil",
+      "credentials": "Diplômes",
+      "locations": "Lieux et horaires",
+      "conditions": "Troubles traités",
+      "settings": "Paramètres"
+    },
+    "overview": {
+      "metaTitle": "Tableau de bord",
+      "title": "Bon retour",
+      "description": "Connecté en tant que @{username}. Voici où en est votre profil."
+    },
+    "verification": {
+      "title": "Vérification",
+      "pending": {
+        "label": "En attente",
+        "description": "Votre syndicat n'a pas encore vérifié votre profil. Les patients pourront vous trouver une fois qu'il sera vérifié."
+      },
+      "active": {
+        "label": "Vérifié",
+        "description": "Votre syndicat a vérifié votre profil le {date}. Les patients peuvent vous trouver."
+      },
+      "rejected": {
+        "label": "Non vérifié",
+        "description": "Votre syndicat n'a pas pu vérifier votre profil : les patients ne peuvent pas encore vous trouver. Vérifiez vos informations et contactez votre syndicat.",
+        "descriptionWithReason": "Votre syndicat n'a pas pu vérifier votre profil : {reason}. Les patients ne peuvent pas encore vous trouver. Mettez vos titres à jour ou contactez votre syndicat."
+      }
+    },
+    "setup": {
+      "title": "Complétez votre profil",
+      "completeTitle": "Votre profil est complet",
+      "progress": "{done} sur {total} terminées",
+      "done": "terminé",
+      "toDo": "à faire",
+      "steps": {
+        "credentials": {
+          "title": "Ajoutez vos diplômes",
+          "description": "Votre diplôme ou votre licence, pour que votre syndicat puisse vous vérifier. Les patients vous trouvent une fois vérifié."
+        },
+        "location": {
+          "title": "Indiquez où et quand vous exercez",
+          "description": "L'adresse de votre cabinet et vos horaires, pour que les patients sachent où aller et quand."
+        },
+        "photo": {
+          "title": "Ajoutez une photo de profil",
+          "description": "Une photo nette de vous met les patients en confiance avant de vous contacter."
+        },
+        "details": {
+          "title": "Ajoutez les détails de votre pratique",
+          "description": "Années d'expérience, langue principale et un numéro WhatsApp où les patients peuvent vous joindre."
+        },
+        "about": {
+          "title": "Présentez-vous",
+          "description": "Une courte biographie, dans au moins une langue, pour que les patients sachent qui vous êtes."
+        },
+        "conditions": {
+          "title": "Choisissez les troubles que vous traitez",
+          "description": "Les patients cherchent par trouble : c'est ainsi qu'ils vous trouvent."
+        }
+      }
+    }
+  },
+  "Profile": {
+    "metaTitle": "Profil",
+    "title": "Votre profil",
+    "description": "Ce que les patients voient sur votre page publique. Les changements apparaissent dès l'enregistrement.",
+    "languages": {
+      "ar": "Arabe",
+      "en": "Anglais",
+      "fr": "Français"
+    },
+    "photos": {
+      "title": "Photos",
+      "description": "Les patients les voient sur votre page publique. Elles sont enregistrées dès que vous les choisissez.",
+      "picture": "Photo de profil",
+      "cover": "Image de couverture",
+      "coverHint": "Une image large en haut de votre page. Nous la recadrons en 1600 × 600."
+    },
+    "details": {
+      "title": "Détails de la pratique",
+      "description": "Les patients s'en servent pour choisir un spécialiste et le contacter.",
+      "experience": "Années d'expérience",
+      "experiencePlaceholder": "8",
+      "experienceHint": "Depuis le début de votre pratique",
+      "whatsapp": "Numéro WhatsApp",
+      "whatsappHint": "Les patients vous contactent à ce numéro",
+      "phoneFormat": "Saisissez un numéro valide pour ce pays",
+      "gender": "Genre",
+      "genders": {
+        "female": "Femme",
+        "male": "Homme"
+      },
+      "language": "Langue principale",
+      "languageHint": "La langue dans laquelle vous travaillez le plus",
+      "notSpecified": "Non précisé",
+      "minAge": "Âge minimum de vos patients",
+      "minAgePlaceholder": "3",
+      "maxAge": "Âge maximum de vos patients",
+      "maxAgePlaceholder": "18",
+      "ageHint": "En années. Laissez vide pour ne pas fixer de limite.",
+      "ageRange": "Doit être au moins égal à l'âge minimum",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    },
+    "about": {
+      "title": "À propos de vous",
+      "description": "Rédigez votre titre, votre accroche et votre biographie dans chaque langue où vous voulez que les patients les lisent. Ils voient la version dans leur langue, ou une autre si elle manque.",
+      "languages": "Langues",
+      "written": "Biographie rédigée",
+      "formTitle": "En {language}",
+      "formDescription": "Affiché aux patients qui consultent Nemouw en {language}.",
+      "titleLabel": "Titre professionnel",
+      "titlePlaceholder": "Orthophoniste",
+      "titleHint": "Affiché sous votre nom",
+      "headline": "Accroche",
+      "headlinePlaceholder": "J'aide les enfants à trouver leurs mots",
+      "headlineHint": "Une ligne qui résume votre travail",
+      "bio": "Biographie",
+      "bioPlaceholder": "Votre formation, les personnes que vous accompagnez et votre façon de travailler.",
+      "bioCount": "{count} / {max} caractères",
+      "save": "Enregistrer le texte en {language}",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    }
+  },
+  "Credentials": {
+    "metaTitle": "Diplômes",
+    "title": "Diplômes et titres",
+    "description": "Ajoutez vos diplômes, licences et adhésions. Votre syndicat examine chacun d'eux ; une fois vérifié, les patients peuvent vous trouver.",
+    "add": "Ajouter un titre",
+    "types": {
+      "degree": "Diplôme",
+      "license": "Licence d'exercice",
+      "certification": "Certification",
+      "membership": "Adhésion"
+    },
+    "status": {
+      "pending": "En cours d'examen",
+      "verified": "Vérifié",
+      "rejected": "Refusé"
+    },
+    "empty": {
+      "title": "Aucun titre pour l'instant",
+      "description": "Ajoutez votre diplôme ou votre licence pour l'envoyer à votre syndicat."
+    },
+    "card": {
+      "number": "N° {number}",
+      "issued": "Délivré le {date}",
+      "expires": "Expire le {date}",
+      "rejected": "Votre syndicat n'a pas pu vérifier ce titre. Modifiez-le ou remplacez son document pour le renvoyer à l'examen.",
+      "rejectedBecause": "Votre syndicat n'a pas pu vérifier ce titre : {reason}. Modifiez-le ou remplacez son document pour le renvoyer à l'examen.",
+      "view": "Voir le document",
+      "viewFailed": "Impossible d'ouvrir le document. Réessayez.",
+      "edit": "Modifier"
+    },
+    "withdraw": {
+      "action": "Retirer",
+      "title": "Retirer ce titre ?",
+      "description": "« {title} » et son document seront supprimés, et votre syndicat ne l'examinera plus.",
+      "verifiedDescription": "« {title} » est vérifié. Le retirer le supprime avec son document ; pour l'afficher de nouveau, il faudra le soumettre et attendre un nouvel examen.",
+      "cancel": "Le garder",
+      "confirm": "Retirer"
+    },
+    "form": {
+      "newTitle": "Nouveau titre",
+      "editTitle": "Modifier le titre",
+      "description": "Votre syndicat compare ces informations au document.",
+      "resubmitDescription": "L'enregistrement renvoie ce titre à votre syndicat pour examen.",
+      "type": "Type",
+      "typePlaceholder": "Choisissez un type",
+      "title": "Intitulé",
+      "titlePlaceholder": "Licence d'exercice en orthophonie",
+      "organization": "Délivré par",
+      "organizationPlaceholder": "Université libanaise",
+      "number": "Numéro",
+      "numberPlaceholder": "LB-2020-1234",
+      "issueDate": "Date de délivrance",
+      "expiryDate": "Date d'expiration",
+      "datePlaceholder": "AAAA-MM-JJ",
+      "expiryHint": "Laissez vide s'il n'expire pas",
+      "document": "Document",
+      "documentHint": "Un scan ou une photo de l'original, ou un PDF. Seuls vous et votre syndicat pouvez le voir.",
+      "dateOrder": "Doit être postérieure ou égale à la date de délivrance",
+      "cancel": "Annuler",
+      "submit": "Envoyer pour examen",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "document": {
+      "pdf": "Document PDF",
+      "image": "Image",
+      "uploaded": "Ajouté le {date}"
+    },
+    "errors": {
+      "verified": "Ce titre a été vérifié entre-temps et ne peut plus être modifié. Retirez-le et ajoutez-en un nouveau."
+    }
+  },
+  "Locations": {
+    "metaTitle": "Lieux et horaires",
+    "title": "Lieux et horaires",
+    "description": "Où vous recevez vos patients, et quand. Votre lieu principal est celui que les patients voient en premier.",
+    "add": "Ajouter un lieu",
+    "empty": {
+      "title": "Aucun lieu pour l'instant",
+      "description": "Ajoutez le cabinet ou le centre où vous recevez vos patients, puis ses horaires."
+    },
+    "card": {
+      "primary": "Lieu principal",
+      "makePrimary": "Définir comme principal",
+      "edit": "Modifier",
+      "editHours": "Horaires"
+    },
+    "remove": {
+      "action": "Supprimer",
+      "title": "Supprimer ce lieu ?",
+      "description": "« {place} » et ses horaires seront supprimés.",
+      "confirm": "Supprimer",
+      "cancel": "Le garder",
+      "primary": "C'est votre lieu principal. Définissez un autre lieu comme principal avant de le supprimer.",
+      "primaryHint": "Pour supprimer votre lieu principal, définissez d'abord un autre lieu comme principal."
+    },
+    "hours": {
+      "title": "Horaires à {place}",
+      "unplacedTitle": "Horaires sans lieu",
+      "description": "Ajoutez une plage horaire pour chaque jour d'ouverture. Ajoutez-en plusieurs pour une pause dans la journée.",
+      "closed": "Fermé",
+      "open": "Ajouter des horaires",
+      "addMore": "Ajouter une plage",
+      "addFor": "Ajouter des horaires le {day}",
+      "opens": "{day}, ouverture",
+      "closes": "{day}, fermeture",
+      "remove": "Retirer ces horaires du {day}",
+      "none": "Pas encore d'horaires",
+      "cancel": "Annuler",
+      "later": "Plus tard",
+      "save": "Enregistrer les horaires",
+      "saving": "Enregistrement…",
+      "problems": {
+        "missing": "Indiquez les deux heures",
+        "order": "Doit fermer après l'ouverture",
+        "overlap": "Chevauche d'autres horaires ce jour-là"
+      }
+    },
+    "form": {
+      "newTitle": "Nouveau lieu",
+      "editTitle": "Modifier le lieu",
+      "firstDescription": "Votre premier lieu devient votre lieu principal.",
+      "label": "Nom",
+      "labelPlaceholder": "Cabinet de Hamra",
+      "labelHint": "Facultatif. Nous affichons la ville en l'absence de nom.",
+      "country": "Pays",
+      "countryPlaceholder": "Choisissez un pays",
+      "city": "Ville",
+      "cityPlaceholder": "Beyrouth",
+      "phone": "Téléphone",
+      "phoneHint": "Le numéro du cabinet, si les patients peuvent l'appeler",
+      "phoneFormat": "Saisissez un numéro valide pour ce pays",
+      "address1": "Adresse",
+      "address1Placeholder": "Rue Bliss, immeuble Al-Rayyes",
+      "address2": "Complément d'adresse",
+      "address2Placeholder": "3e étage",
+      "makePrimary": "En faire mon lieu principal",
+      "cancel": "Annuler",
+      "add": "Ajouter le lieu",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    }
+  },
+  "Conditions": {
+    "metaTitle": "Troubles traités",
+    "title": "Troubles que vous traitez",
+    "description": "Les patients cherchent par trouble. Cochez tous ceux que vous traitez.",
+    "empty": "Aucun trouble n'est encore répertorié sur Nemouw. Revenez bientôt.",
+    "form": {
+      "title": "Troubles",
+      "description": "Vos choix apparaissent sur votre page publique.",
+      "search": "Rechercher un trouble",
+      "searchPlaceholder": "Rechercher, par ex. autisme",
+      "selected": "{count, plural, =0 {Aucun sélectionné} one {# sélectionné} other {# sélectionnés}}",
+      "noMatch": "Aucun trouble ne correspond à votre recherche.",
+      "save": "Enregistrer les troubles",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    }
+  },
+  "Settings": {
+    "metaTitle": "Paramètres",
+    "title": "Paramètres",
+    "description": "Votre nom d'utilisateur public et votre adhésion au syndicat.",
+    "username": {
+      "title": "Nom d'utilisateur",
+      "description": "Il forme le lien vers votre page publique : changez-le avec soin, les anciens liens ne fonctionneront plus.",
+      "save": "Enregistrer le nom",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    },
+    "membership": {
+      "title": "Adhésion au syndicat",
+      "description": "Votre syndicat s'en sert pour vérifier vos titres.",
+      "locked": "Verrouillé : votre syndicat a vérifié votre profil.",
+      "save": "Enregistrer l'adhésion",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
     }
   }
 }

@@ -1,6 +1,6 @@
 import type { Role } from "@workspace/api"
 
-import { AFTER_LOGIN_PATH } from "@/features/auth/lib/constants"
+import { homePathFor } from "@/features/auth/lib/constants"
 import type { CookieSession } from "@/features/auth/session/session-cookie"
 
 /** Query parameter that carries the page to return to after logging in */
@@ -21,7 +21,7 @@ type Access =
 interface Rule {
   prefix: string
   access: Access
-  /** For "protected": the roles allowed in; other signed-in users go home */
+  /** For "protected": the roles allowed in; other signed-in users go to their home */
   roles?: readonly Role[]
 }
 
@@ -33,6 +33,7 @@ const RULES: readonly Rule[] = [
   { prefix: "/forgot-password", access: "guestOnly" },
   { prefix: "/reset-password", access: "guestOnly" },
   { prefix: "/onboarding", access: "protected", roles: ["specialist"] },
+  { prefix: "/dashboard", access: "protected", roles: ["specialist"] },
 ]
 
 const PUBLIC: Rule = { prefix: "", access: "public" }
@@ -67,12 +68,12 @@ export function redirectFor(
       if (!signedIn) return loginPathFor(path + search)
       return !rule.roles || rule.roles.includes(session.role)
         ? null
-        : AFTER_LOGIN_PATH
+        : homePathFor(session.role)
     case "guestOnly":
-      return signedIn ? AFTER_LOGIN_PATH : null
+      return signedIn ? homePathFor(session.role) : null
     case "setupOnly":
       if (session?.kind === "setup") return null
-      return signedIn ? AFTER_LOGIN_PATH : SIGNUP_PATH
+      return signedIn ? homePathFor(session.role) : SIGNUP_PATH
     case "public":
       return null
   }

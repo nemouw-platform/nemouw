@@ -18,7 +18,9 @@ test.describe("proxy redirects", () => {
     await expect(page).toHaveURL(/\/en\/login\?next=%2Fonboarding$/)
   })
 
-  test("signed in: guest pages send you home", async ({ page }) => {
+  test("signed in: guest pages send you home (the dashboard, which sends a specialist who has not onboarded on to onboarding)", async ({
+    page,
+  }) => {
     await signUp(page, uniqueEmail("guest"))
 
     for (const path of [
@@ -28,10 +30,10 @@ test.describe("proxy redirects", () => {
       "/en/reset-password",
     ]) {
       await page.goto(path)
-      await expect(page).toHaveURL(/\/en$/)
+      await expect(page).toHaveURL(/\/en\/onboarding$/)
     }
     await page.goto("/en/signup/password")
-    await expect(page).toHaveURL(/\/en$/)
+    await expect(page).toHaveURL(/\/en\/onboarding$/)
   })
 
   test("?next= only accepts paths on this site", async ({ page }) => {

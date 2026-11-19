@@ -19,6 +19,8 @@ describe("routeAccess", () => {
     ["/forgot-password", "guestOnly"],
     ["/reset-password", "guestOnly"],
     ["/onboarding", "protected"],
+    ["/dashboard", "protected"],
+    ["/dashboard/profile", "protected"],
     ["/", "public"],
     ["/loginx", "public"], // prefix match needs a path boundary
   ])("%s is %s", (path, access) => {
@@ -36,6 +38,7 @@ describe("redirectFor", () => {
   it("keeps protected pages to their roles", () => {
     const admin: CookieSession = { kind: "session", role: "admin" }
     expect(redirectFor("/onboarding", admin)).toBe("/")
+    expect(redirectFor("/dashboard", admin)).toBe("/")
   })
 
   it("lets signed-in users into protected pages", () => {
@@ -43,8 +46,13 @@ describe("redirectFor", () => {
   })
 
   it("sends signed-in users away from login and sign-up", () => {
-    expect(redirectFor("/login", signedIn)).toBe("/")
-    expect(redirectFor("/signup/verify", signedIn)).toBe("/")
+    expect(redirectFor("/login", signedIn)).toBe("/dashboard")
+    expect(redirectFor("/signup/verify", signedIn)).toBe("/dashboard")
+  })
+
+  it("sends other roles away from guest pages to the site's home", () => {
+    const patient: CookieSession = { kind: "session", role: "patient" }
+    expect(redirectFor("/login", patient)).toBe("/")
   })
 
   it("lets signed-out visitors and mid-sign-up users use the guest pages", () => {
@@ -55,7 +63,7 @@ describe("redirectFor", () => {
   it("only opens step 3 with the setup token", () => {
     expect(redirectFor("/signup/password", settingUp)).toBeNull()
     expect(redirectFor("/signup/password", null)).toBe("/signup")
-    expect(redirectFor("/signup/password", signedIn)).toBe("/")
+    expect(redirectFor("/signup/password", signedIn)).toBe("/dashboard")
   })
 
   it("treats the setup token as signed out elsewhere", () => {

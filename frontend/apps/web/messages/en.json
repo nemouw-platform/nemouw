@@ -5,7 +5,56 @@
   },
   "Common": {
     "toggleTheme": "Toggle theme",
-    "language": "Language"
+    "language": "Language",
+    "retry": "Try again",
+    "signOut": "Log out",
+    "close": "Close"
+  },
+  "Form": {
+    "errors": {
+      "network": "We can't reach Nemouw right now. Check your connection and try again.",
+      "unexpected": "Something went wrong on our side. Please try again.",
+      "tooManyRequests": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
+      "required": "{field} is required",
+      "tooShort": "Use at least {min} characters",
+      "tooLong": "Use {max} characters or fewer",
+      "incompleteCode": "Enter all {length} digits",
+      "field": {
+        "REQUIRED": "This field is required",
+        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
+        "TOO_SHORT": "This is too short",
+        "TOO_LONG": "This is too long",
+        "TOO_COMMON": "This password is too common",
+        "CONTAINS_PERSONAL_INFO": "Don't include “nemouw” or the part of your email before @",
+        "INVALID_ROLE": "Only specialists can create an account",
+        "INVALID_FORMAT": "Check the format and try again"
+      },
+      "wholeNumber": "Enter a whole number, like 5",
+      "tooLarge": "Enter {max} or less"
+    }
+  },
+  "PhoneInput": {
+    "country": "Country: {country} (+{code})",
+    "search": "Search countries",
+    "noResults": "No country found"
+  },
+  "Upload": {
+    "choosePhoto": "Upload a photo",
+    "changePhoto": "Change photo",
+    "remove": "Remove",
+    "saving": "Saving…",
+    "hint": "{types}, up to {size}",
+    "dropTitle": "Drop a file here, or click to choose one",
+    "change": "Change",
+    "replace": "Replace",
+    "removeFile": "Remove {name}",
+    "view": "View",
+    "problems": {
+      "type": "This file type isn't accepted. Use {types}.",
+      "size": "This file is too large. The limit is {size}.",
+      "unreadable": "We couldn't read this file. Try another one.",
+      "busy": "We're processing a lot of files right now. Try again in a moment."
+    }
   },
   "Navbar": {
     "mainNav": "Main",
@@ -14,6 +63,7 @@
     "forSpecialists": "For specialists",
     "logIn": "Log in",
     "join": "Join as a specialist",
+    "dashboard": "Dashboard",
     "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
@@ -33,25 +83,6 @@
     },
     "step": "Step {current} of {total}.",
     "copyright": "© {year} Nemouw",
-    "errors": {
-      "network": "We can't reach Nemouw right now. Check your connection and try again.",
-      "unexpected": "Something went wrong on our side. Please try again.",
-      "tooManyRequests": "Too many attempts. Try again in {seconds, plural, one {# second} other {# seconds}}.",
-      "required": "{field} is required",
-      "tooShort": "Use at least {min} characters",
-      "tooLong": "Use {max} characters or fewer",
-      "incompleteCode": "Enter all {length} digits",
-      "field": {
-        "REQUIRED": "This field is required",
-        "MUST_BE_EMAIL": "Enter an email address like name@example.com",
-        "TOO_SHORT": "This is too short",
-        "TOO_LONG": "This is too long",
-        "TOO_COMMON": "This password is too common",
-        "CONTAINS_PERSONAL_INFO": "Don't include “nemouw” or the part of your email before @",
-        "INVALID_ROLE": "Only specialists can create an account",
-        "INVALID_FORMAT": "Check the format and try again"
-      }
-    },
     "phone": {
       "search": "Speech therapy in Beirut",
       "filterLanguage": "Arabic",
@@ -97,7 +128,9 @@
     "fields": {
       "email": "Email address",
       "emailPlaceholder": "john.doe@example.com",
-      "password": "Password"
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "newPasswordPlaceholder": "Create a password"
     },
     "spamHint": "Can't find it? Check your spam folder."
   },
@@ -200,6 +233,10 @@
     "metaTitle": "Set up your profile",
     "title": "Set up your profile",
     "description": "Pick your public username and confirm your syndicate membership. You can fill in the rest of your profile next.",
+    "submit": "Finish setup",
+    "submitting": "Saving…"
+  },
+  "Membership": {
     "username": "Username",
     "usernamePlaceholder": "dr.rana-haddad",
     "usernameHint": "3 to 30 letters, numbers, dots, dashes or underscores. It becomes your public profile link.",
@@ -212,13 +249,321 @@
     "memberNumber": "Member number",
     "memberNumberPlaceholder": "12345",
     "memberNumberHint": "Your membership number in this syndicate. We use it to verify your credentials.",
-    "submit": "Finish setup",
-    "submitting": "Saving…",
     "errors": {
       "usernameFormat": "Use only letters, numbers, dots, dashes and underscores",
       "usernameTaken": "This username is taken. Try another.",
       "usernameUnavailable": "This username isn't available. Try another.",
-      "memberNumberTaken": "This member number is already registered with this syndicate."
+      "memberNumberTaken": "This member number is already registered with this syndicate.",
+      "syndicateLocked": "Your syndicate verified your profile, so your syndicate can't change any more. Contact Nemouw support if it is wrong."
+    }
+  },
+  "Dashboard": {
+    "nav": {
+      "label": "Dashboard",
+      "overview": "Overview",
+      "profile": "Profile",
+      "credentials": "Credentials",
+      "locations": "Locations & hours",
+      "conditions": "Conditions",
+      "settings": "Settings"
+    },
+    "overview": {
+      "metaTitle": "Dashboard",
+      "title": "Welcome back",
+      "description": "Signed in as @{username}. Here is where your profile stands."
+    },
+    "verification": {
+      "title": "Verification",
+      "pending": {
+        "label": "Pending",
+        "description": "Your syndicate hasn't verified your profile yet. Patients can find you once it's verified."
+      },
+      "active": {
+        "label": "Verified",
+        "description": "Your syndicate verified your profile on {date}. Patients can find you."
+      },
+      "rejected": {
+        "label": "Not verified",
+        "description": "Your syndicate couldn't verify your profile, so patients can't find you yet. Check your details and contact your syndicate.",
+        "descriptionWithReason": "Your syndicate couldn't verify your profile: {reason}. Patients can't find you yet. Update your credentials, or contact your syndicate."
+      }
+    },
+    "setup": {
+      "title": "Finish your profile",
+      "completeTitle": "Your profile is complete",
+      "progress": "{done} of {total} done",
+      "done": "done",
+      "toDo": "to do",
+      "steps": {
+        "credentials": {
+          "title": "Add your credentials",
+          "description": "Your degree or licence, so your syndicate can verify you. Patients find you once you're verified."
+        },
+        "location": {
+          "title": "Add where and when you work",
+          "description": "Your clinic's address and your opening hours, so patients know where to go and when."
+        },
+        "photo": {
+          "title": "Add a profile picture",
+          "description": "A clear photo of you helps patients feel at ease before they get in touch."
+        },
+        "details": {
+          "title": "Add your practice details",
+          "description": "Years of experience, your main language and a WhatsApp number patients can reach."
+        },
+        "about": {
+          "title": "Introduce yourself",
+          "description": "A short bio, in at least one language, so patients know who you are."
+        },
+        "conditions": {
+          "title": "Choose the conditions you treat",
+          "description": "Patients search by condition, so this is how they find you."
+        }
+      }
+    }
+  },
+  "Profile": {
+    "metaTitle": "Profile",
+    "title": "Your profile",
+    "description": "What patients see on your public page. Changes show as soon as you save.",
+    "languages": {
+      "ar": "Arabic",
+      "en": "English",
+      "fr": "French"
+    },
+    "photos": {
+      "title": "Photos",
+      "description": "Patients see these on your public page. They save as soon as you pick them.",
+      "picture": "Profile picture",
+      "cover": "Cover image",
+      "coverHint": "A wide image across the top of your page. We crop it to 1600 × 600."
+    },
+    "details": {
+      "title": "Practice details",
+      "description": "Patients use these to choose a specialist and get in touch.",
+      "experience": "Years of experience",
+      "experiencePlaceholder": "8",
+      "experienceHint": "Since you started practising",
+      "whatsapp": "WhatsApp number",
+      "whatsappHint": "Patients contact you on this number",
+      "phoneFormat": "Enter a valid phone number for this country",
+      "gender": "Gender",
+      "genders": {
+        "female": "Female",
+        "male": "Male"
+      },
+      "language": "Main language",
+      "languageHint": "The language you work in most",
+      "notSpecified": "Not specified",
+      "minAge": "Youngest age you see",
+      "minAgePlaceholder": "3",
+      "maxAge": "Oldest age you see",
+      "maxAgePlaceholder": "18",
+      "ageHint": "In years. Leave blank for no limit.",
+      "ageRange": "Must be at least the youngest age",
+      "save": "Save details",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
+    "about": {
+      "title": "About you",
+      "description": "Write your title, headline and bio in each language you want patients to read them in. Patients see the version in their language, or another one when it is missing.",
+      "languages": "Languages",
+      "written": "Has a bio",
+      "formTitle": "In {language}",
+      "formDescription": "Shown to patients browsing Nemouw in {language}.",
+      "titleLabel": "Professional title",
+      "titlePlaceholder": "Speech and language therapist",
+      "titleHint": "Shown under your name",
+      "headline": "Headline",
+      "headlinePlaceholder": "Helping children find their words",
+      "headlineHint": "One line that sums up your work",
+      "bio": "Bio",
+      "bioPlaceholder": "Your training, the people you work with and how you work.",
+      "bioCount": "{count} / {max} characters",
+      "save": "Save {language} text",
+      "saving": "Saving…",
+      "saved": "Saved"
+    }
+  },
+  "Credentials": {
+    "metaTitle": "Credentials",
+    "title": "Credentials",
+    "description": "Add your degrees, licences and memberships. Your syndicate reviews each one; once they verify you, patients can find you.",
+    "add": "Add a credential",
+    "types": {
+      "degree": "Degree",
+      "license": "Licence",
+      "certification": "Certification",
+      "membership": "Membership"
+    },
+    "status": {
+      "pending": "In review",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "empty": {
+      "title": "No credentials yet",
+      "description": "Add your degree or licence to send it to your syndicate for review."
+    },
+    "card": {
+      "number": "No. {number}",
+      "issued": "Issued {date}",
+      "expires": "Expires {date}",
+      "rejected": "Your syndicate couldn't verify this credential. Edit it or replace its document to send it for review again.",
+      "rejectedBecause": "Your syndicate couldn't verify this credential: {reason}. Edit it or replace its document to send it for review again.",
+      "view": "View document",
+      "viewFailed": "We couldn't open the document. Try again.",
+      "edit": "Edit"
+    },
+    "withdraw": {
+      "action": "Withdraw",
+      "title": "Withdraw this credential?",
+      "description": "“{title}” and its document will be deleted, and your syndicate will no longer review it.",
+      "verifiedDescription": "“{title}” is verified. Withdrawing it deletes it and its document; to show it again you'll have to submit it and wait for a new review.",
+      "cancel": "Keep it",
+      "confirm": "Withdraw"
+    },
+    "form": {
+      "newTitle": "New credential",
+      "editTitle": "Edit credential",
+      "description": "Your syndicate checks these details against the document.",
+      "resubmitDescription": "Saving sends this credential back to your syndicate for review.",
+      "type": "Type",
+      "typePlaceholder": "Choose a type",
+      "title": "Title",
+      "titlePlaceholder": "Licence to practise speech therapy",
+      "organization": "Issued by",
+      "organizationPlaceholder": "Lebanese University",
+      "number": "Number",
+      "numberPlaceholder": "LB-2020-1234",
+      "issueDate": "Issue date",
+      "expiryDate": "Expiry date",
+      "datePlaceholder": "YYYY-MM-DD",
+      "expiryHint": "Leave empty if it doesn't expire",
+      "document": "Document",
+      "documentHint": "A scan or photo of the original, or a PDF. Only you and your syndicate can see it.",
+      "dateOrder": "Must be on or after the issue date",
+      "cancel": "Cancel",
+      "submit": "Send for review",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "document": {
+      "pdf": "PDF document",
+      "image": "Image",
+      "uploaded": "Uploaded {date}"
+    },
+    "errors": {
+      "verified": "This credential was verified in the meantime, so it can't be changed. Withdraw it and add a new one instead."
+    }
+  },
+  "Locations": {
+    "metaTitle": "Locations & hours",
+    "title": "Locations & hours",
+    "description": "Where you see patients, and when. Your main location is the one patients see first.",
+    "add": "Add a location",
+    "empty": {
+      "title": "No locations yet",
+      "description": "Add the clinic or centre where you see patients, then its opening hours."
+    },
+    "card": {
+      "primary": "Main location",
+      "makePrimary": "Make main",
+      "edit": "Edit",
+      "editHours": "Opening hours"
+    },
+    "remove": {
+      "action": "Remove",
+      "title": "Remove this location?",
+      "description": "“{place}” and its opening hours will be deleted.",
+      "confirm": "Remove",
+      "cancel": "Keep it",
+      "primary": "This is your main location. Make another location main before removing it.",
+      "primaryHint": "To remove your main location, make another one main first."
+    },
+    "hours": {
+      "title": "Opening hours at {place}",
+      "unplacedTitle": "Hours without a location",
+      "description": "Add a time range for each day you're open. Add more than one for a break in the day.",
+      "closed": "Closed",
+      "open": "Add hours",
+      "addMore": "Add more hours",
+      "addFor": "Add hours on {day}",
+      "opens": "{day}, opens",
+      "closes": "{day}, closes",
+      "remove": "Remove these hours on {day}",
+      "none": "No opening hours yet",
+      "cancel": "Cancel",
+      "later": "Set hours later",
+      "save": "Save hours",
+      "saving": "Saving…",
+      "problems": {
+        "missing": "Fill in both times",
+        "order": "Must close after it opens",
+        "overlap": "Overlaps other hours that day"
+      }
+    },
+    "form": {
+      "newTitle": "New location",
+      "editTitle": "Edit location",
+      "firstDescription": "Your first location becomes your main one.",
+      "label": "Name",
+      "labelPlaceholder": "Hamra clinic",
+      "labelHint": "Optional. We show the city when there's no name.",
+      "country": "Country",
+      "countryPlaceholder": "Choose a country",
+      "city": "City",
+      "cityPlaceholder": "Beirut",
+      "phone": "Phone",
+      "phoneHint": "The clinic's number, if patients can call it",
+      "phoneFormat": "Enter a valid phone number for this country",
+      "address1": "Address",
+      "address1Placeholder": "Bliss Street, Al-Rayyes building",
+      "address2": "Address line 2",
+      "address2Placeholder": "3rd floor",
+      "makePrimary": "Make this my main location",
+      "cancel": "Cancel",
+      "add": "Add location",
+      "save": "Save",
+      "saving": "Saving…"
+    }
+  },
+  "Conditions": {
+    "metaTitle": "Conditions",
+    "title": "Conditions you treat",
+    "description": "Patients search by condition. Pick every condition you treat.",
+    "empty": "No conditions are listed on Nemouw yet. Check back soon.",
+    "form": {
+      "title": "Conditions",
+      "description": "Your choices show on your public page.",
+      "search": "Search conditions",
+      "searchPlaceholder": "Search, e.g. autism",
+      "selected": "{count, plural, =0 {None selected} one {# selected} other {# selected}}",
+      "noMatch": "No condition matches your search.",
+      "save": "Save conditions",
+      "saving": "Saving…",
+      "saved": "Saved"
+    }
+  },
+  "Settings": {
+    "metaTitle": "Settings",
+    "title": "Settings",
+    "description": "Your public username and your syndicate membership.",
+    "username": {
+      "title": "Username",
+      "description": "It becomes the link to your public page, so change it with care: old links stop working.",
+      "save": "Save username",
+      "saving": "Saving…",
+      "saved": "Saved"
+    },
+    "membership": {
+      "title": "Syndicate membership",
+      "description": "Your syndicate uses these to verify your credentials.",
+      "locked": "Locked: your syndicate has verified your profile.",
+      "save": "Save membership",
+      "saving": "Saving…",
+      "saved": "Saved"
     }
   }
 }

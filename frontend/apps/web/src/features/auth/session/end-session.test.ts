@@ -20,6 +20,13 @@ async function load(pathname: string, search = "") {
   return (await import("@/features/auth/session/end-session")).endSession
 }
 
+/** signOut from a fresh module, on the given page */
+async function loadSignOut(pathname: string) {
+  vi.stubGlobal("window", { location: { pathname, search: "", assign } })
+  vi.resetModules()
+  return (await import("@/features/auth/session/end-session")).signOut
+}
+
 describe("endSession", () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -101,5 +108,37 @@ describe("endSession", () => {
     await vi.runAllTimersAsync()
 
     expect(assign).not.toHaveBeenCalled()
+  })
+})
+
+describe("signOut", () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    assign.mockClear()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.unstubAllGlobals()
+  })
+
+  it("clears the cookies, then opens login in the page's language", async () => {
+    const signOut = await loadSignOut("/ar/dashboard/profile")
+    const clear = vi.fn().mockResolvedValue(undefined)
+
+    signOut(clear)
+    signOut(clear)
+    await vi.runAllTimersAsync()
+
+    expect(clear).toHaveBeenCalledOnce()
+    expect(assign).toHaveBeenCalledExactlyOnceWith("/ar/login")
+  })
+
+  it("still opens login when the logout fails", async () => {
+    const signOut = await loadSignOut("/en/dashboard")
+
+    signOut(vi.fn().mockRejectedValue(new Error("offline")))
+    await vi.runAllTimersAsync()
+
+    expect(assign).toHaveBeenCalledExactlyOnceWith("/en/login")
   })
 })

@@ -4,38 +4,40 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FieldGroup } from "@workspace/ui/components/field"
 import { useTranslations } from "next-intl"
 import * as React from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
-import { AuthPromptButton } from "@/features/auth/components/auth-prompt"
-import { FormAlert } from "@/features/auth/components/form-alert"
-import { FormField, FormTextField } from "@/features/auth/components/form-field"
-import { SubmitButton } from "@/features/auth/components/submit-button"
+import { FormAlert } from "@/components/form/form-alert"
+import { SubmitButton } from "@/components/form/submit-button"
 import {
   createOnboardingSchema,
   type OnboardingValues,
 } from "@/features/auth/onboarding/onboarding-schema"
-import { SyndicateSelect } from "@/features/auth/onboarding/syndicate-select"
 import {
   useOnboarding,
   useRedirectIfOnboarded,
 } from "@/features/auth/onboarding/use-onboarding"
-import { useSyndicates } from "@/features/auth/onboarding/use-syndicates"
+import {
+  MemberNumberField,
+  SyndicateField,
+  UsernameField,
+} from "@/features/specialists/membership/membership-fields"
 
 export function OnboardingForm() {
   const t = useTranslations("Onboarding")
-  const tAuthErrors = useTranslations("Auth.errors")
+  const tMembership = useTranslations("Membership")
+  const tFormErrors = useTranslations("Form.errors")
   const schema = React.useMemo(
     () =>
       createOnboardingSchema(
         {
-          username: t("username"),
-          syndicate: t("syndicate"),
-          memberNumber: t("memberNumber"),
+          username: tMembership("username"),
+          syndicate: tMembership("syndicate"),
+          memberNumber: tMembership("memberNumber"),
         },
-        tAuthErrors,
-        t("errors.usernameFormat")
+        tFormErrors,
+        tMembership("errors.usernameFormat")
       ),
-    [t, tAuthErrors]
+    [tMembership, tFormErrors]
   )
 
   const form = useForm<OnboardingValues>({
@@ -48,65 +50,25 @@ export function OnboardingForm() {
     mode: "onTouched",
   })
   useRedirectIfOnboarded()
-  const syndicates = useSyndicates()
   const { submit, isPending, formError } = useOnboarding(form)
   const { errors } = form.formState
 
   return (
     <form noValidate onSubmit={submit}>
       <FieldGroup>
-        <FormTextField
-          id="username"
-          required
-          label={t("username")}
-          placeholder={t("usernamePlaceholder")}
-          description={t("usernameHint")}
-          autoComplete="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          // Usernames are Latin characters, even on Arabic pages
-          dir="ltr"
-          autoFocus
+        <UsernameField
+          registration={form.register("username")}
           error={errors.username}
-          {...form.register("username")}
+          autoFocus
         />
-
-        <FormField
-          id="syndicate_id"
-          required
-          label={t("syndicate")}
+        <SyndicateField
+          name="syndicate_id"
+          control={form.control}
           error={errors.syndicate_id}
-          description={<SyndicatesStatus {...syndicates} />}
-        >
-          {(control) => (
-            <Controller
-              name="syndicate_id"
-              control={form.control}
-              render={({ field }) => (
-                <SyndicateSelect
-                  {...control}
-                  syndicates={syndicates.syndicates}
-                  isLoading={syndicates.isLoading}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  ref={field.ref}
-                />
-              )}
-            />
-          )}
-        </FormField>
-
-        <FormTextField
-          id="syndicate_member_number"
-          required
-          label={t("memberNumber")}
-          placeholder={t("memberNumberPlaceholder")}
-          description={t("memberNumberHint")}
-          autoComplete="off"
-          dir="ltr"
+        />
+        <MemberNumberField
+          registration={form.register("syndicate_member_number")}
           error={errors.syndicate_member_number}
-          {...form.register("syndicate_member_number")}
         />
 
         <FormAlert>{formError}</FormAlert>
@@ -117,25 +79,4 @@ export function OnboardingForm() {
       </FieldGroup>
     </form>
   )
-}
-
-/** Only says something when the list could not load or is empty */
-function SyndicatesStatus({
-  syndicates,
-  isLoading,
-  failed,
-  retry,
-}: ReturnType<typeof useSyndicates>) {
-  const t = useTranslations("Onboarding")
-
-  if (failed) {
-    return (
-      <>
-        {t("syndicatesFailed")}{" "}
-        <AuthPromptButton onClick={retry}>{t("retry")}</AuthPromptButton>
-      </>
-    )
-  }
-  if (!isLoading && syndicates.length === 0) return t("syndicatesEmpty")
-  return null
 }

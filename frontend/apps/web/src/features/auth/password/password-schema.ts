@@ -1,18 +1,18 @@
+import { passwordRule } from "@/features/auth/lib/validation"
 import { z } from "zod"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createFieldRules } from "@/features/auth/lib/validation"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
 
 export const PASSWORD_FIELDS = ["password"] as const
 
 /** Step 3. `email` (when known) lets the form flag passwords that contain it */
 export function createPasswordSchema(
   labels: { password: string },
-  t: AuthErrorsTranslator,
+  t: FormErrorsTranslator,
   email?: string
 ) {
   return z.object({
-    password: createFieldRules(t).password(labels.password, email),
+    password: passwordRule(t, labels.password, email),
   })
 }
 

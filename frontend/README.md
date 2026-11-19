@@ -13,6 +13,10 @@ pnpm + Turborepo monorepo with two Next.js apps and shared packages.
 
 ## Getting started
 
+To only look at the apps, Docker runs everything (database, backend and both
+apps): see [Running Nemouw with Docker](../docs/docker/README.md). The steps
+below run the apps with hot reload, for working on them.
+
 Create each app's env file from its example (once):
 
 ```bash

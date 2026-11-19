@@ -47,7 +47,8 @@ function InputOTPSlot({
   index: number
 }) {
   const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
+  const { char, placeholderChar, hasFakeCaret, isActive } =
+    inputOTPContext?.slots[index] ?? {}
 
   return (
     <div
@@ -59,7 +60,12 @@ function InputOTPSlot({
       )}
       {...props}
     >
-      {char}
+      {char ?? (
+        // The OTPInput's `placeholder`: one character per empty slot
+        <span aria-hidden className="text-muted-foreground/60">
+          {placeholderChar}
+        </span>
+      )}
       {hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />

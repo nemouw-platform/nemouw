@@ -6,7 +6,7 @@ import {
   InputOTPSlot,
 } from "@workspace/ui/components/input-otp"
 
-import type { ControlProps } from "@/features/auth/components/form-field"
+import type { ControlProps } from "@/components/form/form-field"
 
 interface CodeInputProps extends ControlProps {
   length: number
@@ -21,6 +21,9 @@ interface CodeInputProps extends ControlProps {
 
 /** Digits only, matched against the whole value */
 const DIGITS_PATTERN = "^\\d*$"
+
+/** Shown in each empty box: a language-neutral mark, unlike a digit */
+const EMPTY_BOX = "·"
 
 /**
  * One box per digit for emailed codes. Supports paste and the phone's
@@ -38,6 +41,7 @@ export function CodeInput({
         pattern={DIGITS_PATTERN}
         inputMode="numeric"
         autoComplete="one-time-code"
+        placeholder={EMPTY_BOX.repeat(length)}
         aria-invalid={invalid}
         {...props}
       >

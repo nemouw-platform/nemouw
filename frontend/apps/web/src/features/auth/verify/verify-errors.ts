@@ -1,6 +1,6 @@
 import { isApiError } from "@workspace/api"
 
-import { pickFieldErrors } from "@/features/auth/lib/api-errors"
+import { pickFieldErrors } from "@/lib/forms/api-errors"
 
 /**
  * "invalidCode" for anything wrong with the code: the backend answers every

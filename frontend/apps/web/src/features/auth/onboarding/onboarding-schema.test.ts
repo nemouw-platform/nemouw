@@ -1,14 +1,18 @@
+import { createOnboardingSchema } from "@/features/auth/onboarding/onboarding-schema"
 import { describe, expect, it } from "vitest"
 
-import type { AuthErrorsTranslator } from "@/features/auth/lib/api-errors"
-import { createOnboardingSchema } from "@/features/auth/onboarding/onboarding-schema"
+import type { FormErrorsTranslator } from "@/lib/forms/api-errors"
 
 /** Translator stub that echoes the key and values */
 const t = ((key: string, values?: object) =>
-  values ? `${key} ${JSON.stringify(values)}` : key) as AuthErrorsTranslator
+  values ? `${key} ${JSON.stringify(values)}` : key) as FormErrorsTranslator
 
 const schema = createOnboardingSchema(
-  { username: "Username", syndicate: "Syndicate", memberNumber: "Member number" },
+  {
+    username: "Username",
+    syndicate: "Syndicate",
+    memberNumber: "Member number",
+  },
   t,
   "usernameFormat"
 )

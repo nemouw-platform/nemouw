@@ -1,3 +1,5 @@
+import type { Role } from "@workspace/api"
+
 // Facts from the backend (docs/backend/user/README.md) that several screens use
 
 /** Sign-up screens: details, email code, password */
@@ -19,5 +21,10 @@ export const RESEND_COOLDOWN_SECONDS = 60
 /** Where a new specialist goes once signed up: onboarding (username, syndicate) */
 export const AFTER_SIGNUP_PATH = "/onboarding"
 
-/** Where a signed-in, onboarded user lands after logging in (no dashboard yet) */
-export const AFTER_LOGIN_PATH = "/"
+/** A specialist's home once onboarded: their profile and its setup */
+export const DASHBOARD_PATH = "/dashboard"
+
+/** Where a signed-in user lands (after logging in, or sent away from a guest page) */
+export function homePathFor(role: Role): string {
+  return role === "specialist" ? DASHBOARD_PATH : "/"
+}

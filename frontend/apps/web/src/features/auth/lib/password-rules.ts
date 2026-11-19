@@ -22,8 +22,9 @@ export function hasValidLength(password: string): boolean {
 
 /**
  * True when the password contains "nemouw" or the email's local part (4+
- * characters), in any of the backend's forms: lowercase, letters only, and
- * leet-decoded ("N3m0uw!" -> "nemouw").
+ * characters), as the backend's PasswordPolicy checks it: lowercase, as
+ * typed or leet-decoded ("N3m0uw!" -> "nemouw!"). Separators, digits and
+ * symbols stay, so "nem-ouw" passes.
  */
 export function containsPersonalInfo(
   password: string,
@@ -38,7 +39,6 @@ export function containsPersonalInfo(
 
 function normalizedForms(password: string): string[] {
   const lower = password.normalize("NFC").toLowerCase()
-  const lettersOnly = lower.replace(/\P{L}/gu, "")
   const leetDecoded = lower
     .replace(/@/g, "a")
     .replace(/0/g, "o")
@@ -46,8 +46,7 @@ function normalizedForms(password: string): string[] {
     .replace(/[$5]/g, "s")
     .replace(/7/g, "t")
     .replace(/1/g, "i")
-    .replace(/\P{L}/gu, "")
-  return [lower, lettersOnly, leetDecoded].filter(Boolean)
+  return [lower, leetDecoded]
 }
 
 function personalWords(email?: string): string[] {
