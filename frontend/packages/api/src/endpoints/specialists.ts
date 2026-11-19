@@ -77,6 +77,21 @@ export function createSpecialistsApi(client: ApiClient) {
     removeProfilePicture: (options?: CallOptions) =>
       client.delete<void>("/specialists/me/profile-picture", options),
 
+    /** The ids of the conditions the specialist treats */
+    listConditions: (options?: CallOptions) =>
+      client.get<string[]>("/specialists/me/conditions", options),
+
+    /**
+     * Replaces the whole selection (not a diff) and returns it. 422
+     * INVALID_FORMAT on `condition_ids` for an unknown condition.
+     */
+    saveConditions: (conditionIds: string[], options?: CallOptions) =>
+      client.put<string[]>(
+        "/specialists/me/conditions",
+        { condition_ids: conditionIds },
+        options
+      ),
+
     /** Like setProfilePicture: up to 5 MB, stored as a 1600 x 600 WebP */
     setCoverImage: (file: Blob, options?: CallOptions) =>
       client.put<ImageResponse>(

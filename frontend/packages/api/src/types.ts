@@ -47,6 +47,8 @@ export type CredentialFields = Schemas["CredentialUpdateRequest"]
 export type DocumentAccessResponse = Schemas["DocumentAccessResponse"]
 
 export type Country = Schemas["Country"]
+/** A condition specialists can treat, named in each locale (label, label_fr, label_ar) */
+export type Condition = Schemas["Condition"]
 export type SpecialistLocation = Schemas["SpecialistLocation"]
 export type SpecialistLocationWriteRequest =
   Schemas["SpecialistLocationWriteRequest"]
