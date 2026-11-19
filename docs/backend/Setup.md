@@ -59,10 +59,12 @@ Everything else (`TRUST_PROXY`, token lifetimes, rate limit, log settings, `MAIL
 ## 2. Start the backend and the database
 
 ```bash
-docker compose up -d
+docker compose up -d db backend seed
 ```
 
-This builds the image the first time (a few minutes), starts PostgreSQL, waits until it is healthy, starts the backend, and Flyway creates the database tables automatically.
+This builds the image the first time (a few minutes), starts PostgreSQL, waits until it is healthy, starts the backend, and Flyway creates the database tables automatically. `seed` then loads the local reference data (Lebanon, two syndicates, common conditions) and exits.
+
+A plain `docker compose up -d` also builds and starts the two frontend apps: see [Running Nemouw with Docker](../docker/README.md).
 
 - API: `http://localhost:8080/v1`
 - Debugger port: `5005`
@@ -82,10 +84,10 @@ Quick check that it is up: `curl http://localhost:8080/v1/countries` should answ
 ### Developing with automatic reload
 
 ```bash
-docker compose up --watch
+docker compose up --watch db backend
 ```
 
-Changing a file in `backend/src/main/java` or `backend/pom.xml` rebuilds and restarts the backend by itself. Use this instead of `docker compose up -d` while you code.
+Changing a file in `backend/src/main/java` or `backend/pom.xml` rebuilds and restarts the backend by itself. Use this instead of `docker compose up -d db backend seed` while you code.
 
 ## 3. Run the tests
 
@@ -162,7 +164,7 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 # edit backend/.env as in section 1.2 (secrets, CORS, media placeholders)
 
-docker compose up -d                                   # start backend + database
+docker compose up -d db backend seed                   # start backend + database (+ reference data)
 docker compose logs -f backend                         # wait for "Started NemouwBackendApplication"
 docker compose run --rm backend mvn test               # optional: run the tests
 docker compose run --rm backend mvn spring-boot:run '-Dspring-boot.run.fork=false' '-Dspring-boot.run.arguments=--create-user'  # create a user
@@ -173,11 +175,11 @@ docker compose run --rm backend mvn spring-boot:run '-Dspring-boot.run.fork=fals
 
 | Problem                                                                | Fix                                                                                                             |
 |------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| Backend exits right away with validation errors about blank properties | A value without a default is empty in `backend/.env` (section 1.2). Fix it and run `docker compose up -d` again |
+| Backend exits right away with validation errors about blank properties | A value without a default is empty in `backend/.env` (section 1.2). Fix it and run `docker compose up -d db backend` again |
 | `POSTGRES_DB` variable is not set warning                              | `.env` is missing in the repository root. Copy `.env.example`                                                   |
 | `JWT_SECRET` or `OTP_HASH_SECRET` rejected                             | Each must be at least 32 characters. Generate with `openssl rand -base64 48`                                    |
 | Port 8080 or 5432 already in use                                       | Stop the other program using it, or change the port mapping in `docker-compose.yml`                             |
 | `No interactive terminal available` on create-user                     | Run it from a real terminal with `docker compose run --rm ...`, not through a script or CI                      |
 | Browser requests fail with a CORS error                                | Add the frontend origin to `CORS_ALLOWED_ORIGINS` and restart                                                   |
 | Login works with curl but not in the browser                           | Send requests with `credentials: 'include'` and keep `COOKIE_SECURE=false` on plain `http`                      |
-| Start over with an empty database                                      | `docker compose down -v`, then `docker compose up -d`                                                           |
+| Start over with an empty database                                      | `docker compose down -v`, then `docker compose up -d db backend seed`                                           |
