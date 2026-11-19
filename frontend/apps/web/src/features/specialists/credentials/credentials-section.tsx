@@ -9,6 +9,7 @@ import * as React from "react"
 
 import { LoadError } from "@/components/load-error"
 import { PageHeader } from "@/components/page-header"
+import { FormDialog } from "@/features/dashboard/form-dialog"
 import { CredentialCard } from "@/features/specialists/credentials/credential-card"
 import { CredentialForm } from "@/features/specialists/credentials/credential-form"
 import { useCredentials } from "@/features/specialists/credentials/use-credentials"
@@ -44,7 +45,7 @@ export function CredentialsSection() {
     )
   } else if (isLoading) {
     list = <Skeleton className="h-36 w-full rounded-xl" />
-  } else if (credentials.length === 0 && editing !== "new") {
+  } else if (credentials.length === 0) {
     list = (
       <Card>
         <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
@@ -89,7 +90,8 @@ export function CredentialsSection() {
         description={t("description")}
         action={credentials.length > 0 && addButton}
       />
-      {editing === "new" && (
+      {list}
+      <FormDialog open={editing === "new"} onClose={close}>
         <CredentialForm
           onSaved={(result) => {
             saved(result)
@@ -97,8 +99,7 @@ export function CredentialsSection() {
           }}
           onCancel={close}
         />
-      )}
-      {list}
+      </FormDialog>
     </div>
   )
 }

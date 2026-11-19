@@ -7,7 +7,8 @@
     "toggleTheme": "Changer de thème",
     "language": "Langue",
     "retry": "Réessayer",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "close": "Fermer"
   },
   "Form": {
     "errors": {
@@ -484,6 +485,7 @@
       "remove": "Retirer ces horaires du {day}",
       "none": "Pas encore d'horaires",
       "cancel": "Annuler",
+      "later": "Plus tard",
       "save": "Enregistrer les horaires",
       "saving": "Enregistrement…",
       "problems": {

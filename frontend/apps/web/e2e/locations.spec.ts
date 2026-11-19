@@ -28,7 +28,7 @@ test.describe("locations and hours", () => {
     await page.getByLabel("Phone", { exact: true }).fill("01 123 456")
     await page.getByRole("button", { name: "Add location" }).click()
 
-    // Straight on to its opening hours
+    // The popup moves straight on to its opening hours
     await expect(page.getByText("Opening hours at Hamra clinic")).toBeVisible()
     await page.getByRole("button", { name: "Add hours on Monday" }).click()
     await expect(page.getByLabel("Monday, opens")).toHaveValue("09:00")
@@ -81,7 +81,7 @@ test.describe("locations and hours", () => {
     await page.getByRole("button", { name: "Add location" }).click()
     // Saved: its hours editor opens; leave the hours for later
     await expect(page.getByText("Opening hours at Jounieh")).toBeVisible()
-    await page.getByRole("button", { name: "Cancel" }).click()
+    await page.getByRole("button", { name: "Set hours later" }).click()
 
     // Visible only: Next keeps the Overview visited before mounted, hidden
     const cards = page.locator("main [data-slot=card]:visible")

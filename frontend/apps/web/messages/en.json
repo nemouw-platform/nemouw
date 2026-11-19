@@ -7,7 +7,8 @@
     "toggleTheme": "Toggle theme",
     "language": "Language",
     "retry": "Try again",
-    "signOut": "Log out"
+    "signOut": "Log out",
+    "close": "Close"
   },
   "Form": {
     "errors": {
@@ -484,6 +485,7 @@
       "remove": "Remove these hours on {day}",
       "none": "No opening hours yet",
       "cancel": "Cancel",
+      "later": "Set hours later",
       "save": "Save hours",
       "saving": "Saving…",
       "problems": {

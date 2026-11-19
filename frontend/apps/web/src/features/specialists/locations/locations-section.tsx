@@ -9,6 +9,7 @@ import * as React from "react"
 
 import { LoadError } from "@/components/load-error"
 import { PageHeader } from "@/components/page-header"
+import { FormDialog } from "@/features/dashboard/form-dialog"
 import { HoursEditor } from "@/features/specialists/hours/hours-editor"
 import { toWindows } from "@/features/specialists/hours/hours"
 import {
@@ -20,9 +21,13 @@ import { useLocations } from "@/features/specialists/locations/use-locations"
 import { generalErrorMessage } from "@/lib/forms/api-errors"
 import { CardHeading } from "@/features/dashboard/card-heading"
 
-/** What is open for editing: a location's details or hours, or a new one */
+/**
+ * What is open: a new location (in a popup, then its hours in the same
+ * popup), or an existing location's details or hours (in place, on its card)
+ */
 type Editing =
   | { kind: "new" }
+  | { kind: "newHours"; id: string }
   | { kind: "location"; id: string }
   | { kind: "hours"; id: string | null }
   | null
@@ -44,6 +49,12 @@ export function LocationsSection() {
   const sorted = [...data.locations].sort(
     (a, b) => Number(b.is_primary) - Number(a.is_primary)
   )
+  // The location just added, named in the title of its hours step
+  const added =
+    editing?.kind === "newHours"
+      ? data.locations.find((location) => location.id === editing.id)
+      : undefined
+  const newPlace = added?.label || added?.city || ""
   // Hours tied to no location (made elsewhere): shown so they can be edited
   const unplaced = toWindows(data.hours, null)
 
@@ -67,7 +78,7 @@ export function LocationsSection() {
     )
   } else if (data.isLoading) {
     body = <Skeleton className="h-48 w-full rounded-xl" />
-  } else if (sorted.length === 0 && !isEditing("new")) {
+  } else if (sorted.length === 0) {
     body = (
       <Card>
         <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
@@ -137,19 +148,34 @@ export function LocationsSection() {
         description={t("description")}
         action={data.locations.length > 0 && addButton}
       />
-      {isEditing("new") && (
-        <LocationForm
-          countries={data.countries}
-          hasOthers={data.locations.length > 0}
-          onSaved={(saved) => {
-            data.savedLocation(saved)
-            // Straight on to its hours: a place without them is half done
-            setEditing({ kind: "hours", id: saved.id ?? null })
-          }}
-          onCancel={close}
-        />
-      )}
       {body}
+      <FormDialog
+        open={isEditing("new") || isEditing("newHours")}
+        onClose={close}
+      >
+        {editing?.kind === "newHours" ? (
+          <HoursEditor
+            title={t("hours.title", { place: newPlace })}
+            locationId={editing.id}
+            saved={toWindows(data.hours, editing.id)}
+            onSaved={data.reloadHours}
+            onDone={close}
+            cancelLabel={t("hours.later")}
+          />
+        ) : (
+          <LocationForm
+            countries={data.countries}
+            hasOthers={data.locations.length > 0}
+            onSaved={(saved) => {
+              data.savedLocation(saved)
+              // Straight on to its hours: a place without them is half done
+              if (saved.id) setEditing({ kind: "newHours", id: saved.id })
+              else close()
+            }}
+            onCancel={close}
+          />
+        )}
+      </FormDialog>
       {unplaced.length > 0 &&
         (isEditing("hours", null) ? (
           <HoursEditor

@@ -32,6 +32,8 @@ interface HoursEditorProps {
   /** Called after a save, also a failed one, to load the hours again */
   onSaved: () => void
   onDone: () => void
+  /** The button that closes without saving. Default: "Cancel" */
+  cancelLabel?: string
 }
 
 let newKeys = 0
@@ -46,6 +48,7 @@ export function HoursEditor({
   saved,
   onSaved,
   onDone,
+  cancelLabel,
 }: HoursEditorProps) {
   const t = useTranslations("Locations.hours")
   const locale = useLocale()
@@ -126,7 +129,7 @@ export function HoursEditor({
       submit={
         <>
           <Button type="button" variant="ghost" onClick={onDone}>
-            {t("cancel")}
+            {cancelLabel ?? t("cancel")}
           </Button>
           <SubmitButton
             pending={save.isPending}
