@@ -26,7 +26,8 @@ describe("containsPersonalInfo", () => {
     ["violet-harbor-42", false],
     ["myNemouwGarden", true], // service word, any case
     ["N3m0uw-garden!", true], // leet-decoded
-    ["n.e.m.o.u.w-90", true], // letters only
+    // Separators count, as on the server (PasswordPolicy): not the word
+    ["n.e.m.o.u.w-90", false],
   ])("service word: %s -> %s", (password, contains) => {
     expect(containsPersonalInfo(password)).toBe(contains)
   })
@@ -36,6 +37,13 @@ describe("containsPersonalInfo", () => {
     expect(containsPersonalInfo("xx-rana.haddad-xx", email)).toBe(true)
     expect(containsPersonalInfo("ranahaddad2026", email)).toBe(true) // compact form
     expect(containsPersonalInfo("violet-harbor-42", email)).toBe(false)
+  })
+
+  it("accepts the local part spelled with other separators, as the server does", () => {
+    const email = "amira.haddad@clinic.lb"
+    expect(containsPersonalInfo("amira_haddad2026!", email)).toBe(false)
+    expect(containsPersonalInfo("Amira Haddad 2026!", email)).toBe(false)
+    expect(containsPersonalInfo("a.m.i.r.a-x", "amira@clinic.lb")).toBe(false)
   })
 
   it("ignores local parts shorter than 4 characters", () => {
