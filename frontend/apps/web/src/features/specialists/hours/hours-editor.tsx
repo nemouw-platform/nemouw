@@ -126,19 +126,15 @@ export function HoursEditor({
       description={t("description")}
       onSubmit={submit}
       formError={save.formError}
+      cancel={{ label: cancelLabel ?? t("cancel"), onClick: onDone }}
       submit={
-        <>
-          <Button type="button" variant="ghost" onClick={onDone}>
-            {cancelLabel ?? t("cancel")}
-          </Button>
-          <SubmitButton
-            pending={save.isPending}
-            pendingLabel={t("saving")}
-            size="default"
-          >
-            {t("save")}
-          </SubmitButton>
-        </>
+        <SubmitButton
+          pending={save.isPending}
+          pendingLabel={t("saving")}
+          size="default"
+        >
+          {t("save")}
+        </SubmitButton>
       }
     >
       <div className="flex flex-col divide-y">
@@ -214,7 +210,10 @@ function WindowRow({
     type: "time",
     "aria-invalid": problem ? true : undefined,
     "aria-describedby": problem ? problemId : undefined,
-    className: "h-10 w-32 bg-card",
+    // Phones: the two times share the row, without the desktop clock icon
+    // (phones open their own time picker) so "09:00 AM" fits. Wider: fixed.
+    className:
+      "h-10 min-w-0 flex-1 bg-card max-sm:[&::-webkit-calendar-picker-indicator]:hidden sm:w-36 sm:flex-none",
   }
 
   return (
@@ -222,7 +221,10 @@ function WindowRow({
     // a problem does not push the next days down
     <div className="flex flex-wrap items-center gap-2">
       {/* A range reads left to right in every language, as on the card */}
-      <span dir="ltr" className="flex items-center gap-2">
+      <span
+        dir="ltr"
+        className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none"
+      >
         <Input
           {...control}
           aria-label={t("opens", { day: dayName })}

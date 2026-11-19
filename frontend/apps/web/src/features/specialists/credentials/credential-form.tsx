@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { CredentialResponse } from "@workspace/api"
-import { Button } from "@workspace/ui/components/button"
 import { useFormatter, useTranslations } from "next-intl"
 import * as React from "react"
 import { useForm } from "react-hook-form"
@@ -85,19 +84,15 @@ export function CredentialForm({
       }
       onSubmit={submit}
       formError={formError}
+      cancel={{ label: t("cancel"), onClick: onCancel }}
       submit={
-        <>
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            {t("cancel")}
-          </Button>
-          <SubmitButton
-            pending={isPending}
-            pendingLabel={t("saving")}
-            size="default"
-          >
-            {credential ? t("save") : t("submit")}
-          </SubmitButton>
-        </>
+        <SubmitButton
+          pending={isPending}
+          pendingLabel={t("saving")}
+          size="default"
+        >
+          {credential ? t("save") : t("submit")}
+        </SubmitButton>
       }
     >
       <div className="grid gap-5 sm:grid-cols-2">

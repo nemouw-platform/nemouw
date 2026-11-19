@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Country, SpecialistLocation } from "@workspace/api"
-import { Button } from "@workspace/ui/components/button"
 import { Checkbox } from "@workspace/ui/components/checkbox"
 import { isSupportedCountry } from "libphonenumber-js"
 import { useLocale, useTranslations } from "next-intl"
@@ -109,19 +108,15 @@ export function LocationForm({
       description={hasOthers || location ? undefined : t("firstDescription")}
       onSubmit={form.handleSubmit((values) => save.run(values))}
       formError={save.formError}
+      cancel={{ label: t("cancel"), onClick: onCancel }}
       submit={
-        <>
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            {t("cancel")}
-          </Button>
-          <SubmitButton
-            pending={save.isPending}
-            pendingLabel={t("saving")}
-            size="default"
-          >
-            {location ? t("save") : t("add")}
-          </SubmitButton>
-        </>
+        <SubmitButton
+          pending={save.isPending}
+          pendingLabel={t("saving")}
+          size="default"
+        >
+          {location ? t("save") : t("add")}
+        </SubmitButton>
       }
     >
       <div className="grid gap-5 sm:grid-cols-2">

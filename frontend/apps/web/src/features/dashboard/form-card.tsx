@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
@@ -34,6 +35,8 @@ interface FormCardProps {
   children: React.ReactNode
   /** The save button */
   submit: React.ReactNode
+  /** A button that closes the form without saving, before the save button */
+  cancel?: { label: string; onClick: () => void }
   /** A failure no field explains */
   formError?: React.ReactNode
   /** Shown beside the button after a successful save, e.g. "Saved" */
@@ -52,6 +55,7 @@ export function FormCard({
   onSubmit,
   children,
   submit,
+  cancel,
   formError,
   savedMessage,
   className,
@@ -68,15 +72,27 @@ export function FormCard({
       {savedMessage && (
         <p
           role="status"
-          className="flex items-center gap-1.5 text-sm text-muted-foreground"
+          // Its own line above the buttons on phones, beside them otherwise
+          className="flex basis-full items-center justify-center gap-1.5 text-sm text-muted-foreground sm:basis-auto"
         >
           <CircleCheckIcon aria-hidden className="size-4 text-primary" />
           {savedMessage}
         </p>
       )}
+      {cancel && (
+        <Button type="button" variant="outline" onClick={cancel.onClick}>
+          {cancel.label}
+        </Button>
+      )}
       {submit}
     </>
   )
+  /**
+   * Phones: the buttons share one centred row, equally wide. Wider screens:
+   * at the end, as wide as their labels.
+   */
+  const footer =
+    "flex-row flex-wrap items-center justify-center gap-2 *:data-[slot=button]:flex-1 sm:justify-end sm:*:data-[slot=button]:flex-none"
 
   if (frame === "dialog") {
     return (
@@ -92,8 +108,7 @@ export function FormCard({
         <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5">
           {fields}
         </div>
-        {/* One row, as on the page cards (the dialog's own footer stacks on phones) */}
-        <DialogFooter className="m-0 flex-row flex-wrap items-center justify-end px-5 py-4">
+        <DialogFooter className={cn("m-0 px-5 py-4", footer)}>
           {actions}
         </DialogFooter>
       </form>
@@ -108,7 +123,7 @@ export function FormCard({
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent className="flex flex-col gap-5">{fields}</CardContent>
-        <CardFooter className="justify-end gap-3 border-t py-4">
+        <CardFooter className={cn("border-t py-4", footer)}>
           {actions}
         </CardFooter>
       </form>

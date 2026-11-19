@@ -17,7 +17,7 @@ import { generalErrorMessage } from "@/lib/forms/api-errors"
 
 /**
  * The credentials page: each degree, licence or membership with its review
- * status, and the form to add one or edit one under review (one at a time).
+ * status. Adding one, or editing one under review, opens a popup.
  */
 export function CredentialsSection() {
   const t = useTranslations("Credentials")
@@ -61,27 +61,17 @@ export function CredentialsSection() {
       </Card>
     )
   } else {
-    list = credentials.map((credential) =>
-      editing === credential.id ? (
-        <CredentialForm
-          key={credential.id}
-          credential={credential}
-          onSaved={(result) => {
-            saved(result)
-            close()
-          }}
-          onCancel={close}
-        />
-      ) : (
-        <CredentialCard
-          key={credential.id}
-          credential={credential}
-          onEdit={() => setEditing(credential.id ?? null)}
-          onWithdrawn={removed}
-        />
-      )
-    )
+    list = credentials.map((credential) => (
+      <CredentialCard
+        key={credential.id}
+        credential={credential}
+        onEdit={() => setEditing(credential.id ?? null)}
+        onWithdrawn={removed}
+      />
+    ))
   }
+  // The credential being edited; none while adding one
+  const current = credentials.find((credential) => credential.id === editing)
 
   return (
     <div className="flex flex-col gap-6">
@@ -91,8 +81,11 @@ export function CredentialsSection() {
         action={credentials.length > 0 && addButton}
       />
       {list}
-      <FormDialog open={editing === "new"} onClose={close}>
+      <FormDialog open={editing !== null} onClose={close}>
         <CredentialForm
+          // A fresh form for each credential
+          key={editing ?? "none"}
+          credential={current}
           onSaved={(result) => {
             saved(result)
             close()

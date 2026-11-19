@@ -65,6 +65,13 @@ test.describe("locations and hours", () => {
     await expect(page.getByText("09:00–13:00")).toBeVisible()
     await expect(page.getByText("+961 1 123 456")).toBeVisible()
 
+    // Editing opens the same popup, with the saved hours in it
+    await page.getByRole("button", { name: "Opening hours" }).click()
+    const dialog = page.getByRole("dialog")
+    await expect(dialog.getByLabel("Tuesday, opens")).toHaveValue("09:00")
+    await dialog.getByRole("button", { name: "Cancel" }).click()
+    await expect(dialog).toHaveCount(0)
+
     // The overview counts it
     await page.getByRole("link", { name: "Overview" }).first().click()
     await expect(
