@@ -15,7 +15,7 @@ class SpecialistRepository {
                    s.cover_image_id, cm.s3_key AS cover_image_key,
                    s.min_age_treated, s.max_age_treated,
                    s.verification_status AS verification_status_code, s.reviewed_at, s.rejection_reason,
-                   u.status AS user_status_code, s.session_price_min, s.session_price_max, s.price_currencyو
+                   u.status AS user_status_code, s.session_price_min, s.session_price_max, s.price_currency,
                    s.created_at, s.updated_at
             FROM specialists s
             JOIN users u ON u.id = s.user_id
