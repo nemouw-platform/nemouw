@@ -44,6 +44,16 @@ describe("createFieldRules", () => {
     expect(errorOf(years.safeParse("71"))).toBe('tooLarge {"max":70}')
   })
 
+  it("optionalAmount: blank, or money with up to 2 decimals and a cap", () => {
+    const price = rules.optionalAmount(100)
+    expect(price.parse("")).toBe("")
+    expect(price.parse(" 40.5 ")).toBe("40.5")
+    expect(price.parse("40,50")).toBe("40,50")
+    expect(errorOf(price.safeParse("4.505"))).toBe("amount")
+    expect(errorOf(price.safeParse("forty"))).toBe("amount")
+    expect(errorOf(price.safeParse("100.01"))).toBe('tooLarge {"max":100}')
+  })
+
   it("email: required, then the backend's shape", () => {
     expect(errorOf(rules.email("Email").safeParse(""))).toBe(
       'required {"field":"Email"}'

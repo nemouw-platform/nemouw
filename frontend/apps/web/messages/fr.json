@@ -30,7 +30,8 @@
         "INVALID_FORMAT": "Vérifiez le format et réessayez"
       },
       "wholeNumber": "Saisissez un nombre entier, par exemple 5",
-      "tooLarge": "Saisissez {max} ou moins"
+      "tooLarge": "Saisissez {max} ou moins",
+      "amount": "Saisissez un montant comme 40 ou 40,50"
     }
   },
   "PhoneInput": {
@@ -361,6 +362,14 @@
       "maxAgePlaceholder": "18",
       "ageHint": "En années. Laissez vide pour ne pas fixer de limite.",
       "ageRange": "Doit être au moins égal à l'âge minimum",
+      "priceMin": "Prix par séance, à partir de",
+      "priceMinPlaceholder": "40",
+      "priceMinHint": "Laissez vide pour ne pas afficher de prix",
+      "priceMax": "Jusqu'à",
+      "priceMaxPlaceholder": "60",
+      "priceMaxHint": "Laissez vide pour un prix fixe",
+      "priceNeedsMin": "Indiquez d'abord le prix de départ",
+      "priceRange": "Doit être au moins égal au prix de départ",
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "saved": "Enregistré"

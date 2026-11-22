@@ -30,7 +30,8 @@
         "INVALID_FORMAT": "تحقّق من الصيغة وحاول مجددًا"
       },
       "wholeNumber": "أدخل عددًا صحيحًا، مثل 5",
-      "tooLarge": "أدخل {max} أو أقل"
+      "tooLarge": "أدخل {max} أو أقل",
+      "amount": "أدخل مبلغًا مثل 40 أو 40.50"
     }
   },
   "PhoneInput": {
@@ -361,6 +362,14 @@
       "maxAgePlaceholder": "18",
       "ageHint": "بالسنوات. اتركه فارغًا إن لم يكن هناك حد.",
       "ageRange": "يجب ألا يقل عن أصغر عمر",
+      "priceMin": "سعر الجلسة، ابتداءً من",
+      "priceMinPlaceholder": "40",
+      "priceMinHint": "اتركه فارغًا لعدم عرض سعر",
+      "priceMax": "حتى",
+      "priceMaxPlaceholder": "60",
+      "priceMaxHint": "اتركه فارغًا لسعر ثابت",
+      "priceNeedsMin": "أدخل سعر البداية أولًا",
+      "priceRange": "يجب ألا يقل عن سعر البداية",
       "save": "حفظ التفاصيل",
       "saving": "جارٍ الحفظ…",
       "saved": "تم الحفظ"
