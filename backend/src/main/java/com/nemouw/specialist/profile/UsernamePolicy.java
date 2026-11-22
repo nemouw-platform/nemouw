@@ -11,17 +11,19 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Which usernames may not be taken: the reserved list in reserved-usernames.txt, and anything containing the
- * platform name. Both are matched after dropping '.', '_', '-' and decoding common leet digits, so "a.d.m.i.n",
- * "adm1n" and "n3m0uw" do not slip through. Format and length are the Validator's job, not this class's.
+ * Which usernames may not be taken. Matching ignores case and drops '.', '_', '-', so "a.d.m.i.n" is caught.
+ * <ul>
+ *   <li>Reserved words (reserved-usernames.txt): matched exactly, and also after decoding common leet digits
+ *   ("adm1n"), but only for names of at least {@value #MIN_LEET_LENGTH} characters, so "m3" is not "me".</li>
+ *   <li>The platform name "nemouw": blocked anywhere inside a name.</li>
+ * </ul>
+ * Format and length are the Validator's job, not this class's.
  */
 final class UsernamePolicy {
     private static final String RESOURCE = "/reserved-usernames.txt";
-
-    // Matched anywhere inside the normalized username. Extend with other spellings of the platform name.
-    private static final Set<String> PLATFORM_WORDS = Set.of("nemou", "nemow");
-
-    private static final Set<String> RESERVED = load();
+    private static final int MIN_LEET_LENGTH = 4;
+    private static final Set<String> PLATFORM_WORDS = Set.of("nemouw");
+    private static final Set<String> RESERVED = load(RESOURCE);
 
     private UsernamePolicy() {
     }
@@ -30,7 +32,8 @@ final class UsernamePolicy {
         if (username == null) return false;
         String stripped = strip(username);
         String decoded = deLeet(stripped);
-        if (RESERVED.contains(stripped) || RESERVED.contains(decoded)) return true;
+        if (RESERVED.contains(stripped)) return true;
+        if (decoded.length() >= MIN_LEET_LENGTH && RESERVED.contains(decoded)) return true;
         for (String word : PLATFORM_WORDS) {
             if (stripped.contains(word) || decoded.contains(word)) return true;
         }
@@ -46,10 +49,10 @@ final class UsernamePolicy {
                 .replace('4', 'a').replace('5', 's').replace('7', 't');
     }
 
-    private static Set<String> load() {
+    static Set<String> load(String resource) {
         Set<String> set = new HashSet<>(Set.of("me", "byid"));   // the two words the database itself refuses
-        try (InputStream in = UsernamePolicy.class.getResourceAsStream(RESOURCE)) {
-            if (in == null) throw new IllegalStateException(RESOURCE + " is not on the classpath");
+        try (InputStream in = UsernamePolicy.class.getResourceAsStream(resource)) {
+            if (in == null) throw new IllegalStateException(resource + " is not on the classpath");
             try (BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = r.readLine()) != null) {

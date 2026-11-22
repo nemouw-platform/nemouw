@@ -6,13 +6,17 @@
   "scripts": {
     "lint": "eslint",
     "format": "prettier --write \"**/*.ts\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate": "openapi-typescript ../../../backend/src/main/resources/static/openapi.yaml -o src/generated/openapi.ts"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^10",
-    "typescript": "^5"
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5",
+    "vitest": "^4.1.12"
   },
   "exports": {
     ".": "./src/index.ts",

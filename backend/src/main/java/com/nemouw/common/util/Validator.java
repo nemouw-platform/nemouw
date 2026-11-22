@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import static com.nemouw.common.util.ValidationLimits.EMAIL_MAX_LENGTH;
 
 public final class Validator {
-    private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+    private static final Pattern EMAIL = Pattern.compile("^[^@\\s\\p{Z}\\p{Cc}]+@[^@\\s\\p{Z}\\p{Cc}]+\\.[^@\\s\\p{Z}\\p{Cc}]+$");
     private static final Pattern CODE = Pattern.compile("^[a-z][a-z0-9_]{1,49}$");      // specialty / condition codes
     private static final Pattern ISO_CODE = Pattern.compile("^[A-Za-z]{2}$");           // country, ISO 3166-1 alpha-2
     private static final Pattern CURRENCY_CODE = Pattern.compile("^[A-Za-z]{3}$");      // ISO 4217
@@ -23,8 +23,7 @@ public final class Validator {
     private final List<FieldError> errors = new ArrayList<>();
 
     public Validator required(String field, String v) {
-        if ((v == null || v.isBlank())
-                && errors.stream().noneMatch(e -> e.field().equals(field) && e.code() == FieldErrorCode.REQUIRED))
+        if (TextNormalizer.isBlank(v) && errors.stream().noneMatch(e -> e.field().equals(field) && e.code() == FieldErrorCode.REQUIRED))
             errors.add(FieldErrors.required(field));
         return this;
     }
@@ -41,13 +40,12 @@ public final class Validator {
      * Fails when the trimmed value is longer than {@code max} characters (code points). Null or blank is ignored.
      */
     public Validator maxLength(String field, String v, int max) {
-        if (v != null && !v.isBlank() && tooLong(v, max))
-            errors.add(FieldErrors.tooLong(field, max));
+        if (!TextNormalizer.isBlank(v) && tooLong(v, max)) errors.add(FieldErrors.tooLong(field, max));
         return this;
     }
 
     private static boolean tooLong(String v, int max) {
-        String t = v.trim();
+        String t = TextNormalizer.strip(v);
         // Code points never outnumber chars, so a value of max chars or fewer can skip the count
         return t.length() > max && t.codePointCount(0, t.length()) > max;
     }
@@ -60,18 +58,16 @@ public final class Validator {
     // Format checks ignore null and blank: pair with required / requiredForWrite
 
     public Validator email(String field, String v) {
-        if (v == null || v.isBlank()) return this;
-        String trimmed = v.trim();
+        if (TextNormalizer.isBlank(v)) return this;
+        String trimmed = TextNormalizer.strip(v);
         // Length first: cheap, and keeps the regex away from oversized input
-        if (tooLong(trimmed, EMAIL_MAX_LENGTH))
-            errors.add(FieldErrors.tooLong(field, EMAIL_MAX_LENGTH));
-        else if (!EMAIL.matcher(trimmed).matches())
-            errors.add(FieldErrors.mustBeEmail(field));
+        if (tooLong(trimmed, EMAIL_MAX_LENGTH)) errors.add(FieldErrors.tooLong(field, EMAIL_MAX_LENGTH));
+        else if (!EMAIL.matcher(trimmed).matches()) errors.add(FieldErrors.mustBeEmail(field));
         return this;
     }
 
     public Validator requiredEmail(String field, String v) {
-        if (v == null || v.isBlank()) {
+        if (TextNormalizer.isBlank(v)) {
             errors.add(FieldErrors.required(field));
             return this;
         }
@@ -82,8 +78,7 @@ public final class Validator {
      * Lowercase letters, digits and underscores, starting with a letter (case is normalized by the caller).
      */
     public Validator code(String field, String v) {
-        return format(field, v == null ? null : v.toLowerCase(Locale.ROOT), CODE,
-                "use lowercase letters, digits and underscores");
+        return format(field, v == null ? null : v.toLowerCase(Locale.ROOT), CODE, "use lowercase letters, digits and underscores");
     }
 
     public Validator isoCode(String field, String v) {
@@ -99,14 +94,12 @@ public final class Validator {
     }
 
     public Validator username(String field, String v) {
-        return format(field, v == null ? null : v.toLowerCase(Locale.ROOT), USERNAME,
-                "use 3 to 30 characters: letters, digits, '.', '_' or '-'");
+        return format(field, v == null ? null : v.toLowerCase(Locale.ROOT), USERNAME, "use 3 to 30 characters: letters, digits, '.', '_' or '-'");
     }
 
     private Validator format(String field, String v, Pattern pattern, String rule) {
         if (v == null || v.isBlank()) return this;
-        if (!pattern.matcher(v.trim()).matches())
-            errors.add(FieldErrors.invalidFormat(field, rule));
+        if (!pattern.matcher(v.trim()).matches()) errors.add(FieldErrors.invalidFormat(field, rule));
         return this;
     }
 

@@ -3,12 +3,17 @@ package com.nemouw.media.api;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
-/** What an upload is for. Chosen by the endpoint, never by the client. */
+/**
+ * What an upload is for. Chosen by the endpoint, never by the client.
+ */
 public enum MediaKind {
     PROFILE_PICTURE("profile-pictures", true, false),
     COVER_IMAGE("cover-images", true, false),
     CREDENTIAL_DOCUMENT("credential-documents", false, true);
+    private static final Pattern FILE_NAME =
+            Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.[a-z0-9]+");
 
     private final String prefix;
     private final boolean publicAccess;
@@ -36,7 +41,14 @@ public enum MediaKind {
         return prefix + "/" + UUID.randomUUID() + "." + extension;
     }
 
+    /**
+     * The inverse of {@link #newKey}: only keys of exactly that shape belong to a kind.
+     */
     public static Optional<MediaKind> ofKey(String key) {
-        return Arrays.stream(values()).filter(k -> key.startsWith(k.prefix + "/")).findFirst();
+        if (key == null) return Optional.empty();
+        return Arrays.stream(values())
+                .filter(k -> key.startsWith(k.prefix + "/")
+                        && FILE_NAME.matcher(key.substring(k.prefix.length() + 1)).matches())
+                .findFirst();
     }
 }

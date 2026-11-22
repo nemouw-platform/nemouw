@@ -7,6 +7,7 @@ import com.nemouw.media.MediaProperties.Limits;
 import jakarta.annotation.PreDestroy;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -42,11 +43,19 @@ public class ImageProcessor {
     private final long maxPixels;
     private final WebpEncoder encoder = new WebpEncoder();
 
+    @Autowired
     ImageProcessor(MediaProperties props) {
-        MediaProperties.Processing p = props.processing();
-        this.timeout = p.timeout();
-        this.maxPixels = p.maxPixels();
-        this.pool = new ThreadPoolExecutor(p.threads(), p.threads(), 0L, TimeUnit.MILLISECONDS,
+        this(props.processing(), newPool(props.processing()));
+    }
+
+    ImageProcessor(MediaProperties.Processing processing, ThreadPoolExecutor pool) {
+        this.timeout = processing.timeout();
+        this.maxPixels = processing.maxPixels();
+        this.pool = pool;
+    }
+
+    private static ThreadPoolExecutor newPool(MediaProperties.Processing p) {
+        return new ThreadPoolExecutor(p.threads(), p.threads(), 0L, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(p.queueCapacity()), namedThreads(), new ThreadPoolExecutor.AbortPolicy());
     }
 

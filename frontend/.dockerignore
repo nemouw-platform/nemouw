@@ -1,0 +1,17 @@
+# Installed and built inside the image
+**/node_modules
+**/.next
+**/.turbo
+**/out
+**/dist
+**/coverage
+
+# Local settings: the image gets its settings from build args and compose
+**/.env*
+
+# Test output
+**/test-results
+**/playwright-report
+
+.git
+**/*.log

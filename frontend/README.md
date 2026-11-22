@@ -8,9 +8,14 @@ pnpm + Turborepo monorepo with two Next.js apps and shared packages.
 | `apps/admin` | Staff dashboard | http://localhost:3001 |
 | `packages/ui` | shadcn/ui components and theme (`@workspace/ui`) | |
 | `packages/api` | Spring Boot API client and types (`@workspace/api`) | |
+| `packages/i18n` | Supported locales, names and text direction (`@workspace/i18n`) | |
 | `packages/eslint-config`, `packages/typescript-config` | Shared tooling config | |
 
 ## Getting started
+
+To only look at the apps, Docker runs everything (database, backend and both
+apps): see [Running Nemouw with Docker](../docs/docker/README.md). The steps
+below run the apps with hot reload, for working on them.
 
 Create each app's env file from its example (once):
 
@@ -45,5 +50,6 @@ import { Button } from "@workspace/ui/components/button"
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test
 pnpm build
 ```
