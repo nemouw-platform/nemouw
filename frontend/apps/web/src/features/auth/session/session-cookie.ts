@@ -10,12 +10,13 @@ export const ACCESS_TOKEN_COOKIE = "access_token"
 const PASSWORD_SETUP_SCOPE = "password_setup"
 
 export type CookieSession =
-  /** A signed-in user */
-  | { kind: "session"; role: Role }
+  /** A signed-in user (`userId`: the token's subject) */
+  | { kind: "session"; role: Role; userId: string }
   /** Sign-up step 3: the short-lived token that may only set the first password */
   | { kind: "setup" }
 
 interface TokenPayload {
+  sub?: string
   role?: Role
   sid?: string
   scope?: string
@@ -34,8 +35,8 @@ export function readAccessToken(
   const payload = token ? decodePayload(token) : null
   if (!payload || !isUnexpired(payload, now)) return null
   if (payload.scope === PASSWORD_SETUP_SCOPE) return { kind: "setup" }
-  if (payload.role && payload.sid)
-    return { kind: "session", role: payload.role }
+  if (payload.role && payload.sid && payload.sub)
+    return { kind: "session", role: payload.role, userId: payload.sub }
   return null
 }
 

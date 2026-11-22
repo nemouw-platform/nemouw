@@ -23,6 +23,7 @@ import {
   DOCUMENT_RULES,
   useSaveCredential,
 } from "@/features/specialists/credentials/use-save-credential"
+import { credentialsApi } from "@/lib/api"
 
 interface CredentialFormProps {
   /** The credential to edit; none to add one */
@@ -178,7 +179,10 @@ export function CredentialForm({
 function useStoredDocument(credential?: CredentialResponse): StoredFile | null {
   const t = useTranslations("Credentials.document")
   const format = useFormatter()
-  const link = useDocumentLink(credential?.id)
+  const id = credential?.id
+  const link = useDocumentLink(
+    id ? () => credentialsApi.documentLink(id) : undefined
+  )
   const document = credential?.document
   if (!document?.mime_type) return null
 

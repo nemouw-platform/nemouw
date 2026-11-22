@@ -10,7 +10,7 @@ no Node.js, Java or Maven.
 | `admin`   | Staff dashboard                               | http://localhost:3001                  |
 | `backend` | Spring Boot API (debugger on port 5005)       | http://localhost:8080                  |
 | `db`      | PostgreSQL 18, reachable from your machine only | `localhost:5432`                     |
-| `seed`    | Loads the reference data (Lebanon, syndicates, conditions) once, then exits | (no page) |
+| `seed`    | Loads the reference data (Lebanon, syndicates, conditions) and a syndicate owner once, then exits | (no page) |
 
 The frontend apps run as **production builds**, so they behave like the real
 site. To see code changes in them, rebuild (see [Everyday commands](#everyday-commands)).
@@ -107,6 +107,13 @@ Then open http://localhost:3000.
 2. **Onboard**: pick a username and a syndicate (Lebanon and two syndicates
    are loaded by the `seed` service) with any member number.
 3. **Dashboard**: profile, photos, credentials, locations and opening hours.
+4. **Syndicate area**: the seed adds the owner of the speech therapists'
+   syndicate, `owner@syndicate.example`, with no password yet. Go to
+   http://localhost:3000/en/forgot-password, send a link to that address, open
+   the newest `.eml` for it in `backend/target/dev-mails/`, and follow the
+   link to choose a password. Log in: you land on `/en/syndicate`, where you
+   review the specialists who chose that syndicate (and their credentials),
+   manage the staff and edit the syndicate's details.
 
 Pages exist in English, French and Arabic: change the language from the globe
 in the top bar, or go to `/fr/...` or `/ar/...`.

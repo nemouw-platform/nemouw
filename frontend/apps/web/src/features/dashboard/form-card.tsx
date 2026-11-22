@@ -33,8 +33,8 @@ interface FormCardProps {
   onSubmit: React.FormEventHandler<HTMLFormElement>
   /** The fields */
   children: React.ReactNode
-  /** The save button */
-  submit: React.ReactNode
+  /** The save button; a form without one (read-only) has no footer */
+  submit?: React.ReactNode
   /** A button that closes the form without saving, before the save button */
   cancel?: { label: string; onClick: () => void }
   /** A failure no field explains */
@@ -123,9 +123,11 @@ export function FormCard({
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent className="flex flex-col gap-5">{fields}</CardContent>
-        <CardFooter className={cn("border-t py-4", footer)}>
-          {actions}
-        </CardFooter>
+        {(submit || cancel) && (
+          <CardFooter className={cn("border-t py-4", footer)}>
+            {actions}
+          </CardFooter>
+        )}
       </form>
     </Card>
   )

@@ -1,6 +1,6 @@
 "use client"
 
-import type { CredentialResponse } from "@workspace/api"
+import type { CredentialResponse, DocumentAccessResponse } from "@workspace/api"
 import { useLoad } from "@workspace/ui/hooks/use-load"
 import * as React from "react"
 
@@ -34,20 +34,23 @@ export function useCredentials() {
 
 /**
  * Opens a credential's private document in a new tab, through a link that
- * lasts a few minutes. The tab opens on the click itself (so pop-up blockers
- * allow it) and is pointed at the link once it arrives.
+ * lasts a few minutes (`getLink` asks for it: the specialist's own endpoint,
+ * or the reviewer's). The tab opens on the click itself, so pop-up blockers
+ * allow it, and is pointed at the link once it arrives.
  */
-export function useDocumentLink(credentialId: string | undefined) {
+export function useDocumentLink(
+  getLink: (() => Promise<DocumentAccessResponse>) | undefined
+) {
   const [opening, setOpening] = React.useState(false)
   const [failed, setFailed] = React.useState(false)
 
-  const open = React.useCallback(async () => {
-    if (!credentialId) return
+  async function open() {
+    if (!getLink) return
     const tab = window.open("", "_blank")
     setOpening(true)
     setFailed(false)
     try {
-      const { url } = await credentialsApi.documentLink(credentialId)
+      const { url } = await getLink()
       if (tab && url) {
         tab.opener = null
         tab.location.href = url
@@ -58,7 +61,7 @@ export function useDocumentLink(credentialId: string | undefined) {
     } finally {
       setOpening(false)
     }
-  }, [credentialId])
+  }
 
   return { open, opening, failed }
 }

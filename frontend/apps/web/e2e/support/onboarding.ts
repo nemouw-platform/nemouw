@@ -16,11 +16,16 @@ export async function chooseSyndicate(page: Page, name: RegExp) {
   await page.getByRole("option", { name }).click()
 }
 
-/** Completes onboarding from the onboarding page; resolves on the dashboard */
-export async function onboard(page: Page) {
-  await page.getByLabel("Username").fill(`rana.${Date.now() % 1e8}`)
+/**
+ * Completes onboarding from the onboarding page; resolves on the dashboard
+ * with the username it chose
+ */
+export async function onboard(page: Page): Promise<string> {
+  const username = `rana.${Date.now() % 1e8}`
+  await page.getByLabel("Username").fill(username)
   await chooseSyndicate(page, /Speech Therapists/)
   await page.getByLabel("Member number").fill(`M-${Date.now()}`)
   await page.getByRole("button", { name: "Finish setup" }).click()
   await expect(page).toHaveURL(/\/en\/dashboard$/)
+  return username
 }

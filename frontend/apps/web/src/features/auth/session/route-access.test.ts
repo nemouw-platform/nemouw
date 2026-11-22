@@ -7,7 +7,11 @@ import {
 } from "@/features/auth/session/route-access"
 import type { CookieSession } from "@/features/auth/session/session-cookie"
 
-const signedIn: CookieSession = { kind: "session", role: "specialist" }
+const signedIn: CookieSession = {
+  kind: "session",
+  role: "specialist",
+  userId: "u1",
+}
 const settingUp: CookieSession = { kind: "setup" }
 
 describe("routeAccess", () => {
@@ -21,6 +25,7 @@ describe("routeAccess", () => {
     ["/onboarding", "protected"],
     ["/dashboard", "protected"],
     ["/dashboard/profile", "protected"],
+    ["/syndicate", "protected"],
     ["/", "public"],
     ["/loginx", "public"], // prefix match needs a path boundary
   ])("%s is %s", (path, access) => {
@@ -36,7 +41,11 @@ describe("redirectFor", () => {
   })
 
   it("keeps protected pages to their roles", () => {
-    const admin: CookieSession = { kind: "session", role: "admin" }
+    const admin: CookieSession = {
+      kind: "session",
+      role: "admin",
+      userId: "u2",
+    }
     expect(redirectFor("/onboarding", admin)).toBe("/")
     expect(redirectFor("/dashboard", admin)).toBe("/")
   })
@@ -50,8 +59,24 @@ describe("redirectFor", () => {
     expect(redirectFor("/signup/verify", signedIn)).toBe("/dashboard")
   })
 
+  it("keeps the syndicate area to syndicate staff, and sends them there", () => {
+    const staff: CookieSession = {
+      kind: "session",
+      role: "syndicate_staff",
+      userId: "u4",
+    }
+    expect(redirectFor("/syndicate", staff)).toBeNull()
+    expect(redirectFor("/login", staff)).toBe("/syndicate")
+    expect(redirectFor("/dashboard", staff)).toBe("/syndicate")
+    expect(redirectFor("/syndicate/staff", signedIn)).toBe("/dashboard")
+  })
+
   it("sends other roles away from guest pages to the site's home", () => {
-    const patient: CookieSession = { kind: "session", role: "patient" }
+    const patient: CookieSession = {
+      kind: "session",
+      role: "patient",
+      userId: "u3",
+    }
     expect(redirectFor("/login", patient)).toBe("/")
   })
 

@@ -574,5 +574,148 @@
       "saving": "Enregistrement…",
       "saved": "Enregistré"
     }
+  },
+  "Syndicate": {
+    "nav": {
+      "label": "Syndicat",
+      "review": "Vérifications",
+      "staff": "Équipe",
+      "settings": "Infos du syndicat"
+    },
+    "noSyndicate": {
+      "title": "Vous ne faites partie d'aucun syndicat",
+      "description": "Ce compte ne fait partie de l'équipe d'aucun syndicat : il n'y a rien à vérifier. Demandez au responsable de votre syndicat de vous inviter à nouveau."
+    },
+    "status": {
+      "pending": "À vérifier",
+      "active": "Vérifié",
+      "rejected": "Refusé",
+      "suspended": "Suspendu"
+    },
+    "reason": {
+      "label": "Motif",
+      "placeholder": "Le numéro de licence ne correspond pas à notre registre.",
+      "hint": "Le spécialiste lit ce motif dans son tableau de bord : indiquez ce qu'il doit corriger.",
+      "cancel": "Annuler",
+      "sending": "Envoi…"
+    },
+    "queue": {
+      "metaTitle": "Vérifications",
+      "title": "Vérifications",
+      "description": "Les spécialistes qui ont choisi {syndicate}, avec les justificatifs qu'ils vous ont envoyés. Comparez chacun avec votre registre.",
+      "filters": "Afficher",
+      "filter": {
+        "toReview": "À vérifier",
+        "verified": "Vérifiés",
+        "rejected": "Refusés",
+        "all": "Tous"
+      },
+      "empty": {
+        "toReview": "Rien à vérifier. Les nouveaux spécialistes apparaissent ici dès qu'ils envoient un justificatif.",
+        "verified": "Vous n'avez encore vérifié personne.",
+        "rejected": "Vous n'avez refusé personne.",
+        "all": "Aucun spécialiste n'a encore envoyé de justificatif à votre syndicat."
+      },
+      "pendingCredentials": "{count, plural, one {# justificatif à vérifier} other {# justificatifs à vérifier}}",
+      "credentialsReviewed": "Justificatifs vérifiés"
+    },
+    "specialist": {
+      "metaTitle": "Vérifier un spécialiste",
+      "back": "Toutes les vérifications",
+      "title": "Vérifier un spécialiste",
+      "description": "Vérifiez d'abord ses justificatifs, puis décidez pour le spécialiste. Vérifier les justificatifs ne vérifie pas le spécialiste.",
+      "notFound": "Nous n'avons pas trouvé ce spécialiste. Revenez à vos vérifications et ouvrez-le depuis la liste.",
+      "memberNumber": "Membre n° {number}",
+      "joined": "Inscrit le {date}",
+      "reviewed": "Dernière décision le {date}",
+      "explain": {
+        "pending": "Pas encore vérifié. Les patients ne le trouvent pas tant que vous ne l'avez pas vérifié.",
+        "active": "Vérifié : les patients le trouvent dans la recherche.",
+        "rejected": "Refusé : les patients ne le trouvent pas. Le vérifier plus tard le fait réapparaître."
+      },
+      "rejectedBecause": "Vous l'avez refusé : {reason}",
+      "suspendedNotice": "Ce compte est suspendu : il ne peut pas se connecter et n'apparaît pas dans la recherche.",
+      "verify": "Vérifier le spécialiste",
+      "reject": "Refuser le spécialiste",
+      "rejectTitle": "Refuser ce spécialiste ?",
+      "rejectDescription": "@{username} n'apparaîtra plus dans la recherche. Il verra votre motif dans son tableau de bord.",
+      "rejectSubmit": "Refuser le spécialiste",
+      "suspend": {
+        "action": "Suspendre",
+        "title": "Suspendre ce compte ?",
+        "description": "@{username} ne pourra plus se connecter et les patients ne le trouveront plus, jusqu'à la levée de la suspension.",
+        "confirm": "Suspendre",
+        "cancel": "Annuler"
+      },
+      "unsuspend": "Lever la suspension",
+      "credentialsTitle": "Justificatifs",
+      "credentialsDescription": "Ouvrez chaque document et comparez-le avec votre registre.",
+      "credentialsEmpty": "Ce spécialiste n'a encore envoyé aucun justificatif."
+    },
+    "credential": {
+      "verify": "Vérifier",
+      "reject": "Refuser",
+      "rejectTitle": "Refuser ce justificatif ?",
+      "rejectDescription": "« {title} » apparaîtra comme refusé, avec votre motif, jusqu'à ce que le spécialiste le renvoie.",
+      "rejectSubmit": "Refuser le justificatif",
+      "rejectedBecause": "Refusé : {reason}"
+    },
+    "staff": {
+      "metaTitle": "Équipe",
+      "title": "Équipe",
+      "description": "Toutes les personnes qui vérifient les spécialistes pour votre syndicat. Seul le responsable peut inviter ou retirer des membres.",
+      "ownerDescription": "Toutes les personnes qui vérifient les spécialistes pour votre syndicat. Invitez des collègues, changez leur fonction ou retirez-les.",
+      "invite": "Inviter",
+      "you": "(vous)",
+      "owner": "Responsable",
+      "invited": "Invitation envoyée",
+      "edit": "Modifier",
+      "remove": {
+        "action": "Retirer",
+        "title": "Retirer ce membre ?",
+        "description": "{name} perd l'accès immédiatement et son compte est supprimé.",
+        "confirm": "Retirer",
+        "cancel": "Le garder"
+      },
+      "form": {
+        "inviteTitle": "Inviter un membre",
+        "inviteDescription": "Nous lui enverrons un lien pour choisir son mot de passe. Il est valable 24 heures.",
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Rana",
+        "lastName": "Nom",
+        "lastNamePlaceholder": "Haddad",
+        "email": "E-mail",
+        "emailPlaceholder": "rana@syndicate.org.lb",
+        "emailHint": "L'invitation est envoyée à cette adresse",
+        "emailTaken": "Cette adresse a déjà un compte Nemouw.",
+        "title": "Fonction",
+        "titlePlaceholder": "Secrétaire",
+        "invite": "Envoyer l'invitation",
+        "sending": "Envoi…",
+        "cancel": "Annuler",
+        "editTitle": "Modifier la fonction",
+        "editDescription": "La fonction de {name} dans votre syndicat.",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…"
+      }
+    },
+    "settings": {
+      "metaTitle": "Infos du syndicat",
+      "title": "Infos du syndicat",
+      "description": "Le nom de votre syndicat et comment le joindre.",
+      "detailsTitle": "Nom et contact",
+      "detailsDescription": "Les spécialistes les voient quand ils choisissent leur syndicat.",
+      "readOnly": "Seul le responsable de votre syndicat peut les modifier.",
+      "name": "Nom",
+      "namePlaceholder": "Syndicat libanais des orthophonistes",
+      "email": "E-mail de contact",
+      "emailPlaceholder": "contact@syndicate.org.lb",
+      "phone": "Téléphone de contact",
+      "phoneFormat": "Saisissez un numéro de téléphone valide",
+      "keepHint": "Laissez vide pour garder l'actuel",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "saved": "Enregistré"
+    }
   }
 }

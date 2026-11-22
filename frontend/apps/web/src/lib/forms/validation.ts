@@ -66,6 +66,16 @@ export function createFieldRules(t: FormErrorsTranslator) {
         .max(EMAIL_MAX_LENGTH, t("tooLong", { max: EMAIL_MAX_LENGTH }))
         .regex(EMAIL_SHAPE, t("field.MUST_BE_EMAIL")),
 
+    /** An email address, or blank */
+    optionalEmail: () =>
+      z
+        .string()
+        .trim()
+        .max(EMAIL_MAX_LENGTH, t("tooLong", { max: EMAIL_MAX_LENGTH }))
+        .refine((value) => value === "" || EMAIL_SHAPE.test(value), {
+          message: t("field.MUST_BE_EMAIL"),
+        }),
+
     /** A required pick from a list (its value, e.g. an id) */
     choice: (label: string) => z.string().min(1, required(label)),
 
