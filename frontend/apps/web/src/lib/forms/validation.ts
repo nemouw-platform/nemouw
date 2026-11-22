@@ -43,6 +43,21 @@ export function createFieldRules(t: FormErrorsTranslator) {
           message: t("tooLarge", { max }),
         }),
 
+    /**
+     * An amount of money typed into a text box (up to 2 decimals, at most
+     * `max`), or blank. Stays a string, like optionalCount.
+     */
+    optionalAmount: (max: number) =>
+      z
+        .string()
+        .trim()
+        .regex(/^(\d+([.,]\d{1,2})?)?$/, t("amount"))
+        // Only a real amount is too large: text that is not one already
+        // failed the format check above
+        .refine((value) => !(parseAmount(value) > max), {
+          message: t("tooLarge", { max }),
+        }),
+
     email: (label: string) =>
       z
         .string()
@@ -67,4 +82,9 @@ export function createFieldRules(t: FormErrorsTranslator) {
         .min(1, required(label))
         .regex(new RegExp(`^\\d{${length}}$`), t("incompleteCode", { length })),
   }
+}
+
+/** A typed amount as a number; a comma works as the decimal point ("40,5") */
+export function parseAmount(value: string): number {
+  return Number(value.trim().replace(",", "."))
 }

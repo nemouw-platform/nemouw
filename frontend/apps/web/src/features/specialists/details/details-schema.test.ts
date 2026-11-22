@@ -13,6 +13,8 @@ const t = ((key: string) => key) as FormErrorsTranslator
 const schema = createDetailsSchema(t, {
   phoneFormat: "phoneFormat",
   ageRange: "ageRange",
+  priceNeedsMin: "priceNeedsMin",
+  priceRange: "priceRange",
 })
 
 const empty: DetailsValues = {
@@ -22,6 +24,8 @@ const empty: DetailsValues = {
   whatsapp_number: "",
   min_age_treated: "",
   max_age_treated: "",
+  session_price_min: "",
+  session_price_max: "",
 }
 
 const issues = (values: Partial<DetailsValues>) => {
@@ -56,6 +60,32 @@ describe("createDetailsSchema", () => {
   })
 })
 
+describe("createDetailsSchema: session price", () => {
+  it("takes a starting price alone, or a range", () => {
+    expect(issues({ session_price_min: "40" })).toEqual({})
+    expect(
+      issues({ session_price_min: "40.5", session_price_max: "60,75" })
+    ).toEqual({})
+  })
+
+  it("needs a starting price for an upper one, and a range that goes up", () => {
+    expect(issues({ session_price_max: "60" })).toEqual({
+      session_price_max: "priceNeedsMin",
+    })
+    expect(
+      issues({ session_price_min: "60", session_price_max: "40" })
+    ).toEqual({ session_price_max: "priceRange" })
+  })
+
+  it("refuses amounts that are not money", () => {
+    for (const amount of ["4.505", "-5", "forty", "1e3"]) {
+      expect(issues({ session_price_min: amount })).toEqual({
+        session_price_min: "amount",
+      })
+    }
+  })
+})
+
 describe("toDetailsValues / toUpdateRequest", () => {
   const saved: SpecialistResponse = {
     years_of_experience: 0,
@@ -64,6 +94,9 @@ describe("toDetailsValues / toUpdateRequest", () => {
     whatsapp_number: "+96170123456",
     min_age_treated: 2,
     max_age_treated: null,
+    session_price_min: 40.5,
+    session_price_max: null,
+    price_currency: "USD",
   }
 
   it("shows nulls as empty fields and numbers as text (0 included)", () => {
@@ -74,6 +107,8 @@ describe("toDetailsValues / toUpdateRequest", () => {
       whatsapp_number: "+96170123456",
       min_age_treated: "2",
       max_age_treated: "",
+      session_price_min: "40.5",
+      session_price_max: "",
     })
   })
 
@@ -85,6 +120,17 @@ describe("toDetailsValues / toUpdateRequest", () => {
       whatsapp_number: "+96170123456",
       min_age_treated: 2,
       max_age_treated: null,
+      session_price_min: 40.5,
+      session_price_max: null,
     })
+  })
+
+  it("reads a comma as the decimal point, and never sends the currency", () => {
+    const body = toUpdateRequest({
+      ...toDetailsValues(saved),
+      session_price_min: "40,50",
+    })
+    expect(body.session_price_min).toBe(40.5)
+    expect(body).not.toHaveProperty("price_currency")
   })
 })

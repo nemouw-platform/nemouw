@@ -36,6 +36,8 @@ export function DetailsForm() {
       createDetailsSchema(tFormErrors, {
         phoneFormat: t("phoneFormat"),
         ageRange: t("ageRange"),
+        priceNeedsMin: t("priceNeedsMin"),
+        priceRange: t("priceRange"),
       }),
     [t, tFormErrors]
   )
@@ -52,6 +54,8 @@ export function DetailsForm() {
   })
   const { errors } = form.formState
 
+  // Set by the backend (USD for now), shown beside the prices
+  const currency = specialist.price_currency ?? "USD"
   const genders = GENDERS.map((value) => ({
     value,
     label: t(`genders.${value}`),
@@ -141,6 +145,29 @@ export function DetailsForm() {
           inputMode="numeric"
           error={errors.max_age_treated}
           {...form.register("max_age_treated")}
+        />
+        <FormTextField
+          id="session_price_min"
+          label={t("priceMin")}
+          placeholder={t("priceMinPlaceholder")}
+          description={t("priceMinHint")}
+          inputMode="decimal"
+          // Amounts read left to right, the currency after them
+          dir="ltr"
+          suffix={currency}
+          error={errors.session_price_min}
+          {...form.register("session_price_min")}
+        />
+        <FormTextField
+          id="session_price_max"
+          label={t("priceMax")}
+          placeholder={t("priceMaxPlaceholder")}
+          description={t("priceMaxHint")}
+          inputMode="decimal"
+          dir="ltr"
+          suffix={currency}
+          error={errors.session_price_max}
+          {...form.register("session_price_max")}
         />
       </div>
     </FormCard>

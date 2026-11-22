@@ -30,7 +30,8 @@
         "INVALID_FORMAT": "Check the format and try again"
       },
       "wholeNumber": "Enter a whole number, like 5",
-      "tooLarge": "Enter {max} or less"
+      "tooLarge": "Enter {max} or less",
+      "amount": "Enter an amount like 40 or 40.50"
     }
   },
   "PhoneInput": {
@@ -361,6 +362,14 @@
       "maxAgePlaceholder": "18",
       "ageHint": "In years. Leave blank for no limit.",
       "ageRange": "Must be at least the youngest age",
+      "priceMin": "Price per session, from",
+      "priceMinPlaceholder": "40",
+      "priceMinHint": "Leave empty to show no price",
+      "priceMax": "Up to",
+      "priceMaxPlaceholder": "60",
+      "priceMaxHint": "Leave empty for a fixed price",
+      "priceNeedsMin": "Fill in the starting price first",
+      "priceRange": "Must be at least the starting price",
       "save": "Save details",
       "saving": "Saving…",
       "saved": "Saved"

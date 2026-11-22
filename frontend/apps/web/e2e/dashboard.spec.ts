@@ -35,6 +35,7 @@ test.describe("specialist dashboard", () => {
     await page.getByLabel("WhatsApp number").fill("70")
     await page.getByLabel("Youngest age you see").fill("12")
     await page.getByLabel("Oldest age you see").fill("3")
+    await page.getByLabel("Up to").fill("60")
     await page.getByRole("button", { name: "Save details" }).click()
     await expect(
       page.getByText("Enter a valid phone number for this country")
@@ -42,11 +43,16 @@ test.describe("specialist dashboard", () => {
     await expect(
       page.getByText("Must be at least the youngest age")
     ).toBeVisible()
+    await expect(
+      page.getByText("Fill in the starting price first")
+    ).toBeVisible()
 
     // No geo-IP header locally: the field starts on Lebanon
     await page.getByLabel("WhatsApp number").fill("70123456")
     await page.getByLabel("Oldest age you see").fill("18")
     await page.getByLabel("Years of experience").fill("8")
+    // A comma works as the decimal point
+    await page.getByLabel("Price per session, from").fill("40,50")
     await page.getByLabel("Main language").click()
     await page.getByRole("option", { name: "Arabic" }).click()
     await page.getByRole("button", { name: "Save details" }).click()
@@ -63,6 +69,8 @@ test.describe("specialist dashboard", () => {
     // Both stick after a reload, and the overview counts them
     await page.reload()
     await expect(page.getByLabel("Years of experience")).toHaveValue("8")
+    await expect(page.getByLabel("Price per session, from")).toHaveValue("40.5")
+    await expect(page.getByLabel("Up to")).toHaveValue("60")
     await expect(bio).toHaveValue("I help children find their words.")
     await page.getByRole("link", { name: "Overview" }).first().click()
     await expect(page.getByText("2 of 6 done")).toBeVisible()

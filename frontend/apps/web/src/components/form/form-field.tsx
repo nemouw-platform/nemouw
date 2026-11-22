@@ -1,5 +1,11 @@
 import { Field, FieldError, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@workspace/ui/components/input-group"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { cn } from "@workspace/ui/lib/utils"
 import type { FieldError as FormFieldError } from "react-hook-form"
@@ -145,22 +151,39 @@ export function splitFieldProps<T extends FieldOwnProps>(
 }
 
 /** FormField with a text input; `className` styles the input, like on <Input> */
-export function FormTextField(
-  props: FieldOwnProps &
-    PlaceholderProps &
-    Omit<React.ComponentProps<typeof Input>, "id" | "placeholder">
-) {
+export function FormTextField({
+  suffix,
+  ...props
+}: FieldOwnProps &
+  PlaceholderProps &
+  Omit<React.ComponentProps<typeof Input>, "id" | "placeholder"> & {
+    /** Shown at the end of the box, e.g. a unit or currency ("USD") */
+    suffix?: React.ReactNode
+  }) {
   const [field, { className, ...inputProps }] = splitFieldProps(props)
   return (
     <FormField {...field}>
-      {(control) => (
-        <Input
-          {...control}
+      {(control) =>
+        suffix ? (
           // White like the cards, so fields stand out on the lavender page
-          className={cn("h-10 bg-card", className)}
-          {...inputProps}
-        />
-      )}
+          // A dir (e.g. "ltr" for amounts) covers the suffix too: "40 USD"
+          <InputGroup
+            dir={inputProps.dir}
+            className={cn("h-10 bg-card", className)}
+          >
+            <InputGroupInput {...control} {...inputProps} />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>{suffix}</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+        ) : (
+          <Input
+            {...control}
+            className={cn("h-10 bg-card", className)}
+            {...inputProps}
+          />
+        )
+      }
     </FormField>
   )
 }
