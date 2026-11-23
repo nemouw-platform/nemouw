@@ -24,7 +24,12 @@ export const AFTER_SIGNUP_PATH = "/onboarding"
 /** A specialist's home once onboarded: their profile and its setup */
 export const DASHBOARD_PATH = "/dashboard"
 
+/** Syndicate staff's home: their review queue */
+export const SYNDICATE_PATH = "/syndicate"
+
 /** Where a signed-in user lands (after logging in, or sent away from a guest page) */
 export function homePathFor(role: Role): string {
-  return role === "specialist" ? DASHBOARD_PATH : "/"
+  if (role === "specialist") return DASHBOARD_PATH
+  if (role === "syndicate_staff") return SYNDICATE_PATH
+  return "/"
 }

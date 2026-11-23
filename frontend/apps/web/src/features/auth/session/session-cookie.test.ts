@@ -19,7 +19,7 @@ function jwt(payload: object): string {
 }
 
 describe("readAccessToken", () => {
-  it("reads a session token's role", () => {
+  it("reads a session token's role and user", () => {
     const token = jwt({
       sub: "u1",
       role: "specialist",
@@ -29,6 +29,7 @@ describe("readAccessToken", () => {
     expect(readAccessToken(token, NOW)).toEqual({
       kind: "session",
       role: "specialist",
+      userId: "u1",
     })
   })
 
@@ -46,6 +47,7 @@ describe("readAccessToken", () => {
     ["expired", jwt({ role: "specialist", sid: "s1", exp: inSeconds(-1) })],
     ["no expiry", jwt({ role: "specialist", sid: "s1" })],
     ["no session id", jwt({ role: "specialist", exp: inSeconds(600) })],
+    ["no subject", jwt({ role: "specialist", sid: "s1", exp: inSeconds(600) })],
     ["not a JWT", "garbage"],
     ["broken payload", "a.%%%.c"],
   ])("returns null for %s", (_, token) => {
@@ -53,10 +55,16 @@ describe("readAccessToken", () => {
   })
 
   it("decodes non-ASCII payloads (UTF-8)", () => {
-    const token = jwt({ role: "patient", sid: "é", exp: inSeconds(60) })
+    const token = jwt({
+      sub: "u1",
+      role: "patient",
+      sid: "é",
+      exp: inSeconds(60),
+    })
     expect(readAccessToken(token, NOW)).toEqual({
       kind: "session",
       role: "patient",
+      userId: "u1",
     })
   })
 })

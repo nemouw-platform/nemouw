@@ -12,7 +12,9 @@ and password reset.
      which the reset test reads
    - `DEV_FIXED_OTP=000000`: every sign-up code is `000000`
    - `ALLOW_LOCALHOST_ORIGINS=true`
-2. Reference data (one country, two specialties, two syndicates and common conditions).
+2. Reference data (one country, two specialties, two syndicates and common
+   conditions) and the speech therapists' syndicate owner, `owner@syndicate.example`
+   (the syndicate tests set its password through "Forgot password" on their first run).
    `docker compose up` loads it through the `seed` service; to load it by hand:
    ```bash
    docker exec -i nemouw-db-1 psql -U postgres -d nemouw < apps/web/e2e/fixtures/dev-seed.sql

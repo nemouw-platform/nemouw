@@ -35,6 +35,13 @@ export type SpecialistProfileResponse = Schemas["SpecialistProfileResponse"]
 export type SpecialistProfileWriteRequest =
   Schemas["SpecialistProfileWriteRequest"]
 export type SyndicateSummary = Schemas["SyndicateSummary"]
+/** A syndicate with its contact details and owner (staff and admins) */
+export type SyndicateResponse = Schemas["SyndicateResponse"]
+export type SyndicateUpdateRequest = Schemas["SyndicateUpdateRequest"]
+/** A staff member of a syndicate; exactly one per syndicate is the owner */
+export type SyndicateStaffResponse = Schemas["SyndicateStaffResponse"]
+export type SyndicateStaffInviteRequest = Schemas["SyndicateStaffInviteRequest"]
+export type UserSummary = Schemas["UserSummary"]
 
 /** A stored public image: its URL changes on every upload */
 export type ImageResponse = Schemas["ImageResponse"]

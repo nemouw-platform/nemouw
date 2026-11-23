@@ -46,3 +46,32 @@ FROM (VALUES
   ('hearing_loss', 'Hearing loss', 'Perte auditive', 'ضعف السمع')
 ) AS v(code, label, label_fr, label_ar)
 ON CONFLICT (code) DO NOTHING;
+
+-- The speech therapists' syndicate owner, as a pending account (like one an
+-- admin invited). It has no password: activate it with "Forgot password" on
+-- the login page, which emails a link (Mailpit in development) to set one.
+WITH owner AS (
+  INSERT INTO users (role_id, country_id, first_name, last_name)
+  SELECT r.id, c.id, 'Rana', 'Haddad'
+  FROM user_roles r
+  JOIN countries c ON c.iso_code = 'LB'
+  WHERE r.code = 'syndicate_staff'
+    AND NOT EXISTS (
+      SELECT 1 FROM user_identifiers
+      WHERE identifier_type = 'email' AND identifier = 'owner@syndicate.example'
+    )
+    -- A syndicate has one owner: leave one created another way alone
+    AND NOT EXISTS (
+      SELECT 1 FROM syndicate_staff ss
+      JOIN syndicates s ON s.id = ss.syndicate_id
+      WHERE s.name = 'Lebanese Syndicate of Speech Therapists' AND ss.is_owner
+    )
+  RETURNING id
+), email AS (
+  INSERT INTO user_identifiers (user_id, identifier_type, identifier, is_primary)
+  SELECT id, 'email', 'owner@syndicate.example', true FROM owner
+)
+INSERT INTO syndicate_staff (syndicate_id, user_id, title, is_owner)
+SELECT s.id, owner.id, 'President', true
+FROM owner
+JOIN syndicates s ON s.name = 'Lebanese Syndicate of Speech Therapists';

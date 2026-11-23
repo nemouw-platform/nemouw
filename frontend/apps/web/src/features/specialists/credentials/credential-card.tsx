@@ -1,6 +1,6 @@
 "use client"
 
-import type { CredentialResponse } from "@workspace/api"
+import type { CredentialResponse, DocumentAccessResponse } from "@workspace/api"
 import { Button } from "@workspace/ui/components/button"
 import {
   Card,
@@ -26,21 +26,30 @@ import { StatusBadge } from "@/features/dashboard/status-badge"
 import { useDocumentLink } from "@/features/specialists/credentials/use-credentials"
 import { credentialsApi } from "@/lib/api"
 
-interface CredentialCardProps {
+interface CredentialCardFrameProps {
   credential: CredentialResponse
-  onEdit: () => void
-  onWithdrawn: (id: string) => void
+  /** Under the header, e.g. why it was rejected */
+  notice?: React.ReactNode
+  /** Fetches a short-lived link to the document; adds "View document" */
+  getDocumentLink?: () => Promise<DocumentAccessResponse>
+  /** The actions after "View document" */
+  children?: React.ReactNode
 }
 
-/** One credential: what it is, where its review stands, and its actions */
-export function CredentialCard({
+/**
+ * One credential as a card: what it is, where its review stands, its
+ * document, and the actions of whoever is looking (its specialist, or a
+ * reviewer)
+ */
+export function CredentialCardFrame({
   credential,
-  onEdit,
-  onWithdrawn,
-}: CredentialCardProps) {
+  notice,
+  getDocumentLink,
+  children,
+}: CredentialCardFrameProps) {
   const t = useTranslations("Credentials")
   const format = useFormatter()
-  const link = useDocumentLink(credential.id)
+  const link = useDocumentLink(getDocumentLink)
   const status = credential.verification_status ?? "pending"
   // Date-only values: read and shown as calendar days, whatever the time zone
   const day = (value: string) =>
@@ -85,15 +94,9 @@ export function CredentialCard({
         </CardAction>
       </CardHeader>
 
-      {status === "rejected" && (
+      {notice && (
         <CardContent>
-          <FormAlert>
-            {credential.rejection_reason
-              ? t("card.rejectedBecause", {
-                  reason: credential.rejection_reason,
-                })
-              : t("card.rejected")}
-          </FormAlert>
+          <FormAlert>{notice}</FormAlert>
         </CardContent>
       )}
       {link.failed && (
@@ -103,7 +106,7 @@ export function CredentialCard({
       )}
 
       <CardFooter className="flex-wrap justify-end gap-2 py-3">
-        {credential.document && (
+        {credential.document && getDocumentLink && (
           <Button
             variant="ghost"
             size="sm"
@@ -121,16 +124,46 @@ export function CredentialCard({
             {t("card.view")}
           </Button>
         )}
-        <WithdrawButton credential={credential} onWithdrawn={onWithdrawn} />
-        {/* A verified credential cannot change: withdraw it and add a new one */}
-        {status !== "verified" && (
-          <Button variant="outline" size="sm" onClick={onEdit}>
-            <PencilIcon data-icon="inline-start" />
-            {t("card.edit")}
-          </Button>
-        )}
+        {children}
       </CardFooter>
     </Card>
+  )
+}
+
+/** A specialist's own credential: withdraw it, or edit it while under review */
+export function CredentialCard({
+  credential,
+  onEdit,
+  onWithdrawn,
+}: {
+  credential: CredentialResponse
+  onEdit: () => void
+  onWithdrawn: (id: string) => void
+}) {
+  const t = useTranslations("Credentials")
+  const status = credential.verification_status ?? "pending"
+  const id = credential.id
+
+  return (
+    <CredentialCardFrame
+      credential={credential}
+      getDocumentLink={id ? () => credentialsApi.documentLink(id) : undefined}
+      notice={
+        status === "rejected" &&
+        (credential.rejection_reason
+          ? t("card.rejectedBecause", { reason: credential.rejection_reason })
+          : t("card.rejected"))
+      }
+    >
+      <WithdrawButton credential={credential} onWithdrawn={onWithdrawn} />
+      {/* A verified credential cannot change: withdraw it and add a new one */}
+      {status !== "verified" && (
+        <Button variant="outline" size="sm" onClick={onEdit}>
+          <PencilIcon data-icon="inline-start" />
+          {t("card.edit")}
+        </Button>
+      )}
+    </CredentialCardFrame>
   )
 }
 

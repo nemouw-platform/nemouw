@@ -574,5 +574,148 @@
       "saving": "Saving…",
       "saved": "Saved"
     }
+  },
+  "Syndicate": {
+    "nav": {
+      "label": "Syndicate",
+      "review": "Reviews",
+      "staff": "Staff",
+      "settings": "Syndicate details"
+    },
+    "noSyndicate": {
+      "title": "You're not on a syndicate's staff",
+      "description": "This account isn't on any syndicate's staff, so there is nothing to review. Ask your syndicate's owner to invite you again."
+    },
+    "status": {
+      "pending": "To review",
+      "active": "Verified",
+      "rejected": "Rejected",
+      "suspended": "Suspended"
+    },
+    "reason": {
+      "label": "Reason",
+      "placeholder": "The licence number doesn't match our register.",
+      "hint": "The specialist reads this in their dashboard, so say what to fix.",
+      "cancel": "Cancel",
+      "sending": "Sending…"
+    },
+    "queue": {
+      "metaTitle": "Reviews",
+      "title": "Reviews",
+      "description": "Specialists who chose {syndicate}, with the credentials they sent you. Check each one against your register.",
+      "filters": "Show",
+      "filter": {
+        "toReview": "To review",
+        "verified": "Verified",
+        "rejected": "Rejected",
+        "all": "All"
+      },
+      "empty": {
+        "toReview": "Nothing to review. New specialists show here once they send a credential.",
+        "verified": "You haven't verified anyone yet.",
+        "rejected": "You haven't rejected anyone.",
+        "all": "No specialist has sent your syndicate a credential yet."
+      },
+      "pendingCredentials": "{count, plural, one {# credential to review} other {# credentials to review}}",
+      "credentialsReviewed": "Credentials reviewed"
+    },
+    "specialist": {
+      "metaTitle": "Review a specialist",
+      "back": "All reviews",
+      "title": "Review a specialist",
+      "description": "Check their credentials first, then decide on the specialist. Verifying credentials doesn't verify the specialist.",
+      "notFound": "We couldn't find this specialist. Go back to your reviews and open them from there.",
+      "memberNumber": "Member no. {number}",
+      "joined": "Joined {date}",
+      "reviewed": "Last decision {date}",
+      "explain": {
+        "pending": "Not reviewed yet. Patients can't find them until you verify them.",
+        "active": "Verified: patients can find them in search.",
+        "rejected": "Rejected: patients can't find them. Verifying them later brings them back."
+      },
+      "rejectedBecause": "You rejected them: {reason}",
+      "suspendedNotice": "This account is suspended: it can't log in and doesn't show in search.",
+      "verify": "Verify specialist",
+      "reject": "Reject specialist",
+      "rejectTitle": "Reject this specialist?",
+      "rejectDescription": "@{username} won't show in search. They'll see your reason in their dashboard.",
+      "rejectSubmit": "Reject specialist",
+      "suspend": {
+        "action": "Suspend",
+        "title": "Suspend this account?",
+        "description": "@{username} won't be able to log in, and patients won't find them, until you lift the suspension.",
+        "confirm": "Suspend",
+        "cancel": "Cancel"
+      },
+      "unsuspend": "Lift suspension",
+      "credentialsTitle": "Credentials",
+      "credentialsDescription": "Open each document and compare it with your register.",
+      "credentialsEmpty": "This specialist hasn't sent a credential yet."
+    },
+    "credential": {
+      "verify": "Verify",
+      "reject": "Reject",
+      "rejectTitle": "Reject this credential?",
+      "rejectDescription": "“{title}” will show as rejected, with your reason, until the specialist sends it again.",
+      "rejectSubmit": "Reject credential",
+      "rejectedBecause": "Rejected: {reason}"
+    },
+    "staff": {
+      "metaTitle": "Staff",
+      "title": "Staff",
+      "description": "Everyone who reviews specialists for your syndicate. Only the owner can invite or remove staff.",
+      "ownerDescription": "Everyone who reviews specialists for your syndicate. Invite colleagues, change their titles, or remove them.",
+      "invite": "Invite staff",
+      "you": "(you)",
+      "owner": "Owner",
+      "invited": "Invite sent",
+      "edit": "Edit",
+      "remove": {
+        "action": "Remove",
+        "title": "Remove this staff member?",
+        "description": "{name} loses access right away, and their account is deleted.",
+        "confirm": "Remove",
+        "cancel": "Keep them"
+      },
+      "form": {
+        "inviteTitle": "Invite staff",
+        "inviteDescription": "We'll email them a link to set their password. It works for 24 hours.",
+        "firstName": "First name",
+        "firstNamePlaceholder": "Rana",
+        "lastName": "Last name",
+        "lastNamePlaceholder": "Haddad",
+        "email": "Email",
+        "emailPlaceholder": "rana@syndicate.org.lb",
+        "emailHint": "The invite goes to this address",
+        "emailTaken": "This email already has a Nemouw account.",
+        "title": "Title",
+        "titlePlaceholder": "Registrar",
+        "invite": "Send invite",
+        "sending": "Sending…",
+        "cancel": "Cancel",
+        "editTitle": "Edit title",
+        "editDescription": "{name}'s role in your syndicate.",
+        "save": "Save",
+        "saving": "Saving…"
+      }
+    },
+    "settings": {
+      "metaTitle": "Syndicate details",
+      "title": "Syndicate details",
+      "description": "Your syndicate's name and how to reach it.",
+      "detailsTitle": "Name and contact",
+      "detailsDescription": "Specialists see these when they choose their syndicate.",
+      "readOnly": "Only your syndicate's owner can change these.",
+      "name": "Name",
+      "namePlaceholder": "Lebanese Syndicate of Speech Therapists",
+      "email": "Contact email",
+      "emailPlaceholder": "contact@syndicate.org.lb",
+      "phone": "Contact phone",
+      "phoneFormat": "Enter a valid phone number",
+      "keepHint": "Leave empty to keep the current one",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved"
+    }
   }
 }
