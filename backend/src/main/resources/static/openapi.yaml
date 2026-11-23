@@ -1644,7 +1644,7 @@ paths:
         - Specialists
       summary: Update the authenticated specialist's profile
       description: |
-        Partial update. syndicate_id is locked after verification and needs syndicate_member_number in the same request. min_age_treated must not exceed max_age_treated.
+        Partial update. syndicate_id and syndicate_member_number are locked after verification; changing syndicate_id needs syndicate_member_number in the same request.
       requestBody:
         required: true
         content:
@@ -1661,15 +1661,22 @@ paths:
         "403":
           $ref: "#/components/responses/OnboardingRequired"
         "409":
-          description: Username or member number taken, or syndicate locked after verification
+          description: Username or member number taken, or syndicate or member number locked after verification
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-              example:
-                status: 409
-                code: SYNDICATE_LOCKED
-                message: The syndicate cannot be changed after verification
+              examples:
+                syndicateLocked:
+                  value:
+                    status: 409
+                    code: SYNDICATE_LOCKED
+                    message: The syndicate cannot be changed after verification
+                memberNumberLocked:
+                  value:
+                    status: 409
+                    code: MEMBER_NUMBER_LOCKED
+                    message: The member number cannot be changed after verification
         "422":
           $ref: "#/components/responses/ValidationError"
   # ---------------------------------------------------------------------
@@ -3171,14 +3178,18 @@ components:
         years_of_experience:
           type: integer
           nullable: true
+          minimum: 0
+          maximum: 100
         min_age_treated:
           type: integer
           nullable: true
           minimum: 0
+          maximum: 100
         max_age_treated:
           type: integer
           nullable: true
           minimum: 0
+          maximum: 100
         session_price_min:
           type: number
           nullable: true

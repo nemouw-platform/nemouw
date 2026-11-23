@@ -48,14 +48,15 @@ The full walk-through (env values, API docs, activating the created user, troubl
 
 ## Documentation
 
-| Document                                                               | Covers                                                               |
-|------------------------------------------------------------------------|----------------------------------------------------------------------|
-| [Running Nemouw with Docker](docs/docker/README.md)                    | The whole platform in Docker: first run, everyday commands           |
-| [Backend setup and run guide](docs/backend/Setup.md)                   | Docker setup, env values, run, tests, create a user, troubleshooting |
-| [Authentication](docs/backend/user/README.md)                          | Sign-up, login, sessions, password reset, cookies, security model    |
-| [Error handling](docs/backend/errors/README.md)                        | Error response format, status codes, rate limiting                   |
-| [Specialist discovery](docs/backend/specialist/Discovery.md)           | Public search, filters, sorting and specialist profiles              |
-| [Package-by-feature architecture](docs/backend/architecture/README.md) | Package layout, module boundaries, conventions                       |
-| [Frontend](frontend/README.md)                                         | Next.js apps and shared packages                                     |
+| Document                                                               | Covers                                                                                          |
+|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| [Running Nemouw with Docker](docs/docker/README.md)                    | The whole platform in Docker: first run, everyday commands                                      |
+| [Backend setup and run guide](docs/backend/Setup.md)                   | Docker setup, env values, run, tests, create a user, troubleshooting                            |
+| [Authentication](docs/backend/user/README.md)                          | Sign-up, login, sessions, password reset, cookies, security model                               |
+| [Error handling](docs/backend/errors/README.md)                        | Error response format, status codes, rate limiting                                              |
+| [Specialist discovery](docs/backend/specialist/Discovery.md)           | Public search, filters, sorting and specialist profiles                                         |
+| [Specialist verification](docs/backend/specialist/Verification.md)     | Reviewer permissions, specialist verification and suspension, credential approval and rejection |
+| [Package-by-feature architecture](docs/backend/architecture/README.md) | Package layout, module boundaries, conventions                                                  |
+| [Frontend](frontend/README.md)                                         | Next.js apps and shared packages                                                                |
 
 The OpenAPI contract is the source of truth for endpoints: `backend/src/main/resources/static/openapi.yaml`. When `API_DOCS_ENABLED=true`, Swagger UI is served at `http://localhost:8080/swagger-ui.html`.

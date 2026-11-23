@@ -34,4 +34,4 @@ COPY --from=extract /extract/extracted/application/ ./
 # Run as a non-root user
 USER app
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "application.jar"]
+ENTRYPOINT ["java", "--enable-native-access=ALL-UNNAMED", "-jar", "application.jar"]

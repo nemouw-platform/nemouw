@@ -3,14 +3,12 @@ package com.nemouw;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Arrays;
 import java.util.Map;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableScheduling
 public class NemouwBackendApplication {
 
 	static void main(String[] args) {
