@@ -39,6 +39,23 @@ public final class Errors {
         return new ApiException(ErrorCode.INVALID_TOKEN, "Invalid or expired refresh token");
     }
 
+    // ---- Account management ----
+    public static ApiException cannotSuspendTarget() {
+        return new ApiException(ErrorCode.INVALID_TARGET, "Target account cannot be suspended through this endpoint");
+    }
+
+    public static ApiException cannotUnsuspendTarget() {
+        return new ApiException(ErrorCode.INVALID_TARGET, "Target account cannot be unsuspended through this endpoint");
+    }
+
+    public static ApiException cannotSuspendPending() {
+        return new ApiException(ErrorCode.INVALID_TARGET, "A pending account cannot be suspended");
+    }
+
+    public static ApiException cannotSuspendSelf() {
+        return new ApiException(ErrorCode.INVALID_TARGET, "You cannot suspend your own account");
+    }
+
     // ---- Request ----
     static ApiException malformedJson(String message) {
         return new ApiException(ErrorCode.MALFORMED_JSON, message);

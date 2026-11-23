@@ -46,6 +46,7 @@ public enum ErrorCode {
     LOCATION_ALREADY_EXISTS(409, "This location is already saved"),
     PRIMARY_LOCATION_REQUIRED(409, "A primary location is required, make another location primary first"),
     CREDENTIAL_VERIFIED(409, "A verified credential cannot be changed, withdraw it and submit a new one"),
+    INVALID_TARGET(409, "Target account cannot be changed through this endpoint"),
     ACCOUNT_DELETED(409, "The account is deleted and awaiting purge"),
 
     // 413
